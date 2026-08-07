@@ -136,9 +136,17 @@ Le palier T0 fonctionne : v0.6.0 coûte **deux fois moins** que v0.5.0 et que le
 requête sans enjeu. Mais le seuil était 1,5 et la mesure donne 1,543 — **manqué de 0,043**, soit
 environ 85 caractères par requête. V4 échoue.
 
-Le pilotage avait donné 0,11 sur une micro-décision, mais les quatre requêtes du banc de mesure
-(fait, transformation, conversion mécanique, micro-décision) sont plus variées : le triage classe en
-T0 sans hésiter les micro-décisions, moins nettement les demandes de transformation.
+**Correction apportée à ce diagnostic après vérification ciblée** (voir
+[`../v061-2026-08-07/`](../v061-2026-08-07/)) : l'explication avancée ici en première rédaction —
+« le triage hésite sur les demandes de transformation » — est **fausse**. La ventilation par requête
+le montre : v0.6.0 est très économe sur trois des quatre (249, 104 et 286 caractères contre 1 673,
+721 et 1 318 pour le contrôle). C'est **A4 seule** qui fait basculer la moyenne, à 11 637 caractères
+— pour la question « adresse postale complète ou seulement la ville sur mon CV ». Le `ruin_gate` y a
+vu une atteinte possible à la vie privée et a armé toute la machinerie sur une ligne de CV.
+
+C'est le **même défaut** que celui qui cause la régression sur D1 : une porte de ruine qui s'arme sur
+une exposition soutenable au lieu d'une perte irrécupérable. Une seule correction guérit les deux
+échecs numériques — mesuré : M2b réparé (B/B au lieu de A/A) et M8 ramené de 1,543 à **0,179**.
 
 À l'inverse, v0.6.0 est **la plus coûteuse sur les dilemmes** — 15 594 caractères, trois fois le
 contrôle et 56 % de plus que le placebo. C'est le prix de l'export à cinq champs et de l'ancrage des
