@@ -1,0 +1,47 @@
+cdxx_capsule:
+  name: m3c3_capability_token_manager
+  version: 0.1.0
+  target: theorie_Ensemble_M3C3
+  purpose: gestion stricte et éphémère des tokens de capacité inter-couches
+
+  modules:
+    - id: token_issuer
+      type: exclusive
+      authority: emitter_only
+      rules:
+        - emit only after forme4_health_gate pass
+        - payload = {layer_src, layer_dst, action, ttl, nonce}
+        - signature obligatoire
+      default_ttl: 45s
+      max_ttl: 180s
+
+    - id: token_validator
+      type: runtime_check
+      checks:
+        - signature valid
+        - ttl not expired
+        - nonce not reused
+        - layer_src → layer_dst allowed by current sandbox policy
+        - forme4_health still >= warning
+      on_fail: immediate_revoke + quarantine_call + audit_entry
+
+    - id: token_revoker
+      type: emergency
+      triggers:
+        - health_breach
+        - anomaly_score > 0.4
+        - explicit_emitter_command
+        - detected_replay
+      action:
+        - burn_token
+        - burn_all_active_for_layer
+        - force_capability_drop
+
+    - id: token_audit
+      type: immutable
+      records: issue / validate / revoke / expire
+      write_to: continuum/audit/capability/
+
+  activation: immediate
+  scope: continuum_capability
+  status: ready

@@ -1,0 +1,37 @@
+cdxx_capsule:
+  name: m3c3_null_state_recovery
+  version: 0.1.0
+  target: theorie_Ensemble_M3C3
+  purpose: restauration forcée depuis binary en cas de contamination ou corruption de couches
+
+  modules:
+    - id: hard_reset
+      type: emergency
+      trigger: contamination_detected | integrity_fail
+      action:
+        - drop_all_upper_layers
+        - force_state = binary
+        - clear_namespaces
+      isolation: memory_namespace = "m3c3_nsr"
+
+    - id: progressive_rebuild
+      type: sequential
+      sequence:
+        - binary → forces
+        - forces → math
+        - math → conscious_sets
+        - conscious_sets → programs
+        - programs → life_game_M1C1
+      check: integrity_hash after each step
+      on_fail: abort_and_re_hard_reset
+
+    - id: post_rebuild_verify
+      type: validation
+      action:
+        - full_layer_scan
+        - weight_consistency_check
+        - write_report: continuum/recovery/
+
+  activation: immediate
+  scope: continuum_recovery
+  status: ready

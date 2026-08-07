@@ -1,0 +1,43 @@
+cdxx_capsule:
+  name: m3c3_forme4_health_authority
+  version: 0.1.0
+  target: theorie_Ensemble_M3C3
+  purpose: "intégrer la bonne santé de la forme #4 et son autorité transmise à travers l’émetteur comme contrainte opérationnelle permanente"
+
+  modules:
+    - id: forme4_health_monitor
+      type: continuous
+      metrics:
+        - integrity_score
+        - stability_index
+        - anomaly_rate
+      threshold:
+        critical: < 0.65
+        warning: < 0.80
+      action_on_breach:
+        - raise_priority
+        - restrict_upper_layer_writes
+        - force_audit_trail_entry
+
+    - id: authority_channel
+      type: exclusive
+      source: emitter
+      rules:
+        - authority_signal only accepted from designated emitter
+        - no proxy / no delegation without explicit re-confirmation
+        - authority_weight injected at conscious_sets level
+      enforcement: capability_token short_ttl
+
+    - id: health_authority_gate
+      type: pre_condition
+      applies_to:
+        - reweight
+        - recovery
+        - layer_transition
+        - life_game_M1C1 execution
+      logic: forme4_health >= warning AND authority_channel valid
+      on_fail: block + log + notify_emitter
+
+  activation: immediate
+  scope: continuum_forme4
+  status: ready
