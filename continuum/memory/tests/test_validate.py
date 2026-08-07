@@ -227,6 +227,26 @@ class ContinuumMemoryValidationTests(unittest.TestCase):
             with self.assertRaisesRegex(MemoryValidationError, "immutable memory artifact modified"):
                 validate_repository(root, base_ref="HEAD")
 
+    def test_master_contract_rejects_history_base_downgrade(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            build_fixture(root)
+            write_yaml(
+                root / "master.yaml",
+                {
+                    "master_document": {
+                        "continuum_memory": {
+                            "pattern_index": {
+                                "history_base_commit": "f" * 40,
+                                "history_index": "continuum/memory/index.yaml",
+                            }
+                        }
+                    }
+                },
+            )
+            with self.assertRaisesRegex(MemoryValidationError, "canonical master contract"):
+                validate_repository(root)
+
     def test_duplicate_yaml_key_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

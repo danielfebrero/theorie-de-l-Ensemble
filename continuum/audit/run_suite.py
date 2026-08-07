@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -17,6 +18,7 @@ import yaml
 AUDIT_ROOT = Path(__file__).resolve().parent
 REPO_ROOT = AUDIT_ROOT.parents[1]
 INTEGRATION_ROOT = REPO_ROOT / "continuum" / "weights" / "integration-reports"
+RELEASE_AUDIT_PATH = AUDIT_ROOT / "v2.0-2026-08-07" / "results.yaml"
 sys.path.insert(0, str(AUDIT_ROOT))
 sys.path.insert(0, str(INTEGRATION_ROOT))
 
@@ -145,6 +147,86 @@ def index_result() -> dict[str, Any]:
     }
 
 
+def release_audit_result(path: Path = RELEASE_AUDIT_PATH) -> dict[str, Any]:
+    failures: list[dict[str, str]] = []
+    try:
+        document = superset_check.load_yaml(path)
+        audit = document["release_candidate_audit"]
+        master = superset_check.load_yaml(REPO_ROOT / "master.yaml")["master_document"]
+    except (KeyError, OSError, TypeError, yaml.YAMLError) as exc:
+        return {
+            "checker": "release_candidate_audit",
+            "ok": False,
+            "path": str(path.relative_to(REPO_ROOT) if path.is_relative_to(REPO_ROOT) else path),
+            "failures": [{"code": "release_audit_input", "detail": str(exc)}],
+        }
+
+    def require(condition: bool, code: str, detail: str) -> None:
+        if not condition:
+            failures.append({"code": code, "detail": detail})
+
+    baseline = master.get("continuum_memory", {}).get("pattern_index", {}).get(
+        "history_base_commit"
+    )
+    actual_master_sha = hashlib.sha256((REPO_ROOT / "master.yaml").read_bytes()).hexdigest()
+    require(audit.get("schema_version") == 1, "release_audit_schema", "schema_version must be 1")
+    require(audit.get("framework_version") == "2.0.0", "release_audit_version", "framework_version must be 2.0.0")
+    require(audit.get("status") == "release_candidate", "release_audit_status", "status must remain release_candidate")
+    require(audit.get("canonical_activation") is False, "release_audit_activation", "candidate must not claim canonical activation")
+    require(
+        audit.get("implementation_baseline_commit") == baseline,
+        "release_audit_baseline",
+        "implementation baseline must match the canonical memory history base",
+    )
+    require(
+        audit.get("candidate", {}).get("master_sha256") == actual_master_sha,
+        "release_audit_master_hash",
+        "audit master SHA-256 is stale",
+    )
+    required = audit.get("local_gates", {}).get("required", {})
+    require(
+        required == {"pass": 15, "fail": 0, "not_run": 0},
+        "release_audit_required_gates",
+        "expected 15 required pass and no fail/not_run",
+    )
+    require(
+        audit.get("local_gates", {}).get("informational", {}).get("external_model_check")
+        == "not_run",
+        "release_audit_external_model_check",
+        "external model check must remain explicitly not_run",
+    )
+    test_suites = audit.get("test_suites")
+    expected_suites = {"runtime", "distribution", "conformance", "continuum_memory", "capsules"}
+    require(
+        isinstance(test_suites, dict) and set(test_suites) == expected_suites,
+        "release_audit_test_suites",
+        "test suite inventory is incomplete",
+    )
+    if isinstance(test_suites, dict):
+        for name in sorted(expected_suites):
+            item = test_suites.get(name, {})
+            require(
+                isinstance(item, dict)
+                and item.get("status") == "pass"
+                and isinstance(item.get("tests"), int)
+                and item["tests"] > 0,
+                "release_audit_test_result",
+                f"{name} must record a positive passing test count",
+            )
+    require(
+        isinstance(audit.get("limitations"), list) and bool(audit["limitations"]),
+        "release_audit_limitations",
+        "at least one explicit limitation is required",
+    )
+    return {
+        "checker": "release_candidate_audit",
+        "ok": not failures,
+        "path": str(path.relative_to(REPO_ROOT) if path.is_relative_to(REPO_ROOT) else path),
+        "baseline": baseline,
+        "failures": failures,
+    }
+
+
 def negative_test_result() -> dict[str, Any]:
     completed = subprocess.run(
         [sys.executable, str(AUDIT_ROOT / "test_conformance.py")],
@@ -255,6 +337,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         )
     )
     checks.append(index_result())
+    checks.append(release_audit_result())
     if not args.skip_negative:
         checks.append(negative_test_result())
     else:

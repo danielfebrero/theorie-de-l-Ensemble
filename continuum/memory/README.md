@@ -24,10 +24,11 @@ La classe de source `provider_attested` est réservée et refusée tant qu'aucun
 vérificateur d'identité/attestation n'est configuré. Un nom, un chemin et un
 hash auto-déclarés ne constituent pas une attestation fournisseur.
 
-Sur la branche de travail, `history_base` commence au tag v1 puis est épinglé
-au premier commit v2 contenant ces artefacts avant publication de la PR. Cette
-seconde étape rend aussi les nouvelles entrées v2 comparables octet pour octet ;
-un fichier absent de la base reste explicitement une addition candidate.
+`history_base` est épinglé au premier commit v2 contenant ces artefacts :
+`188f0bc517822e95cccc4ba1baaef9f11bc32b2c`. Le validateur exige la même ancre
+dans `master.yaml`, puis compare octet pour octet tous les artefacts déjà
+présents à cette base. Un fichier absent de la base reste explicitement une
+addition candidate jusqu'à une ancre ultérieure.
 
 Voir `master.yaml` → `continuum_memory`, `activation_policy` et
 `weight_integration_contract`.

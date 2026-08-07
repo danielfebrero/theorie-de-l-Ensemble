@@ -200,6 +200,15 @@ class UnifiedSuiteTests(unittest.TestCase):
         self.assertEqual(result["checks"][0]["checker"], "suite_input")
         self.assertIn("pinned", result["checks"][0]["detail"])
 
+    def test_release_audit_is_materialized_and_stale_input_fails(self) -> None:
+        self.assertTrue(run_suite.release_audit_result()["ok"])
+        with tempfile.NamedTemporaryFile("w", suffix=".yaml", encoding="utf-8") as handle:
+            handle.write("release_candidate_audit:\n  schema_version: 0\n")
+            handle.flush()
+            result = run_suite.release_audit_result(Path(handle.name))
+        self.assertFalse(result["ok"])
+        self.assertTrue(result["failures"])
+
 
 class IntegrationReportTests(unittest.TestCase):
     @classmethod

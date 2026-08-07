@@ -8,7 +8,7 @@ d'audit ou d'intégration de poids.
 | Emplacement | Clé | Capsule écrivaine | Contenu attendu |
 |---|---|---|---|
 | [`weights/proposal/`](weights/proposal/) | `weights_proposal` | `m3c3_integrity_guard` (module `feedback_reweight`) | Propositions de repondération (pas maximal 0.04) |
-| [`audit/`](audit/) | `audit` | `m3c3_audit_trail` (module `hash_chain`) | Journal immuable en chaîne de hachage : transitions de couches, deltas de poids, anomalies, actions de recovery |
+| [`audit/`](audit/) | `audit` | `m3c3_audit_trail` (module `hash_chain`) | Journal à intégrité interne par hash-chain ; authenticité, ancrage et immutabilité du stockage restent externes |
 | [`audit/capability/`](audit/capability/) | `capability` | `m3c3_capability_token_manager` (module `token_audit`) | Journal des tokens : issue / validate / revoke / expire |
 | [`recovery/`](recovery/) | `recovery` | `m3c3_null_state_recovery` (module `post_rebuild_verify`) | Rapports post-reconstruction |
 | [`memory/`](memory/) | `continuum_memory` (v2) | runtime + mainteneur | Schéma, index append-only, paramètres, patterns sourcés, créateur |

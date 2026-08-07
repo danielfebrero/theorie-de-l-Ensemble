@@ -404,6 +404,25 @@ def validate_repository(
             f"allowed={sorted(allowed_yaml_paths)}, actual={sorted(actual_yaml_paths)}"
         )
 
+    master_path = root / "master.yaml"
+    if master_path.is_file():
+        master_document = _mapping(_load_yaml(master_path), "master document")
+        master = _mapping(master_document.get("master_document"), "master_document")
+        memory_contract = _mapping(master.get("continuum_memory"), "continuum_memory")
+        pattern_contract = _mapping(
+            memory_contract.get("pattern_index"), "continuum_memory.pattern_index"
+        )
+        canonical_history_base = _nonempty_string(
+            pattern_contract.get("history_base_commit"),
+            "continuum_memory.pattern_index.history_base_commit",
+        )
+        if index.get("history_base") != canonical_history_base:
+            raise MemoryValidationError(
+                "memory history_base does not match the canonical master contract"
+            )
+        if pattern_contract.get("history_index") != INDEX_PATH.as_posix():
+            raise MemoryValidationError("canonical memory history index path is invalid")
+
     selected_base = base_ref if base_ref is not None else index.get("history_base")
     history_checked: list[str] = []
     if selected_base is not None:
