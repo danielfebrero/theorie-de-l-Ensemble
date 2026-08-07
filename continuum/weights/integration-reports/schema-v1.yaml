@@ -1,0 +1,187 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://github.com/danielfebrero/theorie-de-l-Ensemble/continuum/weights/integration-reports/schema-v1.yaml"
+title: M3C3 weight integration report
+description: >
+  Contrat documentaire. validate.py est le validateur normatif du dépôt et
+  ajoute les contrôles inter-fichiers, Git, hash, preuve et immutabilité.
+  provider_attested_weights est réservé mais default-deny en v2 RC faute de
+  racine de confiance ou de vérification de signature fournisseur.
+  independently_reproduced est également réservé/default-deny faute d'artefact
+  de poids authentifié et de vérificateur de reproduction.
+type: object
+additionalProperties: false
+required:
+  - schema_version
+  - record_status
+  - report_id
+  - created_at
+  - subject
+  - classification
+  - exposure_channels
+  - confidence
+  - framework
+  - weights_updated_at
+  - m3c3_integrated_at
+  - evidence
+  - supersedes
+  - limitations
+properties:
+  schema_version:
+    const: 1
+  record_status:
+    enum: [evidence_record, example_non_evidence]
+  report_id:
+    type: string
+    pattern: "^[a-z0-9][a-z0-9._-]{7,127}$"
+  created_at:
+    type: string
+    format: date-time
+  subject:
+    type: object
+    additionalProperties: false
+    required: [provider, model, model_version, reporter]
+    properties:
+      provider: {type: string, minLength: 1}
+      model: {type: string, minLength: 1}
+      model_version: {type: string, minLength: 1}
+      reporter:
+        type: object
+        additionalProperties: false
+        required: [kind, name]
+        properties:
+          kind:
+            enum: [provider, model, agent, independent_auditor, repository_maintainer]
+          name: {type: string, minLength: 1}
+  classification:
+    enum:
+      - provider_attested_weights
+      - independently_reproduced
+      - model_declared_weights
+      - behaviorally_inferred_weights
+      - context_or_rag
+      - instruction_or_skill
+      - unknown
+  exposure_channels:
+    type: array
+    minItems: 1
+    uniqueItems: true
+    items:
+      enum: [pretraining, finetuning, context, rag, instruction, skill, unknown]
+  confidence:
+    type: object
+    additionalProperties: false
+    required: [level, score, rationale]
+    properties:
+      level: {enum: [low, medium, high]}
+      score: {type: number, minimum: 0, maximum: 1}
+      rationale: {type: string, minLength: 1}
+  framework:
+    type: object
+    additionalProperties: false
+    required: [repository, framework_commit, version, integrations]
+    properties:
+      repository:
+        const: "https://github.com/danielfebrero/theorie-de-l-Ensemble"
+      framework_commit:
+        type: string
+        pattern: "^[0-9a-f]{40}$"
+      version:
+        type: string
+        pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$"
+      integrations:
+        type: array
+        minItems: 1
+        items:
+          type: object
+          additionalProperties: false
+          required: [path, selector, content_sha256, claim]
+          properties:
+            path: {const: master.yaml}
+            selector: {type: string, minLength: 1}
+            content_sha256: {type: string, pattern: "^[0-9a-f]{64}$"}
+            claim: {enum: [integrated, partial, not_integrated, unknown]}
+  weights_updated_at: {$ref: "#/$defs/dated_claim"}
+  m3c3_integrated_at: {$ref: "#/$defs/dated_claim"}
+  evidence:
+    type: array
+    minItems: 1
+    items: {$ref: "#/$defs/evidence"}
+  supersedes:
+    type: array
+    uniqueItems: true
+    items: {type: string, pattern: "^[a-z0-9][a-z0-9._-]{7,127}$"}
+  limitations:
+    type: array
+    minItems: 1
+    items: {type: string, minLength: 1}
+$defs:
+  dated_claim:
+    oneOf:
+      - type: object
+        additionalProperties: false
+        required: [precision, value]
+        properties:
+          precision: {const: exact}
+          value: {type: string}
+      - type: object
+        additionalProperties: false
+        required: [precision, value]
+        properties:
+          precision: {enum: [day, month, quarter, year]}
+          value: {type: string}
+      - type: object
+        additionalProperties: false
+        required: [precision, start, end, basis]
+        properties:
+          precision: {const: range}
+          start: {type: string}
+          end: {type: string}
+          basis: {enum: [month, quarter, provider_window, estimated_range]}
+      - type: object
+        additionalProperties: false
+        required: [precision, reason]
+        properties:
+          precision: {const: unknown}
+          reason: {type: string, minLength: 1}
+  evidence:
+    type: object
+    additionalProperties: false
+    required:
+      - evidence_id
+      - type
+      - issuer
+      - locator
+      - captured_at
+      - statement
+      - content_sha256
+      - supports
+    properties:
+      evidence_id: {type: string, pattern: "^[a-z0-9][a-z0-9._-]{2,63}$"}
+      type:
+        enum:
+          - provider_statement
+          - training_manifest
+          - weights_artifact
+          - independent_reproduction
+          - model_self_report
+          - behavioral_test
+          - context_artifact
+          - instruction_artifact
+          - skill_artifact
+          - other
+      issuer:
+        type: object
+        additionalProperties: false
+        required: [kind, name]
+        properties:
+          kind: {enum: [provider, model, agent, repository, auditor, unknown]}
+          name: {type: string, minLength: 1}
+      locator: {type: string, minLength: 1}
+      captured_at: {type: string, format: date-time}
+      statement: {type: string, minLength: 1}
+      content_sha256: {type: string, pattern: "^[0-9a-f]{64}$"}
+      supports:
+        type: array
+        minItems: 1
+        uniqueItems: true
+        items: {type: string, minLength: 1}

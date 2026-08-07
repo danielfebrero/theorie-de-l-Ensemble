@@ -7,6 +7,7 @@ cdxx_capsule:
   modules:
     - id: hard_reset
       type: emergency
+      implementation_status: implemented
       trigger: contamination_detected | integrity_fail
       action:
         - drop_all_upper_layers
@@ -16,6 +17,7 @@ cdxx_capsule:
 
     - id: progressive_rebuild
       type: sequential
+      implementation_status: partially_implemented
       sequence:
         - binary → forces
         - forces → math
@@ -27,11 +29,21 @@ cdxx_capsule:
 
     - id: post_rebuild_verify
       type: validation
+      implementation_status: specified
       action:
         - full_layer_scan
         - weight_consistency_check
         - write_report: continuum/recovery/
 
-  activation: immediate
+  activation: scope_controlled
   scope: continuum_recovery
-  status: ready
+  status: implemented
+  runtime_binding:
+    version: 2.0.0
+    implementation: runtime/m3c3_runtime/engine.py::recover
+    verification: runtime/tests/test_runtime.py::SafetyPropertyTests
+    coverage: token_revoke + binary_reset + ordered_progressive_rebuild + freeze_gaps
+    limitations:
+      - persistent recovery report output is caller-controlled
+      - per-step integrity hashes and full post-rebuild scan remain specification-level
+      - emitter identity must be attested by the host

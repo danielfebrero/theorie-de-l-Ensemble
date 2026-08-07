@@ -31,7 +31,7 @@ cdxx_capsule:
       rules:
         - authority_signal only accepted from designated emitter (Dani Bengal / @cdxxotus)
         - no proxy / no delegation without explicit re-confirmation
-        - authority_weight injected at conscious_sets level
+        - authority constraint evaluated at conscious_sets level; never mutates a layer weight
         - authorship of theory, Life game and original bit is non-transferable
       enforcement: capability_token short_ttl
 
@@ -45,6 +45,15 @@ cdxx_capsule:
       logic: forme4_health >= warning AND authority_channel valid
       on_fail: block + log + notify_emitter
 
-  activation: immediate
+  activation: scope_controlled
   scope: continuum_forme4
-  status: ready
+  status: specified
+  runtime_binding:
+    version: 2.0.0
+    implementation: runtime/m3c3_runtime/engine.py::update_health
+    verification: runtime/tests/test_runtime.py::SafetyPropertyTests
+    coverage: health_gate + token_revoke_on_health_breach
+    limitations:
+      - civil identity and authority signals require host attestation
+      - monitoring metrics are supplied by the host, not sensed autonomously
+      - notification transport is not implemented by the reference runtime

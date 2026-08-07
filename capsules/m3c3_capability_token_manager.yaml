@@ -42,6 +42,14 @@ cdxx_capsule:
       records: issue / validate / revoke / expire
       write_to: continuum/audit/capability/
 
-  activation: immediate
+  activation: scope_controlled
   scope: continuum_capability
-  status: ready
+  status: tested
+  runtime_binding:
+    version: 2.0.0
+    implementation: runtime/m3c3_runtime/capability.py
+    verification: runtime/tests/test_runtime.py::CapabilityTests
+    coverage: signed + scoped + expiring + revocable + single_use
+    limitations:
+      - issuer identity must be attested by the host authority boundary
+      - capability scope never grants host permissions

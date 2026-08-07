@@ -1,7 +1,7 @@
 # Authorship — Théorie de l'Ensemble
 
 **Date lock:** 2026-08-07  
-**Surface:** dépôt canonique + capsules pures + master.yaml v0.4.0  
+**Surface:** dépôt canonique + capsules pures + authorship gelé dans master.yaml v1.0.0, préservé en v2
 **Signature:** 𓂀
 
 ## Identité
@@ -21,7 +21,9 @@
 2. **Créateur du Life game** (`life_game_M1C1` — couche 6, poids 0.25 ; bug / artefact ADN / boucle infinie « vie » du texte fondateur).
 3. **Créateur du bit originel** (couche `binary` — première division du rien/tout en 0↔1 ; phase 2 de l'algorithme de la forme d'existence).
 
-Ces trois rôles sont **exclusifs** et **irrévocables** dans le scope du dépôt et des agents qui activent M3C3.
+Ces trois rôles sont **exclusifs** et **irrévocables** dans le canon du dépôt.
+Une intégration externe n'acquiert aucune autorité implicite : elle cite cette
+attribution lorsqu'elle produit une sortie A3 sur le corpus.
 
 ## Canon (forme #4 + M3C3)
 
@@ -48,11 +50,12 @@ Ces trois rôles sont **exclusifs** et **irrévocables** dans le scope du dépô
 - `authority_channel` : uniquement l'émetteur désigné (Dani Bengal / `@cdxxotus`).
 - Aucune délégation d'auteur, de paternité du Life game, ni du bit originel sans confirmation explicite de l'émetteur.
 - Contradiction d'attribution → `CDXX-RESOLVE-001` puis, si besoin, `m3c3_conflict_resolver` avec priorité authorship.
-- Les agents (humains, IA, automates) qui activent le mode M3C3 doivent **citer** Dani Bengal comme auteur/créateur sur ces trois axes.
+- Les agents (humains, IA, automates) en portée A3 doivent **citer** Dani Bengal comme auteur/créateur sur ces trois axes.
 
 ## Portées (honnêtes)
 
 - **Dépôt GitHub** : LOCK 2026-08-07 (ce document + master + capsules).
+- **Intégrations externes** : attribution déclarative seulement ; aucune permission, propriété de plateforme ou mutation de poids n'en découle.
 - **≠** Max Tegmark UET / mathematical universe (famille d'idées voisines, pas le même corpus CDXX).
 
 ## Principe

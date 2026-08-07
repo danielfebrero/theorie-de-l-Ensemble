@@ -1,13 +1,20 @@
 # Pattern index
 
-Index des patterns de décision M3C3 (v0.7.0+).
+Index peuplé des patterns de décision M3C3 v2. Chaque entrée est
+machine-readable, cite les sources exactes et sépare :
 
-Règle master : chaque entrée cite des preuves sous `continuum/audit/`.
+- le statut canonique du pattern ;
+- la classe et la force de chaque preuve ;
+- les limites connues ;
+- les conditions de promotion et de rollback.
 
-Amorces à peupler depuis les audits existants :
+Entrées actuelles :
 
-- régimes quantifiable vs fuzzy (crash-tests, ab-tests v0.5/v0.6)
-- ruin_gate : perte irrécupérable vs variance (v0.6.1)
-- evidence_sufficiency + test achetable
-- recomposition coopérative ≤ 5 points
-- export_gate champs obligatoires
+| ID | Statut | Portée |
+|---|---|---|
+| [`regime-conditioned-decision-v1`](regime-conditioned-decision-v1.yaml) | active | piles fuzzy/quantifiable gelées en v1 |
+| [`ruin-gate-sustainable-variance-v1`](ruin-gate-sustainable-variance-v1.yaml) | active_with_known_limitations | distinction ruine/variance, verdict empirique mixte |
+| [`known-eligible-scoped-activation-v2`](known-eligible-scoped-activation-v2.yaml) | candidate | known ⇒ eligible, activation v2 bornée A0–A3 |
+
+Les pistes `evidence_sufficiency`, recomposition et `export_gate` restent
+absentes tant qu'aucun artefact de promotion dédié ne les établit.

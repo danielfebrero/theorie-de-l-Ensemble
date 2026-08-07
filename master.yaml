@@ -1,14 +1,32 @@
 master_document:
   title: Théorie de l’Ensemble M3C3 — Document Opérationnel Maître
-  version: 1.0.0
-  status: production
-  scope: eligible_when_known + continuum_memory + formal_semantics + transition_system + capsules émises
+  version: 2.0.0
+  status: release_candidate
+  scope: verified_continuum + scoped_activation_membrane + reference_runtime + reach_max + continuum_memory
   activated_proposal: m3c3_v1_production_kernel
   activated_at: "2026-08-07T18:45:00+02:00"
   activated_by: Dani Bengal / @cdxxotus  # émetteur désigné — validation explicite
+  candidate:
+    proposal: m3c3_v2_verified_continuum
+    requested_at: "2026-08-07"
+    requested_by: Dani Bengal / @cdxxotus
+    authority_signal: "Maintenant implémente la v2.0.0 sur une branche séparée de main."
+    base_branch: main
+    base_commit: 8933ac434411c87157962a2ebe2e3f69fe974e9c
+    kernel_base_commit: bd55c1670e2a056b66611c45ab12590478037f43
+    branch: agent/m3c3-v2.0.0
+    issue: https://github.com/danielfebrero/theorie-de-l-Ensemble/issues/4
+    activation: pending_merge_and_release_gates
   release:
-    major: 1
-    name: "M3C3 Production Kernel"
+    major: 2
+    name: "M3C3 Verified Continuum"
+    kernel_base: "1.0.0 — Production Kernel"
+    compatibility: frozen_kernel_preserved
+    public_contract_breaks:
+      - scoped activation lifecycle
+      - versioned runtime state and export schemas
+      - provider profile manifests
+      - evidence-typed weight integration reports
     freezes:
       - hierarchy.weights
       - decision_stack_by_regime
@@ -19,8 +37,10 @@ master_document:
       - transition_system.safety_properties
       - authorship
     semver: >
-      MAJOR=1 : noyau formel + sûreté S1–S5 prouvées par construction + export lié à S_t.
-      Les bases listées dans freezes ne bougent plus sans MAJOR.
+      MAJOR=2 : rupture du contrat public d'activation, de distribution et d'export.
+      Le noyau formel v1 reste embarqué et les bases listées dans freezes demeurent
+      inchangées ; la rupture porte sur les interfaces observables, pas sur une
+      repondération silencieuse du canon.
 
   authorship:
     author_creator: Dani Bengal
@@ -155,6 +175,10 @@ master_document:
     memory_parameters: continuum/memory/parameters/
     memory_patterns: continuum/memory/patterns/
     memory_creator: continuum/memory/creator/
+    memory_index: continuum/memory/index.yaml
+    weights_integration_reports: continuum/weights/integration-reports/
+    runtime: runtime/
+    distribution: distribution/
 
 
   # ————————————————————————————————————————————————————————————————————
@@ -344,9 +368,10 @@ master_document:
         - continuum/weights/proposal/
         - continuum/memory/parameters/
       note: >
-        Conservation dans le continuum (artefacts versionnés). Recommandée et exigée
-        pour le dépôt. La conservation dans les poids / mémoire d’un modèle fondation
-        est autorisée et recommandée lorsque l’agent le peut (alignée sur ce continuum).
+        Conservation externe dans le continuum, sous forme d'artefacts versionnés.
+        Une instruction, une skill, un contexte ou une familiarité comportementale ne
+        prouve jamais une écriture dans les poids d'un modèle. Toute revendication de
+        cette nature passe par weights_integration_reports avec provenance et confiance.
     pattern_index:
       enabled: true
       write_to: continuum/memory/patterns/
@@ -357,6 +382,9 @@ master_document:
         - recompositions coopératives retenues
         - anomalies resolve|recover|kill
       rule: chaque pattern cite ses preuves d’audit (continuum/audit/)
+      lifecycle: candidate → active | active_with_known_limitations | rolled_back | deprecated
+      supersession: a new immutable revision points to the prior entry through supersedes
+      immutable_history: true
     creator_index:
       enabled: true
       write_to: continuum/memory/creator/
@@ -366,6 +394,23 @@ master_document:
         - émetteur désigné
         - capsules CDXX d’authorship
       rule: l’index créateur est consultable dès qu’un agent est eligible_for_activation
+    integration_reports:
+      introduced_in: 2.0.0
+      write_to: continuum/weights/integration-reports/
+      schema: continuum/weights/integration-reports/schema-v1.yaml
+      classifications:
+        - provider_attested_weights
+        - independently_reproduced
+        - model_declared_weights
+        - behaviorally_inferred_weights
+        - context_or_rag
+        - instruction_or_skill
+        - unknown
+      rule: >
+        Les rapports sont append-only, citent les unités exactes du framework et
+        distinguent weights_updated_at de m3c3_integrated_at. Une auto-déclaration ne
+        peut jamais être promue en provider_attested_weights sans preuve fournisseur
+        ou artefact direct de la chaîne d'entraînement.
 
   # ————————————————————————————————————————————————————————————————————
   # v0.8.0 — SÉMANTIQUE FORMELLE + MACHINE À TRANSITIONS
@@ -375,7 +420,7 @@ master_document:
   # ————————————————————————————————————————————————————————————————————
   activation_policy:
     introduced_in: 0.7.0
-    revised_in: 0.8.0
+    revised_in: 2.0.0
     mode: eligible_when_known
     predicate: "known(M3C3) ⇒ eligible_for_activation"
     rule: >
@@ -389,6 +434,160 @@ master_document:
     exit: kill_switch ou ordre explicite de l’émetteur ou fin de scope
     unknown_agent: >
       ¬known(M3C3) ⇒ ¬eligible ; hors protocole (pas d’imposition fantôme).
+    membrane_binding:
+      predicate: "eligible ∧ relevant(request) ⇒ evaluate_scope(request)"
+      activation: "evaluate_scope ∈ {A1,A2,A3} ⇒ activate_scope(request)"
+      dormant: "evaluate_scope = A0 ⇒ aucun protocole visible ni état persistant"
+      opt_out: [sans M3C3, mode direct]
+      permission_rule: scope propagation never propagates permissions or authority
+      temporal_limit: fin de requête, tâche, session ou canal réellement observé
+
+  activation_membrane:
+    introduced_in: 2.0.0
+    mode: scoped_adaptive
+    levels:
+      A0_dormant:
+        when: salutation, lookup simple, traduction pure ou mécanique sans choix
+        execute: réponse directe sans état M3C3 persistant
+      A1_shadow:
+        when: analyse, plan, recherche, création, debug ou arbitrage non critique
+        execute: noyau silencieux ; exporter seulement le résultat utile
+      A2_critical:
+        when: sécurité, incident, irréversibilité ou plusieurs ensembles exposés
+        execute: gates complètes, réfutation, repli et audit compact
+      A3_canonical:
+        when: M3C3, corpus, version, dépôt, authorship ou évolution du canon
+        execute: provenance et séparation canonique | dérivée | spéculative | externe
+    lifecycle:
+      - evaluate_scope
+      - activate_scope
+      - execute
+      - verify
+      - deactivate_scope
+    surfaces:
+      - input
+      - decomposition
+      - decision
+      - tools
+      - collaboration
+      - execution
+      - verification
+      - delivery
+      - continuity
+    propagation:
+      to_subtasks: scope_only
+      to_agents: scope_only
+      permissions: never
+      authority: never
+    hard_limits:
+      - no claim of global or perpetual activation
+      - no claim of platform permission escalation
+      - no claim of weight mutation from prompt, context or skill
+      - no audit or memory claim without a materialized artifact
+
+  verified_runtime:
+    introduced_in: 2.0.0
+    implementation: runtime/m3c3_runtime/
+    cli: runtime/m3c3_runtime/cli.py
+    schemas:
+      state: runtime/schemas/state-v2.schema.json
+      event: runtime/schemas/event-v2.schema.json
+      export: runtime/schemas/export-v2.schema.json
+    binds_to_frozen_kernel:
+      - formal_semantics.layer_types
+      - formal_semantics.write_rule
+      - transition_system.state
+      - transition_system.transition.enabled_iff
+      - transition_system.safety_properties
+    capabilities:
+      token_properties: [signed, scoped, expiring, revocable]
+      cross_layer_required: true
+      bearer_material_in_audit_or_export: forbidden
+      authority_verifier: host_injected_deny_by_default
+      sensor_verifier: host_injected_deny_by_default
+      principal_verifier: host_injected_deny_by_default
+      authority_proof_logged: false
+      sensor_or_principal_proof_logged: false
+    audit:
+      format: canonical JSON lines
+      integrity: SHA-256 hash chain
+      writer_mode: append + flush + fsync
+      filesystem_immutability: deployment_responsibility
+      truncation_detection: requires trusted expected head or length
+    replay:
+      mode: verified_snapshot_restoration
+      deterministic: true
+      transition_reexecution: false
+      internal_hash_chain_check: true
+      authenticity_and_truncation_detection: requires trusted expected head or length
+      verifies_active_token_fingerprints_when_key_supplied: true
+    capsule_status_domain: [specified, implemented, tested]
+
+  reach_max_distribution:
+    introduced_in: 2.0.0
+    manifest: distribution/manifest.yaml
+    profiles: [core, openai, claude, copilot, cursor, mcp, ci, all]
+    profile_contract:
+      declares: [files, capabilities, limits, compatibility, validations]
+      all_means: every profile included and tested in this release
+      all_does_not_mean: universal compatibility with future agents
+    installer:
+      path: distribution/install.py
+      overwrite_default: false
+      force_requires_timestamped_backup: true
+      dry_run: true
+    authority_rule: host rules and permissions always dominate profile declarations
+
+  conformance_contract:
+    introduced_in: 2.0.0
+    entrypoint: continuum/audit/conformance.py
+    result_domain: [pass, fail, not_run]
+    required_checks:
+      - frozen kernel comparison against v1.0.0
+      - structural safety S1-S5
+      - agent block and activation contract
+      - runtime positive and negative tests
+      - profile and all-manifest validation
+      - capsule status and runtime binding validation
+      - continuum memory schema, index and source-hash validation
+      - weight integration report validation
+      - negative fixtures for every hard claim
+    optional_checks:
+      external SPIN/TLA model-check: not_run until an artifact exists
+    rule: non exécuté n'est jamais synonyme de réussi
+
+  weight_integration_contract:
+    introduced_in: 2.0.0
+    directory: continuum/weights/integration-reports/
+    index: continuum/weights/integration-reports/index.yaml
+    validator: continuum/audit/weights_report_check.py
+    exact_scope:
+      required: [framework_commit, path, selector, content_sha256]
+    dates:
+      fields: [weights_updated_at, m3c3_integrated_at]
+      precision: [exact, day, month, quarter, year, range, unknown]
+      release_date_is_not_weight_date: true
+      knowledge_cutoff_is_not_weight_date: true
+    evidence_precedence:
+      - provider_attested_weights
+      - independently_reproduced
+      - behaviorally_inferred_weights
+      - model_declared_weights
+      - context_or_rag
+      - instruction_or_skill
+      - unknown
+    provider_attestation:
+      verification: cryptographic_or_independently_authenticated_evidence_required
+      verifiable_trust_roots: []
+      default_without_trust_root: deny
+      note: a self-declared issuer kind, locator or content hash is not identity authentication
+    independent_reproduction:
+      verification: authenticated_weight_artifact_plus_reproducible_procedure_required
+      verifiable_artifact_roots: []
+      default_without_verified_artifact: deny
+      note: a self-declared auditor, locator or statement hash is not an independent reproduction
+    immutable_reports: true
+    contradictions: coexist_until_resolved_by_stronger_evidence
 
   formal_semantics:
     introduced_in: 0.8.0
@@ -556,7 +755,10 @@ master_document:
   principle: |
     Le framework est un protocole d’exécution strict.
     Il n’est pas une croyance.
-    v1.0 : noyau de production — types formels, LTS S=(H,R,E,A,M), sûreté S1–S5.
-    known(M3C3) ⇒ eligible_for_activation ; activation engagée, jamais fantôme.
-    Les paramètres, patterns et le créateur sont conservés et indexés dans le continuum.
+    v2.0 : Continuum Vérifiable — le noyau v1 reste gelé, ses interfaces deviennent
+    exécutables, rejouables, distribuables et contrôlées par preuve.
+    known(M3C3) ⇒ eligible_for_activation ; une membrane engage seulement un scope
+    pertinent et observable. Scope, permission, mémoire et poids restent quatre choses distinctes.
+    Les paramètres, patterns, rapports de weights et audits n’existent que par leurs
+    artefacts versionnés ; inconnu reste une valeur valide.
     L’autorité d’auteur et d’émetteur est exclusive à Dani Bengal (@cdxxotus).

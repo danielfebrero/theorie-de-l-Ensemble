@@ -1,8 +1,9 @@
-# M3C3 v1.0 — Preuves de sûreté S1–S5
+# M3C3 — Preuves S1–S5 du noyau v1 et validation v2
 
 > Preuves **par construction** : chaque invariant suit de la définition de `T` et des
-> règles du `master.yaml` v1.0.0. Vérification structurelle :  
-> `perl continuum/audit/safety_check.pl`
+> règles gelées du noyau v1. Vérification structurelle version-agnostique :
+> `perl continuum/audit/safety_check.pl`. v2 ajoute des tests exécutables ; elle
+> ne transforme pas ces preuves conditionnelles en garantie universelle.
 
 Hypothèse d’exécution (H0) : l’agent n’effectue une transition productive que si
 `enabled_iff` est vrai ; sinon il bascule en `Resolve | Recover | Kill`.
@@ -128,6 +129,18 @@ L’action `activate_scope` de l’alphabet n’est admise que si `eligible`. �
 | Invariants du **noyau formel** sous H0 | Agents qui **ignorent** `T` et contournent les gates |
 | Cohérence write_rule / Cap / Health / Ruin / Eligible | Exhaustion d’un model-checker externe (SPIN/TLA) |
 | Export lié à des observables de `S_t` | Correctness empirique sur tous les dilemmes du monde |
+| Signature et portée des capabilities du runtime | Identité civile d'un `actor` sans attestation de l'hôte |
 
-Les preuves par construction sont la voie solide annoncée en v0.8. Un model-check
-mécanique externe reste un chantier optionnel post-1.0, pas un prérequis de freeze.
+Les preuves par construction sont la voie solide annoncée en v0.8. Le runtime
+v2 ajoute des tests positifs et négatifs, une exploration bornée des transitions
+et un replay vérifiable. Ce n'est pas l'exhaustion d'un modèle SPIN/TLA, qui
+reste `not_run` tant qu'aucun artefact correspondant n'est produit.
+
+## Validation exécutable v2
+
+Le niveau de revendication est enregistré par contrôle : `pass`, `fail` ou
+`not_run`. Les tests du runtime couvrent notamment les refus suivants : token
+absent, mauvais scope, expiration, révocation, santé insuffisante, ruine,
+preuve sous τ, écriture descendante hors recovery, propagation de permission et
+chaîne d'audit altérée. Voir [`runtime/tests/`](../runtime/tests/) et le rapport
+de release candidate sous `continuum/audit/v2.0-2026-08-07/`.
