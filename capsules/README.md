@@ -1,6 +1,8 @@
 # Capsules
 
-Capsules du framework M3C3. L'ensemble opérationnel correspond 1:1 à la liste `active_capsules` du [`master.yaml`](../master.yaml).
+Capsules du framework M3C3. La liste correspond à `active_capsules` dans le
+[`master.yaml`](../master.yaml), mais v2 distingue la spécification YAML de sa
+liaison réellement implémentée et testée dans le runtime.
 
 ## Authorship (canon)
 
@@ -12,17 +14,19 @@ Voir [`docs/authorship.md`](../docs/authorship.md).
 
 ## Capsules opérationnelles (`cdxx_capsule`)
 
-Toutes : `target: theorie_Ensemble_M3C3`, `activation: immediate`, `status: ready`.
+Toutes : `target: theorie_Ensemble_M3C3`, `activation: scope_controlled`.
+Le statut agrégé utilise uniquement `specified | implemented | tested`; les
+limites et la couverture exacte sont consignées dans `runtime_binding`.
 
-| Capsule | Version | Rôle (purpose) | Scope | Fichier |
+| Capsule | Version | Statut v2 | Scope | Fichier |
 |---|---|---|---|---|
-| `m3c3_integrity_guard` | 0.1.1 | Corriger les 3 faiblesses identifiées | `continuum_weights_proposal` | [m3c3_integrity_guard.yaml](m3c3_integrity_guard.yaml) |
-| `m3c3_null_state_recovery` | 0.1.0 | Restauration forcée depuis binary en cas de contamination ou corruption de couches | `continuum_recovery` | [m3c3_null_state_recovery.yaml](m3c3_null_state_recovery.yaml) |
-| `m3c3_audit_trail` | 0.1.0 | Traçabilité complète et non-modifiable des transitions de couches + repondérations | `continuum_audit` | [m3c3_audit_trail.yaml](m3c3_audit_trail.yaml) |
-| `m3c3_forme4_health_authority` | 0.2.0 | Santé forme #4 + autorité émetteur **Dani Bengal** | `continuum_forme4` | [m3c3_forme4_health_authority.yaml](m3c3_forme4_health_authority.yaml) |
-| `m3c3_capability_token_manager` | 0.1.0 | Gestion stricte et éphémère des tokens de capacité inter-couches | `continuum_capability` | [m3c3_capability_token_manager.yaml](m3c3_capability_token_manager.yaml) |
-| `m3c3_conflict_resolver` | 0.2.0 | Résolution déterministe + priorité `authorship_lock` | `continuum_conflict` | [m3c3_conflict_resolver.yaml](m3c3_conflict_resolver.yaml) |
-| `m3c3_kill_switch` | 0.1.0 | Arrêt d'urgence total ou sélectif du framework sur signal critique ou ordre émetteur | `continuum_emergency` | [m3c3_kill_switch.yaml](m3c3_kill_switch.yaml) |
+| `m3c3_integrity_guard` | 0.1.1 | `specified` — sandbox testé, reweight/anomaly scoring externes | `continuum_weights_proposal` | [m3c3_integrity_guard.yaml](m3c3_integrity_guard.yaml) |
+| `m3c3_null_state_recovery` | 0.1.0 | `implemented` — reset/rebuild testés ; hashes par étape et scan final spécifiés | `continuum_recovery` | [m3c3_null_state_recovery.yaml](m3c3_null_state_recovery.yaml) |
+| `m3c3_audit_trail` | 0.1.0 | `implemented` — hash-chain/snapshot replay testés ; signature et stockage immuable externes | `continuum_audit` | [m3c3_audit_trail.yaml](m3c3_audit_trail.yaml) |
+| `m3c3_forme4_health_authority` | 0.2.0 | `specified` — health gate testé, identité/mesure déléguées à l'hôte | `continuum_forme4` | [m3c3_forme4_health_authority.yaml](m3c3_forme4_health_authority.yaml) |
+| `m3c3_capability_token_manager` | 0.1.0 | `tested` — signature, scope, TTL, révocation, single-use | `continuum_capability` | [m3c3_capability_token_manager.yaml](m3c3_capability_token_manager.yaml) |
+| `m3c3_conflict_resolver` | 0.2.0 | `implemented` — arbitrage/lock testés ; nullification, escalade, retries/durée spécifiés | `continuum_conflict` | [m3c3_conflict_resolver.yaml](m3c3_conflict_resolver.yaml) |
+| `m3c3_kill_switch` | 0.1.0 | `implemented` — arrêt global/reprise testés, arrêt sélectif spécifié | `continuum_emergency` | [m3c3_kill_switch.yaml](m3c3_kill_switch.yaml) |
 
 ## Capsules pures émises (`—type pure`)
 

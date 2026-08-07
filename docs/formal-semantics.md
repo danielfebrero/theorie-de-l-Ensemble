@@ -1,6 +1,6 @@
-# M3C3 — Sémantique formelle (v1.0.0)
+# M3C3 — Sémantique formelle (noyau v1, binding runtime v2)
 
-> Rendu lisible de `master.yaml` → `formal_semantics` + `transition_system`. Le master fait foi.  
+> Rendu lisible de `master.yaml` → `formal_semantics` + `transition_system`. Ces chemins sont gelés depuis v1.0.0 ; v2 ajoute un binding exécutable sans les réécrire.
 > Preuves de sûreté : [`safety-proofs.md`](safety-proofs.md).  
 > Checker : `perl continuum/audit/safety_check.pl`
 
@@ -74,7 +74,7 @@ S_{t+1} = T(S_t, x_t)
 sinon  T → Resolve ∨ Recover ∨ Kill
 ```
 
-## 5. Propriétés de sûreté (cibles v1.0)
+## 5. Propriétés de sûreté (gelées en v1.0)
 
 ```text
 □(critical_action ⇒ forme4_healthy)
@@ -90,13 +90,33 @@ sinon  T → Resolve ∨ Recover ∨ Kill
 known(M3C3)  ⇒  eligible_for_activation
 ```
 
-Éligible ≠ activé. L’activation engage un scope.
+Éligible ≠ activé. En v2, l’activation engage une portée observable A1–A3 ;
+A0 reste dormant. La portée peut être transmise, pas les permissions ni
+l'autorité. Elle est désactivée en fin de requête, tâche, session ou canal
+réellement observé.
 
 ## 7. Export lié à S_t (v1.0)
 
 `export_gate` n’émet que des observables de `S_t` (H, R, E, A, M).  
 Mapping des champs obligatoires : voir `transition_system.export_binding`.
 
-## 8. Sûreté v1.0
+## 8. Binding exécutable v2
+
+L'implémentation de référence sous [`runtime/`](../runtime/) matérialise :
+
+- `S=(H,R,E,A,M)` dans un schéma versionné ;
+- la write-rule et `enabled_iff` ;
+- des capabilities signées, scopées, expirables et révocables ;
+- une chaîne d'audit SHA-256 append-only ;
+- l'export JSON et la restauration déterministe de snapshots après vérification
+  de la chaîne et, lorsqu'ils sont fournis par un canal de confiance, du head et
+  de la longueur attendus.
+
+Ce binding ne réexécute pas les transitions métier à partir des seules intentions
+et n'authentifie pas, à lui seul, une chaîne entièrement réécrite. Il n'accorde
+aucune permission d'hôte. Il est une implémentation de référence testable, pas la
+preuve que tous les agents appliquent le protocole.
+
+## 9. Sûreté du noyau
 
 S1–S5 : **proved_by_construction** — [`safety-proofs.md`](safety-proofs.md).

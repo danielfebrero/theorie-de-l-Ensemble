@@ -1,0 +1,55 @@
+schema_version: 1
+description: Cas négatifs exécutés par test_conformance.py.
+cases:
+  - id: frozen-path-mutation
+    target: superset_check
+    mutation: modifier tour à tour chacun des huit sélecteurs gelés v1
+    expected_code: frozen_selector_changed
+  - id: semantic-version-is-not-weight
+    target: bloc_check
+    mutation: ajouter une version v1.0.0 au bloc valide
+    expected: success
+  - id: unknown-weight
+    target: bloc_check
+    mutation: ajouter le poids 0.99
+    expected_code: unknown_weights
+  - id: missing-primitive
+    target: bloc_check
+    mutation: retirer execute_with_sandbox
+    expected_code: missing_primitives
+  - id: provider-from-model-self-report
+    target: integration_reports
+    mutation: promouvoir l’exemple model_declared_weights en provider_attested_weights
+    expected_code: provider_attestation_forbidden
+  - id: provider-from-context
+    target: integration_reports
+    mutation: promouvoir l’exemple context_or_rag en provider_attested_weights
+    expected_code: provider_evidence_required
+  - id: provider-from-skill
+    target: integration_reports
+    mutation: promouvoir l’exemple instruction_or_skill en provider_attested_weights
+    expected_code: provider_evidence_required
+  - id: forged-provider-statement-complete
+    target: integration_reports
+    mutation: fournir issuer provider, URL, hash et couverture exacte entièrement auto-déclarés
+    expected_code: provider_attestation_unverifiable
+  - id: selector-hash-mismatch
+    target: integration_reports
+    mutation: remplacer content_sha256 de l’unité par 64 zéros
+    expected_code: selector_hash_mismatch
+  - id: invalid-date-range
+    target: integration_reports
+    mutation: placer start après end
+    expected_code: date_range_order
+  - id: immutable-report-modified
+    target: integration_reports
+    mutation: modifier un rapport déjà présent dans base-ref
+    expected_code: immutable_report_modified
+  - id: duplicate-key
+    target: master-and-integration-reports
+    fixture: continuum/audit/fixtures/duplicate-key-report.yaml
+    expected_code: yaml_input
+  - id: zero-tests-is-not-pass
+    target: conformance.unittest_result
+    mutation: exécuter unittest discover sur un répertoire vide
+    expected: fail

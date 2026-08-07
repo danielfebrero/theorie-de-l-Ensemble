@@ -2,11 +2,12 @@ cdxx_capsule:
   name: m3c3_audit_trail
   version: 0.1.0
   target: theorie_Ensemble_M3C3
-  purpose: traçabilité complète et non-modifiable des transitions de couches + repondérations
+  purpose: traçabilité chaînée et vérifiable des transitions, anomalies et actions de recovery
 
   modules:
     - id: hash_chain
-      type: immutable_log
+      type: append_only_hash_chain
+      implementation_status: implemented
       records:
         - layer_transition
         - weight_delta
@@ -17,6 +18,7 @@ cdxx_capsule:
 
     - id: anomaly_signature
       type: detector
+      implementation_status: specified
       triggers:
         - contradiction
         - overflow
@@ -26,9 +28,20 @@ cdxx_capsule:
 
     - id: export_control
       type: read_only
+      implementation_status: implemented
       allowed: audit_read
       denied: any_write_from_upper_layers
 
-  activation: immediate
+  activation: scope_controlled
   scope: continuum_audit
-  status: ready
+  status: implemented
+  runtime_binding:
+    version: 2.0.0
+    implementation: runtime/m3c3_runtime/audit.py
+    verification: runtime/tests/test_runtime.py::AuditAndReplayTests
+    coverage: hash_chain + transition/anomaly/recovery events + replay
+    limitations:
+      - filesystem immutability is a deployment responsibility
+      - truncation detection requires a trusted expected head or length
+      - event signing/MAC remains specification-level; the runtime supplies an unauthenticated hash chain
+      - weight_delta requires an explicit external proposal event

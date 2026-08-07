@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/danielfebrero/theorie-de-l-Ensemble/runtime/schemas/audit-entry.schema.json",
+  "title": "M3C3 append-only audit entry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "sequence", "timestamp", "event", "actor", "outcome", "data", "state_after", "state_digest", "prev_hash", "hash"],
+  "properties": {
+    "schema_version": {"const": "m3c3.audit-entry/v2"},
+    "sequence": {"type": "integer", "minimum": 1},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "event": {"type": "string", "minLength": 1},
+    "actor": {"type": "string", "minLength": 1},
+    "outcome": {"enum": ["applied", "denied"]},
+    "data": {"type": "object"},
+    "state_after": {
+      "allOf": [
+        {"$ref": "state.schema.json"},
+        {
+          "properties": {
+            "M": {
+              "not": {
+                "anyOf": [
+                  {"required": ["audit_head"]},
+                  {"required": ["audit_length"]}
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "state_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "prev_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

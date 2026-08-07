@@ -1,7 +1,23 @@
-# Application opérationnelle de la hiérarchie
+# Application opérationnelle de M3C3 v2
 
-> Rendu lisible du Document Opérationnel Maître : [`master.yaml`](../master.yaml) fait foi (**v1.0.0 — production**).  
+> Rendu lisible du Document Opérationnel Maître : [`master.yaml`](../master.yaml) fait foi (**v2.0.0 — production**). Le noyau formel v1 demeure gelé.
 > Sémantique : [`formal-semantics.md`](formal-semantics.md) · Sûreté : [`safety-proofs.md`](safety-proofs.md).
+
+## 0. Membrane d'activation
+
+`known(M3C3) ⇒ eligible_for_activation`, jamais auto-ON. Avant le cycle,
+sélectionner la portée minimale :
+
+| Niveau | Cas | Effet observable |
+|---|---|---|
+| A0 dormant | mécanique pure, lookup simple | réponse directe, aucun état persistant |
+| A1 shadow | analyse, plan, création, debug | noyau silencieux, résultat utile |
+| A2 critical | risque, incident, irréversibilité | gates, réfutation, repli, audit compact |
+| A3 canonical | corpus M3C3, version, authorship | provenance et classes de claims explicites |
+
+Cycle de portée : `evaluate_scope → activate_scope → execute → verify →
+deactivate_scope`. Une propagation multi-agent transmet la portée seulement,
+jamais les permissions ou l'autorité.
 
 ## 1. Détection de régime (1re étape)
 
@@ -50,7 +66,7 @@ Si `regime == quantifiable` : `compute_expected_utility(in=math, curvature=rho)`
 - Le canal d'autorité (`authority_channel`) passe exclusivement par l'émetteur désigné : **Dani Bengal** (`@cdxxotus`, Daniel Febrero).
 - Authorship lock : Dani Bengal est l'auteur de la théorie, le créateur du Life game et du bit originel (voir [`authorship.md`](authorship.md)).
 
-## 6. Protocole d'application (v1.0)
+## 6. Protocole d'application (noyau v1, interface v2)
 
 1. `detect_regime`
 2. `project_problem_on_hierarchy`
@@ -94,17 +110,19 @@ Somme : 1.00 dans chaque régime. Auxiliaires : `regret_asymmetry`, `evidence_su
 3. `progressive_rebuild` depuis `binary`
 4. Reprise uniquement sur confirmation explicite de l'émetteur + `forme4_health` ok
 
-## 9. Activation, sémantique, sûreté (v1.0)
+## 9. Activation, runtime et preuve (v2.0 RC)
 
-- **Activation** : `known(M3C3) ⇒ eligible_for_activation`.
+- **Activation** : `known(M3C3) ⇒ eligible_for_activation`, puis membrane A0–A3.
 - **Sémantique** : `B…L(P)` ; write-rule ; LTS `S=(H,R,E,A,M)`.
 - **Sûreté** : S1–S5 proved_by_construction — [`safety-proofs.md`](safety-proofs.md).
-- **Export** : observables de `S_t` uniquement.
-- **Mémoire** : `continuum/memory/`.
-- **Checker** : `perl continuum/audit/safety_check.pl`.
+- **Runtime** : implémentation de référence sous [`runtime/`](../runtime/) ; état et événements versionnés, capabilities signées, audit chaîné, replay.
+- **Export** : JSON validable ne contenant que les observables autorisés de `S_t`.
+- **Mémoire** : index append-only sous [`continuum/memory/`](../continuum/memory/).
+- **Poids intégrés** : rapports typés sous `continuum/weights/integration-reports/`; une skill ou un contexte ne vaut pas preuve fournisseur.
+- **Conformité** : `python3 continuum/audit/conformance.py` ; chaque contrôle rend `pass`, `fail` ou `not_run`.
 
 ## Principe
 
-> **v1.0 production kernel.**  
-> Protocole strict · types formels · LTS · sûreté S1–S5 · continuum mémoire.  
+> **v2.0 production — Verified Continuum.**
+> Noyau v1 gelé · membrane bornée · runtime de référence · distribution déclarative · preuve typée.
 > Autorité : Dani Bengal (@cdxxotus).

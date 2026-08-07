@@ -31,6 +31,14 @@ cdxx_capsule:
       action: progressive_rebuild from binary
       deny: any automatic resume
 
-  activation: immediate
+  activation: scope_controlled
   scope: continuum_emergency
-  status: ready
+  status: implemented
+  runtime_binding:
+    version: 2.0.0
+    implementation: runtime/m3c3_runtime/engine.py::kill
+    verification: runtime/tests/test_runtime.py::LifecycleAndFallbackTests
+    coverage: global_halt + mass_revoke + quarantine + explicit_resume_gate
+    limitations:
+      - selective per-layer halt remains specification-level
+      - emitter identity must be attested by the host

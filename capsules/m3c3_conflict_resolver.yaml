@@ -7,6 +7,7 @@ cdxx_capsule:
   modules:
     - id: conflict_detector
       type: continuous
+      implementation_status: implemented
       detects:
         - state_contradiction
         - weight_inconsistency
@@ -16,6 +17,7 @@ cdxx_capsule:
 
     - id: resolution_engine
       type: deterministic
+      implementation_status: partially_implemented
       strategy:
         - priority = authorship_lock (Dani Bengal / @cdxxotus) when attribution is contested
         - then priority = layer_weight (higher weight wins)
@@ -27,10 +29,19 @@ cdxx_capsule:
 
     - id: post_resolution_lock
       type: temporary
+      implementation_status: partially_implemented
       duration: 30s
       action: block_new_writes_on_resolved_layers
       release: after integrity_check pass
 
-  activation: immediate
+  activation: scope_controlled
   scope: continuum_conflict
-  status: ready
+  status: implemented
+  runtime_binding:
+    version: 2.0.0
+    implementation: runtime/m3c3_runtime/engine.py::resolve
+    verification: runtime/tests/test_runtime.py::LifecycleAndFallbackTests
+    coverage: freeze_affected_layers + deterministic_weight_winner + health_checked_release
+    limitations:
+      - host must authenticate authorship conflicts
+      - retry count, branch nullification, escalation and wall-clock lock duration remain specification-level

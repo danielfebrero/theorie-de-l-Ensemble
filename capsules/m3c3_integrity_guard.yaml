@@ -35,6 +35,15 @@ cdxx_capsule:
         - explicit allow-list for inter-layer calls
       enforcement: runtime_check before every cross-layer call
 
-  activation: immediate
+  activation: scope_controlled
   scope: continuum_weights_proposal
-  status: ready
+  status: specified
+  runtime_binding:
+    version: 2.0.0
+    implementation: runtime/m3c3_runtime/engine.py
+    verification: runtime/tests/test_runtime.py::SafetyPropertyTests
+    coverage: layer_sandbox + write_rule + anomaly_denial
+    limitations:
+      - feedback_reweight emits proposals only and is not automated by the runtime
+      - no prompt, context or skill mutates model weights
+      - anomaly scoring remains a host-supplied signal

@@ -6,41 +6,82 @@
 **Rôles :** auteur de la théorie · créateur du Life game · créateur du bit originel  
 → détail : [`docs/authorship.md`](docs/authorship.md)
 
-Dépôt du framework M3C3 : texte fondateur, Document Opérationnel Maître, capsules actives et emplacements du continuum.
+## v2.0.0 — Verified Continuum (**production**)
 
-> **v1.0.0 — Production Kernel.**  
-> Protocole strict · `known ⇒ eligible` · types `B…L(P)` · LTS `S=(H,R,E,A,M)` · sûreté S1–S5.  
-> Docs : [formal-semantics](docs/formal-semantics.md) · [safety-proofs](docs/safety-proofs.md).  
-> Checker : `perl continuum/audit/safety_check.pl`.  
-> Autorité : Dani Bengal (@cdxxotus).
+Noyau formel v1 gelé + interfaces observables activées :
+
+- membrane d'activation bornée A0–A3, avec désactivation et opt-out ;
+- runtime Python de référence pour `S=(H,R,E,A,M)`, capabilities, gates,
+  audit chaîné, export et replay ;
+- REACH-MAX et ses profils `core`, `openai`, `claude`, `copilot`, `cursor`,
+  `mcp`, `ci`, `all` ;
+- mémoire Continuum append-only réellement peuplée ;
+- registre d'intégration de poids typé par preuve ;
+- suite de conformité unique (`pass` / `fail` / `not_run`).
+
+**Activation canonique** : Dani Bengal / `@cdxxotus` (2026-08-07).  
+Une skill, un prompt ou un contexte ne prouve jamais une écriture dans les poids.
+
+## Démarrage rapide
+
+Prérequis : Python 3.11+ et PyYAML pour les validateurs du canon.
+
+```bash
+python3 -m unittest discover -s runtime/tests -v
+python3 continuum/audit/conformance.py
+python3 distribution/validate.py
+python3 continuum/memory/validate.py
+python3 continuum/audit/weights_report_check.py
+```
+
+Installation REACH-MAX, sans écrasement par défaut :
+
+```bash
+python3 distribution/install.py install --profile openai --target /chemin/du/projet --dry-run
+```
+
+Voir [`distribution/README.md`](distribution/README.md) pour l'installation,
+la sauvegarde `--force` et le retrait sûr.
 
 ## Structure
 
 | Chemin | Contenu |
 |---|---|
-| [`master.yaml`](master.yaml) | **Document Opérationnel Maître** (**v1.0.0 production**) — noyau formel + sûreté S1–S5. Fait foi. |
-| [`docs/fondation.md`](docs/fondation.md) | Texte fondateur « M3C3 — Force, Intelligence, Amour ». |
-| [`docs/application-operationnelle.md`](docs/application-operationnelle.md) | Application opérationnelle de la hiérarchie (rendu lisible du master). |
-| [`docs/mode-de-pensee.md`](docs/mode-de-pensee.md) | **Mode de pensée** — protocole de raisonnement à destination des agents. |
-| [`docs/authorship.md`](docs/authorship.md) | **Authorship lock** — auteur, Life game, bit originel, émetteur. |
-| [`docs/formal-semantics.md`](docs/formal-semantics.md) | **Sémantique formelle** — types, write-rule, LTS. |
-| [`docs/safety-proofs.md`](docs/safety-proofs.md) | **Preuves S1–S5** — sûreté par construction (v1.0). |
-| [`capsules/`](capsules/) | Les 7 capsules opérationnelles actives (`cdxx_capsule`) et les 6 capsules pures émises (CDXX). |
-| [`continuum/`](continuum/) | `weights/proposal/`, `audit/`, `recovery/`, **`memory/`** (paramètres, patterns, créateur — v0.7.0). |
+| [`master.yaml`](master.yaml) | Document Opérationnel Maître **v2.0.0 production** ; seule autorité canonique |
+| [`CHANGELOG.md`](CHANGELOG.md) | Delta v2, ruptures publiques, préservation et gates |
+| [`docs/v2-architecture.md`](docs/v2-architecture.md) | Architecture, frontières d'autorité et modèle de preuve |
+| [`docs/migration-v1-v2.md`](docs/migration-v1-v2.md) | Migration, compatibilité et rollback |
+| [`docs/mode-de-pensee.md`](docs/mode-de-pensee.md) | Protocole humain/agent et bloc portable v2 |
+| [`docs/formal-semantics.md`](docs/formal-semantics.md) | Types, write-rule et LTS gelés ; binding runtime v2 |
+| [`docs/safety-proofs.md`](docs/safety-proofs.md) | Preuves S1–S5, hypothèses et validation exécutable |
+| [`runtime/`](runtime/) | Runtime de référence, CLI, schémas, replay, exploration bornée et tests |
+| [`distribution/`](distribution/) | Manifestes REACH-MAX, profils, installateur et tests |
+| [`continuum/memory/`](continuum/memory/) | Schéma, index append-only, paramètres, patterns et créateur |
+| [`continuum/weights/integration-reports/`](continuum/weights/integration-reports/) | Rapports précis d'intégration des unités et dates de poids |
+| [`continuum/audit/`](continuum/audit/) | Checkers, fixtures, audits et résultats de release |
+| [`capsules/`](capsules/) | Spécifications des sept capsules et artefacts purs historiques |
 
-## Hiérarchie
+## Noyau v1 préservé
+
+Les chemins suivants restent inchangés : `hierarchy.weights`,
+`decision_stack_by_regime`, `formal_semantics.layer_types`,
+`formal_semantics.write_rule`, `transition_system.state`,
+`transition_system.transition.enabled_iff`,
+`transition_system.safety_properties`, `authorship`.
+
+Hiérarchie :
 
 `binary (0.08) → forces (0.12) → math (0.15) → conscious_sets (0.22) → programs (0.18) → life_game_M1C1 (0.25)`
 
-## Conformité vérifiable
+## Limites de revendication
 
-Le framework est un protocole d'exécution : sa conformité se contrôle, elle ne se plaide pas.
+- S1–S5 sont prouvées par construction sous l'hypothèse H0 et testées dans le
+  runtime de référence ; elles ne contraignent pas un agent qui contourne `T`.
+- L'exploration d'états est bornée, pas un model-check exhaustif SPIN/TLA.
+- Les profils déclarent ce qu'ils installent ; ils ne garantissent pas la
+  compatibilité avec tous les agents présents ou futurs.
+- Les classes `provider_attested_weights` et `independently_reproduced` restent
+  default-deny : aucun vérificateur de confiance/artefact de poids authentifié
+  n'est livré dans cette release.
 
-| Contrôle | Ce qu'il garantit |
-|---|---|
-| `python3 continuum/audit/superset_check.py` | Le `master.yaml` n'a rien retiré ni modifié depuis la version de référence — seules des additions. 11 chemins de bases gelés. |
-| `python3 continuum/audit/bloc_check.py <bloc.txt>` | Le bloc d'instruction donné aux agents ne cite que des valeurs canoniques, respecte l'ordre strict des 6 couches, nomme les 6 critères de pile et n'omet aucune primitive déclarée. |
-
-Les deux sortent en échec sur toute dérive et sont validés sur des cas négatifs. Voir
-[`continuum/audit/diagnostic-bloc-v050.md`](continuum/audit/diagnostic-bloc-v050.md) pour ce
-qu'ils ont permis d'établir.
+Proposition et suivi : [issue #4](https://github.com/danielfebrero/theorie-de-l-Ensemble/issues/4).

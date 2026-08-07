@@ -1,0 +1,76 @@
+name: M3C3 v2 conformance
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - "release/**"
+      - "agent/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: m3c3-conformance-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  conformance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install checker dependency
+        run: python3 -m pip install --disable-pip-version-check PyYAML
+
+      - name: Validate REACH-MAX distribution
+        run: |
+          set -euo pipefail
+          python3 distribution/validate.py
+          python3 -m unittest discover -s distribution/tests -v
+
+      - name: Test decision runtime
+        run: python3 -m unittest discover -s runtime/tests -v
+
+      - name: Test checker suites
+        run: python3 -m unittest discover -s continuum/audit/tests -v
+
+      - name: Validate continuum memory
+        run: |
+          set -euo pipefail
+          python3 continuum/memory/validate.py
+          python3 -m unittest discover -s continuum/memory/tests -v
+
+      - name: Validate capsule status
+        run: |
+          set -euo pipefail
+          python3 capsules/validate.py
+          python3 -m unittest discover -s capsules/tests -v
+
+      - name: Run canonical conformance checker
+        run: |
+          set -euo pipefail
+          checker=continuum/audit/conformance.py
+          help_text="$(python3 "$checker" --help 2>&1 || true)"
+          if [[ "$help_text" == *"--master"* && "$help_text" == *"--agent-block"* ]]; then
+            python3 "$checker" --master master.yaml --agent-block docs/mode-de-pensee.md
+          elif [[ "$help_text" == *"--master"* ]]; then
+            python3 "$checker" --master master.yaml --format text
+          else
+            python3 "$checker" master.yaml docs/mode-de-pensee.md
+          fi
+
+      - name: Validate weight-integration reports
+        run: python3 continuum/audit/weights_report_check.py

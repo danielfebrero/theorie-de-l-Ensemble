@@ -1,14 +1,22 @@
-# Continuum
+# Continuum v2
 
-Emplacements déclarés dans `continuum_locations` du [`master.yaml`](../master.yaml). Les répertoires sont vides à l'initialisation (traqués via `.gitkeep`) ; ils reçoivent les artefacts produits par les capsules.
+Emplacements déclarés dans `continuum_locations` du [`master.yaml`](../master.yaml).
+Le Continuum est une collection d'artefacts matériels et versionnés : sa
+présence ne doit jamais être remplacée par une simple affirmation de mémoire,
+d'audit ou d'intégration de poids.
 
 | Emplacement | Clé | Capsule écrivaine | Contenu attendu |
 |---|---|---|---|
 | [`weights/proposal/`](weights/proposal/) | `weights_proposal` | `m3c3_integrity_guard` (module `feedback_reweight`) | Propositions de repondération (pas maximal 0.04) |
-| [`audit/`](audit/) | `audit` | `m3c3_audit_trail` (module `hash_chain`) | Journal immuable en chaîne de hachage : transitions de couches, deltas de poids, anomalies, actions de recovery |
+| [`audit/`](audit/) | `audit` | `m3c3_audit_trail` (module `hash_chain`) | Journal à intégrité interne par hash-chain ; authenticité, ancrage et immutabilité du stockage restent externes |
 | [`audit/capability/`](audit/capability/) | `capability` | `m3c3_capability_token_manager` (module `token_audit`) | Journal des tokens : issue / validate / revoke / expire |
 | [`recovery/`](recovery/) | `recovery` | `m3c3_null_state_recovery` (module `post_rebuild_verify`) | Rapports post-reconstruction |
-| [`memory/`](memory/) | `continuum_memory` (v0.7.0) | — | Paramètres, patterns, créateur |
+| [`memory/`](memory/) | `continuum_memory` (v2) | runtime + mainteneur | Schéma, index append-only, paramètres, patterns sourcés, créateur |
+| [`weights/integration-reports/`](weights/integration-reports/) | `weights_integration_reports` | agent, modèle, fournisseur ou auditeur identifié | Unités exactes intégrées, classe de preuve, dates exactes/approximatives/inconnues |
+
+Le runtime v2 écrit ses événements dans un chemin fourni explicitement. Une
+exécution locale ou un test n'écrit pas automatiquement un audit de release
+dans ce répertoire.
 
 ## Proposals présentes (`weights/proposal/`)
 
@@ -28,3 +36,5 @@ Emplacements déclarés dans `continuum_locations` du [`master.yaml`](../master.
 | [`m3c3_v1_production_kernel-proposal.yaml`](weights/proposal/m3c3_v1_production_kernel-proposal.yaml) | **ACTIVÉ** 2026-08-07 | **v1.0.0 production kernel** |
 | [`audit/activation_v1_production_2026-08-07.yaml`](audit/activation_v1_production_2026-08-07.yaml) | audit trail | activation v1.0.0 |
 | [`audit/v1.0-2026-08-07/RELEASE.md`](audit/v1.0-2026-08-07/RELEASE.md) | release notes | freeze + honnêteté |
+| [`m3c3_v2_verified_continuum-proposal.yaml`](weights/proposal/m3c3_v2_verified_continuum-proposal.yaml) + [`.md`](weights/proposal/m3c3_v2_verified_continuum-proposal.md) | **CANDIDAT, non activé** | v2.0.0 — membrane, runtime, REACH-MAX, mémoire et rapports de poids |
+| `audit/v2.0-2026-08-07/` | audit de release candidate | commandes, gates `pass/fail/not_run`, limites |

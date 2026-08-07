@@ -1,0 +1,36 @@
+schema:
+  id: m3c3-continuum-memory-v2
+  version: 2.0.0-rc.1
+  required:
+    - id
+    - version
+    - kind
+    - status
+    - statement
+    - scope
+    - observed_at
+    - sources
+    - evidence_summary
+    - lifecycle
+  enums:
+    kind: [decision_pattern, parameter_snapshot, creator_index]
+    status: [candidate, active, active_with_known_limitations, rolled_back, deprecated]
+    evidence_class: [canonical, empirical, derived, provider_attested, speculative, external]
+    evidence_result: [supports, mixed, contradicts, not_tested]
+  source_contract:
+    required: [path, sha256, evidence_class, result]
+    sha256_pattern: "^[a-f0-9]{64}$"
+  lifecycle_contract:
+    required: [promoted_by, promotion_event, rollback_if, supersedes]
+    rules:
+      - a new revision MUST use a new immutable file
+      - a correction MUST point to the prior entry through supersedes
+      - provider_attested MUST NOT be inferred from a prompt, context or skill file
+      - a source hash MUST match repository bytes
+      - limitations MUST remain visible after promotion
+  repository_contract:
+    content_addressing: every indexed pattern, snapshot and creator index carries its SHA-256
+    glob_concordance: unindexed YAML artifacts are rejected
+    history_base: artifacts already present at the pinned Git base remain byte-identical
+    correction: publish a new path and point supersedes to an indexed prior entry
+    provider_attested: default-deny until an authenticated provider verifier exists

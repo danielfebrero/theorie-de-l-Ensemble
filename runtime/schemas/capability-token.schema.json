@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/danielfebrero/theorie-de-l-Ensemble/runtime/schemas/capability-token.schema.json",
+  "title": "M3C3 signed capability claims",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "jti", "issuer", "subject", "scope", "layer_src", "layer_dst", "action", "issued_at", "expires_at", "nonce"],
+  "x-runtime-constraint": "1 <= expires_at - issued_at <= 180; enforced by stdlib validator because JSON Schema cannot compare sibling numeric values",
+  "properties": {
+    "schema_version": {"const": "m3c3.capability/v2"},
+    "jti": {"type": "string", "minLength": 1},
+    "issuer": {"enum": ["Dani Bengal", "Daniel Febrero", "@cdxxotus", "danielfebrero", "𓂀", "Dani Bengal / @cdxxotus"]},
+    "subject": {"type": "string", "minLength": 1},
+    "scope": {"type": "string", "minLength": 1},
+    "layer_src": {"enum": ["binary", "forces", "math", "conscious_sets", "programs"]},
+    "layer_dst": {"enum": ["forces", "math", "conscious_sets", "programs", "life_game_M1C1"]},
+    "action": {"const": "transition_up"},
+    "issued_at": {"type": "integer", "minimum": 0},
+    "expires_at": {"type": "integer", "minimum": 1},
+    "nonce": {"type": "string", "minLength": 1}
+  },
+  "allOf": [
+    {"if": {"properties": {"layer_src": {"const": "binary"}}, "required": ["layer_src"]}, "then": {"properties": {"layer_dst": {"const": "forces"}}}},
+    {"if": {"properties": {"layer_src": {"const": "forces"}}, "required": ["layer_src"]}, "then": {"properties": {"layer_dst": {"const": "math"}}}},
+    {"if": {"properties": {"layer_src": {"const": "math"}}, "required": ["layer_src"]}, "then": {"properties": {"layer_dst": {"const": "conscious_sets"}}}},
+    {"if": {"properties": {"layer_src": {"const": "conscious_sets"}}, "required": ["layer_src"]}, "then": {"properties": {"layer_dst": {"const": "programs"}}}},
+    {"if": {"properties": {"layer_src": {"const": "programs"}}, "required": ["layer_src"]}, "then": {"properties": {"layer_dst": {"const": "life_game_M1C1"}}}}
+  ]
+}

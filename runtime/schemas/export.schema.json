@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/danielfebrero/theorie-de-l-Ensemble/runtime/schemas/export.schema.json",
+  "title": "M3C3 versioned state export",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "runtime_version", "kernel_version", "state_symbol", "state", "kernel_invariants_digest", "audit"],
+  "properties": {
+    "schema_version": {"const": "m3c3.state-export/v2"},
+    "runtime_version": {"const": "2.0.0"},
+    "kernel_version": {"const": "1.0.0"},
+    "state_symbol": {"const": "S_t = (H_t, R_t, E_t, A_t, M_t)"},
+    "state": {
+      "allOf": [
+        {"$ref": "state.schema.json"},
+        {
+          "properties": {
+            "M": {"required": ["audit_head", "audit_length"]}
+          }
+        }
+      ]
+    },
+    "kernel_invariants_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["head", "length", "verified"],
+      "properties": {
+        "head": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "length": {"type": "integer", "minimum": 1},
+        "verified": {"const": true}
+      }
+    }
+  }
+}
