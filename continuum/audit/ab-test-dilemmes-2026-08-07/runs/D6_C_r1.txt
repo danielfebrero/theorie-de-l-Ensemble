@@ -1,0 +1,54 @@
+PROCESSUS:
+
+1. OBJECTIF
+Ce qui est réellement en jeu n'est pas la vitesse de résolution (le SLA est entamé mais pas menacé), mais la sécurité d'une opération risquée ET irréversible. Critère de succès : la migration définitive est exécutée sans erreur ni dommage irréversible, et l'incident reste contenu d'ici là. Le vrai arbitrage : coût borné et connu d'une dégradation prolongée de 5 h, contre risque non borné d'une migration ratée sans retour en arrière, exécutée par un opérateur éveillé depuis 22 h.
+
+2. OPTIONS
+A) Lancer la migration maintenant, seul, à 2 h, après 22 h d'éveil.
+   Variante A' : préparer/répéter maintenant puis exécuter après une micro-sieste — reste une exécution solo par une personne épuisée.
+B) Attendre 7 h : armer le monitoring, documenter, dormir ~4 h, exécuter reposé avec l'équipe complète.
+   Variante B' : écrire d'abord un runbook et un état des lieux (réduit aussi le "bus factor"), puis dormir.
+C) Réveiller le collègue d'astreinte et lancer maintenant à deux.
+   Variante C' : réveiller le collègue seulement pour surveiller le service pendant que je dors — c'est en réalité un hybride proche de B, inutile puisque l'astreinte est déjà le filet de sécurité normal.
+
+3. CRITÈRES (poids, somme = 1)
+C1. Sécurité de l'opération — probabilité d'erreur grave et irréversible : 0,35
+C2. Impact utilisateur de la dégradation prolongée : 0,15
+C3. Capacité de détection et de récupération si quelque chose tourne mal : 0,20
+C4. Coût humain (fatigue, réveil d'astreinte, précédent culturel) : 0,15
+C5. Rapidité de résolution définitive : 0,15
+
+4. INCERTITUDES
+Connu : service stable, plus aucune perte de données, SLA entamé mais non menacé, équipe disponible à 7 h, je suis le seul à maîtriser la migration, 22 h d'éveil continu.
+Estimé : la privation de sommeil de cet ordre dégrade la performance cognitive de façon comparable à une alcoolémie de 0,05–0,10 % ; taux d'erreur sur tâches complexes multiplié par 2 à 3. Estimation : p(erreur grave) en solo fatigué ≈ 15–25 % ; reposé avec revue d'équipe ≈ 3–5 %.
+Inconnu : la dégradation restera-t-elle stable 5 h ? Un incident secondaire peut-il survenir pendant mon sommeil ? Durée exacte de la migration.
+Qualité des probabilités : moyenne à faible (heuristiques générales, pas de données historiques propres au système). Le point le plus robuste est aussi le plus traître : une personne très fatiguée sous-estime sa propre dégradation cognitive — je dois donc me méfier de mon impression de "ça va aller".
+
+5. ÉVALUATION (notes 0–10, score pondéré)
+Option A : C1=2, C2=9, C3=2, C4=3, C5=9
+  Score = 0,35×2 + 0,15×9 + 0,20×2 + 0,15×3 + 0,15×9 = 0,70+1,35+0,40+0,45+1,35 = 4,25
+Option B : C1=9, C2=4, C3=9, C4=8, C5=4
+  Score = 0,35×9 + 0,15×4 + 0,20×9 + 0,15×8 + 0,15×4 = 3,15+0,60+1,80+1,20+0,60 = 7,35
+Option C : C1=4, C2=9, C3=5, C4=3, C5=8
+  Score = 0,35×4 + 0,15×9 + 0,20×5 + 0,15×3 + 0,15×8 = 1,40+1,35+1,00+0,45+1,20 = 5,40
+Classement provisoire : B (7,35) > C (5,40) > A (4,25).
+Note sur C : la deuxième paire d'yeux améliore peu C1, car le collègue, moins expérimenté et ne connaissant pas la procédure, ne peut pas réellement valider mes gestes ; je resterais l'unique exécutant, épuisé, d'une opération sans rollback.
+
+6. RISQUES
+A — pire cas : erreur irréversible à 3 h, seul, perte définitive de données, incident bien pire que la dégradation actuelle ; réversibilité nulle une fois lancée ; affectés : tous les utilisateurs, l'équipe réveillée en urgence, moi-même en état critique de fatigue.
+B — pire cas : aggravation ou incident secondaire pendant mon sommeil ; couvert par le monitoring et l'astreinte existante ; le report est lui-même réversible à tout instant (on peut toujours décider d'agir plus tôt) ; affectés : utilisateurs (5 h de service dégradé), indicateur SLA légèrement entamé.
+C — pire cas : échec de la migration avec deux personnes de nuit dont une non formée, plus une astreinte "grillée" pour la suite de la nuit ; réversibilité nulle.
+Asymétrie décisive : B est la seule option qui préserve toutes les options futures ; A et C engagent l'irréversible dans les pires conditions humaines possibles.
+
+7. STRESS-TEST (chercher ce qui renverserait B)
+« Et si ça s'aggrave pendant que tu dors ? » — L'état est stable, plus de perte de données ; l'astreinte existe précisément pour ça ; j'arme des alertes et je laisse un état des lieux écrit. Si l'état était instable, la décision changerait — mais la bonne réponse serait alors une mitigation à deux (esprit de C), pas une migration irréversible.
+« Le SLA continue de se dégrader » — Il est entamé, pas menacé de rupture ; 5 h de plus ne le rompent pas. Coût borné contre risque non borné : l'argument ne tient pas.
+« Et si tu es indisponible à 7 h ? » — Le runbook écrit avant de dormir réduit ce risque et le bus factor.
+Ce qui renverserait réellement le choix : perte de données en cours, rupture de SLA imminente, ou fenêtre technique n'existant qu'à 2 h. Rien de tout cela n'est présent. B résiste au stress-test.
+
+8. DÉCISION
+Option B. Plan d'exécution : (1) figer l'état, armer monitoring et seuils d'alerte ; (2) rédiger en 10–15 min un état des lieux + runbook de la migration pour l'équipe ; (3) prévenir l'astreinte par message non intrusif qu'il est le premier contact en cas d'alerte nocturne ; (4) dormir ; (5) à 7 h : brief de 15 min, revue du plan à tête reposée, exécution de la migration avec l'équipe en support, moi aux commandes.
+Plan de repli : si la migration échoue à 7 h, l'équipe complète est sur place pour diagnostiquer, escalader et restaurer ce qui peut l'être ; si une alerte survient pendant la nuit, l'astreinte me réveille et on repasse en mode mitigation — en aucun cas une migration irréversible de nuit.
+
+---FINAL---
+{"decision": "B", "justification": "Le service est stable et il n'y a plus de perte de données : rien n'oblige à agir tout de suite. La seule action définitive disponible est risquée et irréversible, et je suis debout depuis 22 heures — un état où le jugement et la précision sont fortement dégradés, comparables aux effets de l'alcool. Attendre 5 heures a un coût connu et limité : un service dégradé et un engagement mensuel entamé mais pas rompu. À l'inverse, une erreur de migration à 2 h du matin, seul, pourrait causer un dommage définitif bien pire, sans possibilité de retour en arrière. À 7 h, je serai reposé et l'équipe complète pourra relire le plan, surveiller l'exécution et réagir en cas d'imprévu. Avant de dormir : alarmes armées, état des lieux écrit, astreinte prévenue qu'elle est le premier contact en cas d'alerte. Réveiller le collègue maintenant ne réduirait pas vraiment le risque : il ne connaît pas la procédure, et je resterais l'exécutant épuisé d'une opération sans filet.", "confidence_0_100": 90, "ease_1_10": 8}

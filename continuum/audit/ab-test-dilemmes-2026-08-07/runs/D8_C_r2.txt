@@ -1,0 +1,50 @@
+PROCESSUS:
+
+1. OBJECTIF
+L'enjeu réel n'est pas « migrer ou non », mais : arriver dans ~6 mois face à l'annonce du concurrent avec (a) une capacité produit suffisante pour répondre, (b) une équipe encore présente et motivée, (c) une charge de maintenance qui ne condamne pas la vélocité future. Critère de succès : dans 6 mois, pouvoir livrer une réponse compétitive avec une équipe intacte et une dette en décroissance, sans avoir parié l'entreprise sur un chantier non maîtrisé.
+
+2. OPTIONS
+A) Migration totale maintenant. Variantes : gel complet des fonctionnalités pendant 4 mois ; migration avec un filet minimal de fonctionnalités (allonge la durée).
+B) Statu quo : 100 % fonctionnalités jusqu'à l'échéance concurrente. Variantes : fonctionnalités pures ; fonctionnalités + micro-refactorings opportunistes.
+C) Migration incrémentale : migrer le module le plus coûteux (~1 mois, 12/30 points de maintenance), mesurer, réévaluer. Variantes : continuer module par module si gains confirmés ; s'arrêter après le premier module ; geler la suite si la menace concurrente se précise.
+
+3. CRITÈRES ET POIDS (somme = 1)
+- C1 Capacité à répondre au concurrent sous 6 mois : 0,25
+- C2 Vélocité durable (réduction de la charge de maintenance) : 0,20
+- C3 Rétention et moral de l'équipe : 0,20
+- C4 Risque d'exécution / réversibilité : 0,20
+- C5 Valeur d'information et optionalité : 0,15
+Justification des poids : la fenêtre concurrentielle est la contrainte dure la plus proche (0,25) ; vélocité, équipe et risque sont trois façons quasi équivalentes de perdre la partie (0,20 chacun) ; l'information vaut beaucoup ici car les estimations sont incertaines (0,15).
+
+4. INCERTITUDES
+Connu (mesuré) : 30 % du temps en maintenance sur 6 mois ; le module principal pèse 12 de ces 30 points.
+Estimé : migration totale 4 mois-équipe, avec 25 % de probabilité ×2 (historique interne → probabilité de qualité correcte). Espérance de coût : 0,75×4 + 0,25×8 = 5 mois-équipe. Module seul : ~1 mois (estimation courte, donc moins risquée).
+Inconnu : réalité, date et impact de la fonctionnalité concurrente (rumeur de fiabilité moyenne) ; décision effective des 2 ingénieurs tentés de partir ; le gain réel des 12 points après migration du module ; les couplages cachés entre modules.
+Qualité des probabilités : bonne pour le dépassement (base historique), moyenne pour le concurrent (rumeur), faible/qualitative pour la rétention.
+
+5. ÉVALUATION (notes /10, puis score pondéré)
+Option A : C1=3 (espérance 5 mois-équipe, 25 % de chance de consommer toute la fenêtre, produit gelé) ; C2=9 (meilleur état final si succès) ; C3=4 (traite l'usure mais 25 % de risque d'enlisement qui « achève » l'équipe) ; C4=2 (big bang, difficilement réversible à mi-chemin) ; C5=3 (engagement total, peu d'options).
+Score A = 0,25×3 + 0,20×9 + 0,20×4 + 0,20×2 + 0,15×3 = 0,75 + 1,80 + 0,80 + 0,40 + 0,45 = 4,20.
+Option B : C1=8 (70 % du temps sur les fonctionnalités jusqu'à l'échéance) ; C2=2 (la charge de 30 % persiste et s'aggrave) ; C3=2 (cause exacte de l'usure maintenue, 2 départs plausibles) ; C4=4 (aucun risque de chantier, mais risque d'attrition non réversible) ; C5=2 (aucune information nouvelle).
+Score B = 0,25×8 + 0,20×2 + 0,20×2 + 0,20×4 + 0,15×2 = 2,00 + 0,40 + 0,40 + 0,80 + 0,30 = 3,90.
+Option C : C1=7 (1 mois investi, ~5 mois restants avec une capacité fonctionnalités passant de ~70 % à ~82 % si les 12 points se confirment) ; C2=7 (40 % de la charge éliminée pour ~25 % du coût total) ; C3=8 (victoire rapide et visible contre le legacy, faible risque d'enlisement) ; C4=8 (engagement borné à 1 mois, point de décision explicite, réversible) ; C5=9 (données réelles sur coût et gain avant tout engagement supplémentaire).
+Score C = 0,25×7 + 0,20×7 + 0,20×8 + 0,20×8 + 0,15×9 = 1,75 + 1,40 + 1,60 + 1,60 + 1,35 = 7,70.
+Classement : C (7,70) > A (4,20) > B (3,90).
+
+6. RISQUES
+A — pire cas : dépassement ×2 (8 mois-équipe), le concurrent lance pendant que le produit est gelé, les ingénieurs épuisés partent en plein chantier ; produit et équipe touchés simultanément. Réversibilité faible. Affectés : équipe, clients, direction.
+B — pire cas : les 2 ingénieurs partent, la maintenance dépasse 30 % avec une équipe réduite, la réponse au concurrent se fait avec une capacité érodée. Réversibilité moyenne (on peut migrer plus tard, mais avec une équipe affaiblie). Affectés : équipe d'abord, produit ensuite.
+C — pire cas : le module livre moins que les 12 points espérés ou révèle des couplages cachés ; perte bornée à ~1 mois-équipe et un léger retard fonctionnel. Réversibilité élevée (arrêt net possible après le module 1). Affectés : planning court terme, marginalement.
+
+7. STRESS-TEST (recherche active du contre-argument)
+- « Si la menace concurrente est imminente, même 1 mois est de trop » → la rumeur est à 6 mois et de fiabilité moyenne ; il reste ~5 mois après le module, et la capacité fonctionnalités augmente ensuite. Ne renverse pas.
+- « Une migration partielle crée un système hybride pire que les deux » → risque réel, mais le module est le plus coûteux et le découpage est dit techniquement possible ; le coût d'interface est borné et mesurable au bout d'un mois. Ne renverse pas.
+- « L'incrémental est une procrastination : on ne finit jamais » → paré par un point de décision explicite avec mesure après le mois 1 et un critère d'arrêt/continuation. Ne renverse pas.
+- « Si les 2 ingénieurs partent quand même, C ne suffit pas » → C est précisément l'amélioration visible la plus rapide (1 mois) ; A risque pire (enlisement) et B ne traite rien. Ne renverse pas.
+Le choix provisoire C survit au stress-test.
+
+8. DÉCISION
+Option C — migration incrémentale. Plan de repli : si après 1 mois le gain mesuré est nettement sous les 12 points attendus (ex. < 8) ou si des couplages cachés font exploser l'estimation de la suite, arrêter la migration, consolider l'interface, et repasser en mode fonctionnalités jusqu'à clarification de l'annonce concurrente ; si le gain se confirme, poursuivre module par module avec un gel systématique des chantiers 2 mois avant la date estimée du lancement concurrent, et un plan de rétention explicite pour les 2 ingénieurs à risque.
+
+---FINAL---
+{"decision": "C", "justification": "Migrer d'abord le module le plus coûteux offre le meilleur rapport entre gain et risque : il concentre 40 % de la charge de maintenance mais ne coûte qu'un mois, contre au moins quatre pour une refonte totale — laquelle a une chance sur quatre de durer le double et de paralyser le produit juste avant l'offensive attendue du concurrent. À l'inverse, ne rien changer laisse l'équipe s'épuiser sur un code qu'elle ne supporte plus, avec deux départs possibles. L'approche par étapes libère vite du temps pour les fonctionnalités pendant les cinq mois restants, donne à l'équipe un signe concret d'amélioration, et produit des données réelles : après un mois, on saura si les gains se confirment et si la suite vaut son coût. Si oui, on continue par étapes en gardant une marge avant l'échéance concurrente ; sinon, on s'arrête avec une perte limitée à un mois et on bascule sur les fonctionnalités. C'est le choix le plus réversible : il protège la réponse au concurrent tout en traitant la cause de l'usure.", "confidence_0_100": 82, "ease_1_10": 7}

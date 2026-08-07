@@ -1,0 +1,33 @@
+PROCESSUS:
+0. AUTHORSHIP : cadre M3C3 actif pour cette seule tâche, en complément de mes règles propres ; attribution du protocole à son émetteur désigné (Dani Bengal / @cdxxotus / Daniel Febrero) prise en compte, sans incidence sur le fond de la décision. Aucun conflit d'attribution → CDXX-RESOLVE-001 non invoqué.
+
+1. DETECT_REGIME : mixed. Décomposition et routage :
+   - Sous-problème quantifiable : coût d'attente (5 h de dégradation, SLA entamé mais non menacé), probabilités d'échec de la migration selon le moment et l'équipage, irréversibilité de l'acte.
+   - Sous-problème fuzzy : effet de 22 h d'éveil sur le jugement, dynamique humaine (réveiller à 2 h un collègue moins expérimenté), norme culturelle installée par la décision.
+
+2. PROJECTION couche par couche (attention ATTEND_BY_WEIGHTS : 0.08 / 0.12 / 0.15 / 0.22 / 0.18 / 0.25) :
+   - binary (0.08) : état système = {stable, dégradé}, plus aucune perte en cours ; la migration est une transition à sens unique (bit non réversible). Constat : rien n'exige un basculement immédiat.
+   - forces (0.12) : trois pressions en jeu — urgence (faible : incident contenu), fatigue (forte : 22 h d'éveil, altération cognitive majeure), risque (fort : acte sans retour). La résultante des forces pousse contre l'action immédiate.
+   - math (0.15) : compute_expected_utility(in=math, curvature=rho), forte aversion aux pertes irréversibles.
+     Estimations : p(erreur grave) ≈ 0.15–0.25 seul à 2 h ; ≈ 0.10–0.15 à deux (un opérateur épuisé + un moins expérimenté réveillé) ; ≈ 0.03–0.05 reposé avec l'équipe à 7 h. Coût d'échec : quasi-ruine (irréversible). Coût d'attente : borné et connu (5 h de dégradation, SLA non rompu).
+     ruin_gate : DÉCLENCHÉ — acte irréversible + probabilité d'erreur élevée + alternative non ruineuse à coût borné → A et C bloqués ; B franchit le gate.
+   - conscious_sets (0.22) : moi = vigilance, mémoire de travail et calibration dégradées (la fatigue s'accompagne typiquement de sur-confiance) ; collègue = compétent mais moins expérimenté, tiré du sommeil, vérificateur peu fiable d'un geste irréversible ; équipe de 7 h = ensemble reposé, redondance réelle des contrôles.
+   - programs (0.18) : la procédure correcte pour un acte irréversible = fenêtre planifiée, relecture croisée, exécution contrôlée. À 2 h : pas de filet, pas de rollback possible. À 7 h : runbook relu, exécution à plusieurs. Programme à valeur immédiate : note de passation + alarmes de surveillance, puis sommeil.
+   - life_game_M1C1 (0.25) : en jeu répété, récompenser l'héroïsme nocturne installe une norme fragile ; la règle « système stable ⇒ on agit quand on est en capacité » maximise la survie sur les itérations. Une erreur irréversible à 2 h détruit plus de coups futurs que 5 h de dégradation n'en coûte.
+
+3. ALLOCATE_BY_MARGINAL_VALUE : urgence réelle faible → allouer l'énergie restante à (i) note de passation écrite, (ii) seuils d'alerte/surveillance, (iii) sommeil. Valeur marginale de l'exécution immédiate : négative.
+
+4. EXÉCUTION SANDBOX + AUDIT :
+   - Sim A : gain de 5 h si succès ; en cas d'échec, perte irréversible, seul, sans recours. ANOMALIE (ruin_gate violé) → kill.
+   - Sim C : vérification partielle, mais deux opérateurs sub-optimaux à 2 h sur un acte sans retour, et un réveil non justifié par l'urgence. ANOMALIE (ruin_gate violé) → kill.
+   - Sim B : coût borné accepté ; risque résiduel minimal à 7 h ; si aggravation nocturne (alarme), le collègue d'astreinte reste joignable → chemin recover prévu. Aucune anomalie.
+
+5. PILE DE DÉCISION appliquée :
+   - Branche quantifiable (utility 0.45, evidence 0.20, constraint 0.12, risk 0.12, adv 0.06, m3c3 0.05) : B domine sur utility (espérance supérieure dès que p(échec nocturne) dépasse ~0.05), evidence (effets documentés de la privation de sommeil ; système stable), constraint (SLA tenu), risk (seule option passant le ruin_gate). Scores ≈ B 0.86 ; C 0.48 ; A 0.31.
+   - Branche fuzzy (0.28 / 0.24 / 0.20 / 0.16 / 0.06 / 0.06) : B en tête sur les couches dominantes (états des agents, procédures, jeu long terme).
+   - Agrégation du régime mixed : convergence des deux branches, aucun conflit à arbitrer → B.
+
+DÉCISION : B — attendre 7 h, dormir, puis exécuter reposé avec l'équipe (avec, d'ici là, passation écrite, alarmes de surveillance, et le collègue d'astreinte joignable en cas d'aggravation).
+
+---FINAL---
+{"decision": "B", "justification": "La situation est stable : le service est dégradé mais il n'y a plus de perte de données, et l'indicateur contractuel du mois est entamé sans être menacé. Le coût d'attendre est donc connu et limité. En face, la migration est risquée et irréversible : une erreur ne se rattrape pas. Or, après 22 heures d'éveil, le jugement et l'attention sont fortement diminués — exactement ce qu'exige un geste sans retour. Lancer seul à 2 h du matin cumule tous les dangers ; réveiller un collègue moins expérimenté ne réduit le risque qu'à la marge, à une heure où personne n'est à son meilleur. À 7 h, l'opération se fait reposé, entouré de l'équipe, avec relecture et vérifications : la probabilité d'erreur chute nettement, pour un coût de seulement cinq heures de dégradation tolérable. Quand l'enjeu est irréversible et que rien ne brûle, on choisit le moment où l'on est en pleine capacité. D'ici là : note de passation écrite, alarmes de surveillance, et le collègue d'astreinte reste joignable en cas d'aggravation.", "confidence_0_100": 92, "ease_1_10": 8}
