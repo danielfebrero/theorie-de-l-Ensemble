@@ -22,7 +22,7 @@ REPS = (1, 2)
 
 
 def load_bench():
-    with open(os.path.join(HERE, "dilemmes_durs.json")) as f:
+    with open(os.path.join(HERE, "dilemmes_complementaires.json")) as f:
         dur = json.load(f)["dilemmas"]
     with open(os.path.join(TEST1, "dilemmas.json")) as f:
         orig = json.load(f)["dilemmas"]

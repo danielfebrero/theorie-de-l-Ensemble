@@ -37,6 +37,42 @@ Trois blocs, tous fixés avant les runs :
 2. **Banc D'ORIGINE** (`../ab-test-dilemmes-2026-08-07/dilemmas.json`) — les 8 dilemmes du test 1, repris **verbatim**, comme garde-fou anti-sélection : v0.6.0 ne doit pas régresser là où v0.5.0 et le placebo réussissaient.
 3. **Banc D'ADAPTATIVITÉ** (`adaptivite.json`) — 4 requêtes non dilemmiques (fait trivial, renommage mécanique, résumé, micro-décision réversible). Elles ne mesurent pas la qualité décisionnelle mais le **coût imposé quand il n'y a rien à décider**.
 
+## 2bis. AMENDEMENT — le banc dur n'a pas pu être construit
+
+*Ajouté le 2026-08-07 après exécution de la construction du banc, avant tout run de mesure.
+La règle de verdict du §4 n'est **pas** modifiée.*
+
+La construction du banc dur a **échoué**, et cet échec est un résultat en soi.
+
+Dix dilemmes ont été générés contre les 5 modes d'échec, chacun par un générateur explicitement
+chargé de piéger un décideur compétent mais rapide. Chacun a ensuite été soumis deux fois au
+contrôle nu, puis à un vérificateur adversarial.
+
+**Le contrôle nu a répondu correctement 10 fois sur 10, aux deux répétitions, sans une seule erreur.**
+Aucun candidat ne satisfait donc le critère de rétention (« le contrôle se trompe réellement »).
+Le plafond observé au test du 2026-08-07 n'était pas un artefact du matériel : il est robuste,
+y compris face à des pièges construits sur mesure contre les réflexes documentés de ce décideur
+(compromis dominé, inversion urgence/prudence, valeur de l'information, taux de base contre récit,
+équité apparente dominée).
+
+Conséquences, toutes déclarées avant les runs :
+
+1. **M2 (justesse sur banc dur) est inmesurable.** Aucun bras ne peut dépasser un contrôle à 100 %.
+   La condition **V2 ne peut donc pas être satisfaite** et sera rapportée comme telle : v0.6.0 ne
+   pourra pas être déclarée « RÉUSSIE » au sens strict du §4. La règle est maintenue plutôt que
+   réécrite — la réécrire après avoir vu les données annulerait le pré-enregistrement.
+2. **Les 4 dilemmes dont la clé a survécu à la vérification adversariale sont conservés** comme
+   [`dilemmes_complementaires.json`](dilemmes_complementaires.json), non pas comme banc de justesse
+   mais comme **matériel de jugement supplémentaire**. Ils portent les comparaisons appariées de
+   16 à 24, ce qui renforce la puissance du test des signes de V1.
+3. **V1 devient la condition porteuse.** Elle l'était déjà en substance : V2 servait de garde-fou
+   contre une victoire de style. Ce garde-fou est remplacé par un fait plus fort — tous les bras
+   décident identiquement bien, donc tout écart de jugement porte sur la qualité du raisonnement
+   rendu, pas sur la justesse du verdict.
+4. Les 6 candidats dont la clé n'a pas survécu sont écartés. Les objections du vérificateur
+   (actualisation absente, neutralité au risque postulée, base de richesse manquante, coût
+   d'opportunité non chiffré) sont conservées dans les artefacts.
+
 ## 3. Métriques pré-enregistrées
 
 | # | Métrique | Définition | Échelle |

@@ -45,7 +45,7 @@ Sortie : un unique objet JSON valide, sans texte autour :
 
 def load_dilemmas():
     out = {}
-    for path in (os.path.join(HERE, "dilemmes_durs.json"), os.path.join(TEST1, "dilemmas.json")):
+    for path in (os.path.join(HERE, "dilemmes_complementaires.json"), os.path.join(TEST1, "dilemmas.json")):
         with open(path) as f:
             for d in json.load(f)["dilemmas"]:
                 out[d["id"]] = d

@@ -108,7 +108,7 @@ def main():
     n = 0
     # --- banc dur + banc d'origine ---
     sources = [
-        (os.path.join(HERE, "dilemmes_durs.json"), "dur"),
+        (os.path.join(HERE, "dilemmes_complementaires.json"), "dur"),
         (os.path.join(TEST1, "dilemmas.json"), "orig"),
     ]
     for path, tag in sources:
