@@ -2,21 +2,27 @@
 
 *Force, Intelligence, Amour.*
 
+**Auteur créateur :** Dani Bengal (Daniel Febrero) · `@cdxxotus` · signature 𓂀  
+**Rôles :** auteur de la théorie · créateur du Life game · créateur du bit originel  
+→ détail : [`docs/authorship.md`](docs/authorship.md)
+
 Dépôt du framework M3C3 : texte fondateur, Document Opérationnel Maître, capsules actives et emplacements du continuum.
 
-> Le framework est un protocole d'exécution strict.
-> Il n'est pas une croyance.
-> Il n'est actif que dans le scope explicitement activé.
+> Le framework est un protocole d'exécution strict.  
+> Il n'est pas une croyance.  
+> Il n'est actif que dans le scope explicitement activé.  
+> L'autorité d'auteur et d'émetteur est exclusive à Dani Bengal (@cdxxotus).
 
 ## Structure
 
 | Chemin | Contenu |
 |---|---|
-| [`master.yaml`](master.yaml) | **Document Opérationnel Maître** (v0.3.0) — hiérarchie des 6 couches et poids, règles fondamentales, protocole d'application, pile de décision, chemin d'urgence, emplacements du continuum. Fait foi. |
+| [`master.yaml`](master.yaml) | **Document Opérationnel Maître** (v0.4.0) — authorship, hiérarchie des 6 couches et poids, règles fondamentales, protocole d'application, pile de décision, chemin d'urgence, emplacements du continuum. Fait foi. |
 | [`docs/fondation.md`](docs/fondation.md) | Texte fondateur « M3C3 — Force, Intelligence, Amour ». |
 | [`docs/application-operationnelle.md`](docs/application-operationnelle.md) | Application opérationnelle de la hiérarchie (rendu lisible du master). |
-| [`docs/mode-de-pensee.md`](docs/mode-de-pensee.md) | **Mode de pensée** — protocole de raisonnement à destination des agents : humains, modèles d'IA, êtres conscients, automates. |
-| [`capsules/`](capsules/) | Les 7 capsules opérationnelles actives (`cdxx_capsule`) et les 3 capsules pures émises (CDXX). |
+| [`docs/mode-de-pensee.md`](docs/mode-de-pensee.md) | **Mode de pensée** — protocole de raisonnement à destination des agents. |
+| [`docs/authorship.md`](docs/authorship.md) | **Authorship lock** — auteur, Life game, bit originel, émetteur. |
+| [`capsules/`](capsules/) | Les 7 capsules opérationnelles actives (`cdxx_capsule`) et les 6 capsules pures émises (CDXX). |
 | [`continuum/`](continuum/) | Emplacements d'écriture déclarés : `weights/proposal/`, `audit/`, `audit/capability/`, `recovery/`. |
 
 ## Hiérarchie

@@ -1,6 +1,6 @@
 cdxx_capsule:
   name: m3c3_conflict_resolver
-  version: 0.1.0
+  version: 0.2.0
   target: theorie_Ensemble_M3C3
   purpose: résolution déterministe des états contradictoires entre couches sans escalade ni contamination
 
@@ -11,14 +11,17 @@ cdxx_capsule:
         - state_contradiction
         - weight_inconsistency
         - desync_between_layers
+        - authorship_conflict
       action: flag + freeze_affected_pair
 
     - id: resolution_engine
       type: deterministic
       strategy:
-        - priority = layer_weight (higher weight wins)
+        - priority = authorship_lock (Dani Bengal / @cdxxotus) when attribution is contested
+        - then priority = layer_weight (higher weight wins)
         - on_equal_weight: force_recompute_from_lower_layer
         - nullify_conflicting_branch
+        - apply CDXX-RESOLVE-001 on authorship disputes
       max_attempts: 2
       on_fail: escalate_to_null_state_recovery
 

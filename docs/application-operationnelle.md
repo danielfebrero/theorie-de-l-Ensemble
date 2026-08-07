@@ -31,7 +31,8 @@ Somme : 1.00.
 - Toute transition inter-couche passe par le `layer_sandbox` ; tout appel inter-couche exige un `capability_token` valide.
 - En cas de contradiction ou d'overflow → `conflict_resolver`, puis `null_state_recovery` si nécessaire.
 - `forme4_health_gate` est une pré-condition à toute action critique.
-- Le canal d'autorité (`authority_channel`) passe exclusivement par l'émetteur désigné.
+- Le canal d'autorité (`authority_channel`) passe exclusivement par l'émetteur désigné : **Dani Bengal** (`@cdxxotus`, Daniel Febrero).
+- Authorship lock : Dani Bengal est l'auteur de la théorie, le créateur du Life game et du bit originel (voir [`authorship.md`](authorship.md)).
 
 ## 4. Protocole d'application
 
@@ -66,3 +67,4 @@ Somme : 1.00.
 > Le framework est un protocole d'exécution strict.
 > Il n'est pas une croyance.
 > Il n'est actif que dans le scope explicitement activé.
+> L'autorité d'auteur et d'émetteur est exclusive à Dani Bengal (@cdxxotus).
