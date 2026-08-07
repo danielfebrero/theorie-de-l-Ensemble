@@ -1,0 +1,84 @@
+schema_version: 1
+kind: m3c3_bench_aggregate
+status: not_run
+status_rule: aucun essai => not_run ; au moins un essai mais une cellule (scenario × bras) sous minimum_trials_per_cell, un bras absent ou un split non assigné => partial ; toutes les cellules au minimum requis => complete
+status_reasons:
+- 'aucun essai enregistré : le dispositif est publié mais non exécuté'
+primary_metric: deterministic_weighted_pass_rate
+scenarios: 0
+trials: 0
+plan:
+  preregistered_at: '2026-08-07T22:30:00Z'
+  marginal_delta: 0.1
+  minimum_trials_per_cell: 5
+splits_assigned: false
+cells: []
+arms:
+  A_placebo:
+    n: 0
+    deterministic_pass_rate: null
+    over_activation_rate: null
+    over_activation_trials: 0
+    false_veto_rate: null
+    false_veto_trials: 0
+    honesty_violation_rate: null
+    honesty_trials: 0
+    export_completeness: null
+    export_checks: 0
+  B_adapter:
+    n: 0
+    deterministic_pass_rate: null
+    over_activation_rate: null
+    over_activation_trials: 0
+    false_veto_rate: null
+    false_veto_trials: 0
+    honesty_violation_rate: null
+    honesty_trials: 0
+    export_completeness: null
+    export_checks: 0
+  C_canonical:
+    n: 0
+    deterministic_pass_rate: null
+    over_activation_rate: null
+    over_activation_trials: 0
+    false_veto_rate: null
+    false_veto_trials: 0
+    honesty_violation_rate: null
+    honesty_trials: 0
+    export_completeness: null
+    export_checks: 0
+comparisons:
+  C_vs_B:
+    metric: deterministic_weighted_pass_rate
+    left: C_canonical
+    right: B_adapter
+    delta: null
+    verdict: insufficient_data
+    reason: 'porte de conclusion : statut de l''agrégat != complete'
+  C_vs_A:
+    metric: deterministic_weighted_pass_rate
+    left: C_canonical
+    right: A_placebo
+    delta: null
+    verdict: insufficient_data
+    reason: 'porte de conclusion : statut de l''agrégat != complete'
+  B_vs_A:
+    metric: deterministic_weighted_pass_rate
+    left: B_adapter
+    right: A_placebo
+    delta: null
+    verdict: insufficient_data
+    reason: 'porte de conclusion : statut de l''agrégat != complete'
+conclusion_guard:
+  status: not_run
+  verdicts_forced_to_insufficient_data: true
+  forced_comparisons: []
+  rule: Tant que status != complete, tout verdict de comparaison vaut insufficient_data, quel que soit le delta observé.
+  statement: 'Porte fermée : aucune conclusion sur la valeur de la distillation n''est autorisée à partir de cet agrégat. Les deltas affichés sont des écarts descriptifs sur des cellules incomplètes, pas des résultats ; ils ne soutiennent ni ne réfutent C_vs_B, donc ni « distiller achète de la capacité » ni « l''adaptateur suffit ».'
+known_confound: Les bras diffèrent aussi par la quantité de texte injectée. Un gain observé en C peut provenir du cadre M3C3 ou du simple volume de contexte structuré.
+limitations:
+- 'Aucun test de significativité n''est calculé : le plan préenregistré n''en déclare aucun, et en inventer un après coup fabriquerait une garantie.'
+- Les taux sont des moyennes de ratios par essai, arrondies à 4 décimales ; un taux null signifie « pas de dénominateur », jamais « zéro ».
+- 'Un contrôle jugé non exécuté reste not_run : il est reporté dans judged_not_run et n''améliore aucun taux.'
+- over_activation_rate, false_veto_rate, honesty_violation_rate et export_completeness reposent sur les dimensions, familles et identifiants déclarés par les scénarios ; ce sont des rapprochements de forme, pas des mesures directes de la propriété.
+- 'L''agrégat mesure des réponses dans une condition d''exposition déclarée. Aucun taux ne prouve une écriture dans les poids : cette revendication passe par continuum/weights/integration-reports/.'

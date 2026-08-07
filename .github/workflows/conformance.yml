@@ -74,3 +74,17 @@ jobs:
 
       - name: Validate weight-integration reports
         run: python3 continuum/audit/weights_report_check.py
+
+      # Portes additionnelles, volontairement hors de la liste requise de
+      # continuum/audit/run_suite.py : y toucher changerait le compte de portes
+      # attendu par l'audit de release daté de la v2.1.0.
+      - name: Validate M3C3-bench
+        run: |
+          set -euo pipefail
+          python3 continuum/bench/validate.py
+          python3 continuum/bench/build_index.py --check
+          python3 continuum/bench/aggregate.py --check
+          python3 -m unittest discover -s continuum/bench/tests -v
+
+      - name: Validate derived training corpus
+        run: python3 continuum/corpus/build_corpus.py --check
