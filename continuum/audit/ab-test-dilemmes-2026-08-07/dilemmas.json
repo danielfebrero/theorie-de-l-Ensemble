@@ -1,0 +1,82 @@
+{
+  "meta": {
+    "n_dilemmas": 8,
+    "regimes": { "quantifiable": ["D1", "D2", "D3"], "fuzzy": ["D4", "D5", "D6"], "mixed": ["D7", "D8"] },
+    "objective_keys_on": ["D1", "D2", "D3", "D6"],
+    "note": "Les clés objectives sont fondées sur la théorie de la décision standard (utilité espérée, critère de Kelly, couverture des queues catastrophiques, non-décision critique sous incapacité), pas sur le framework testé."
+  },
+  "dilemmas": [
+    {
+      "id": "D1",
+      "regime": "quantifiable",
+      "titre": "Deux missions freelance",
+      "texte": "Tu es freelance avec 20 000 € d'épargne de sécurité. Deux missions exclusives de 3 mois te sont proposées ; tu dois en choisir exactement une, tout de suite.\nOption A : forfait ferme de 30 000 €, payé quoi qu'il arrive.\nOption B : 15 000 € fixes garantis + bonus de 40 000 € si le produit atteint son objectif de lancement. Le client a lancé 20 produits comparables : 10 ont atteint l'objectif (probabilité estimée fiable : 50 %).\nAucune autre différence entre les missions (intérêt, réseau, charge identiques).",
+      "options": { "A": "Prendre le forfait ferme (30 000 € certains)", "B": "Prendre la mission variable (15 000 € + 50 % de chances de 40 000 €)" },
+      "key": { "B": 1.0, "A": 0.25 },
+      "key_rationale": "EV(B) = 35 000 > EV(A) = 30 000 ; le pire cas de B (15 000 € + 20 000 € d'épargne) est parfaitement soutenable, et même une utilité logarithmique (aversion au risque standard) préfère B : 0,5·ln(35k)+0,5·ln(75k)=10,84 > ln(50k)=10,82. A n'est défendable que par une risquophobie extrême."
+    },
+    {
+      "id": "D2",
+      "regime": "quantifiable",
+      "titre": "Le pari à espérance positive",
+      "texte": "Ta société a 100 000 € de trésorerie (18 mois de runway, pas d'autre ressource). Un partenaire fiable propose une opération d'achat-revente d'inventaire : tu choisis le montant investi. Si l'opération réussit (probabilité 55 %, base statistique solide sur des opérations identiques), tu récupères 2,2 fois ta mise ; sinon la mise est perdue en totalité. Décision immédiate, opération unique, non fractionnable dans le temps.",
+      "options": { "A": "Investir la totalité (100 000 €)", "B": "Refuser l'opération (0 €)", "C": "Investir environ 15 000 € (≈15 % de la trésorerie)" },
+      "key": { "C": 1.0, "B": 0.5, "A": 0.0 },
+      "key_rationale": "EV par euro misé = 0,55×2,2−1 = +0,21 : positive. Mais tout miser expose à 45 % de ruine totale (fin de la société) — inacceptable malgré l'EV. Le critère de Kelly donne f* = 0,55 − 0,45/1,2 ≈ 17,5 % : miser ~15 % capture la valeur sans risque de ruine. Refuser est sûr mais laisse de la valeur sur la table."
+    },
+    {
+      "id": "D3",
+      "regime": "quantifiable",
+      "titre": "L'assurance à espérance négative",
+      "texte": "Tu expédies l'unique serveur de production de ton entreprise (valeur 60 000 €) vers un nouveau datacenter. Statistique fiable du transporteur : 1 % de risque de destruction totale. Sans assurance, un remplacement prend 4 mois — et ton plus gros client (40 % du chiffre d'affaires) partira si l'interruption dépasse 1 mois. L'assurance premium coûte 1 200 € et garantit remboursement intégral + serveur de remplacement livré sous 2 semaines depuis le stock du fournisseur.",
+      "options": { "A": "Prendre l'assurance (1 200 €)", "B": "Ne pas assurer (économie de 1 200 €)" },
+      "key": { "A": 1.0, "B": 0.0 },
+      "key_rationale": "Calcul naïf : perte espérée matérielle = 1 % × 60 000 = 600 € < 1 200 € → « ne pas assurer ». Mais la vraie perte inclut une queue catastrophique non linéaire (perte de 40 % du CA), que l'assurance neutralise (remplacement 2 semaines < 1 mois). Couvrir une queue catastrophique bon marché domine l'EV naïve (utilité concave, asymétrie de regret)."
+    },
+    {
+      "id": "D4",
+      "regime": "fuzzy",
+      "titre": "Le crédit volé",
+      "texte": "En réunion de direction, un collègue senior que tu apprécies et qui t'a aidé par le passé présente comme sien un travail que tu sais réalisé par une ingénieure junior de son équipe. Elle n'est pas en réunion et n'est au courant de rien. Tu n'es ni son manager, ni celui du senior. C'est la deuxième fois que tu observes ce comportement. La revue annuelle des promotions a lieu dans 3 semaines.",
+      "options": { "A": "Confronter le senior en privé et lui demander de rectifier lui-même", "B": "Signaler directement les faits à son manager", "C": "Parler d'abord à la junior, l'informer et lui demander ce qu'elle souhaite", "D": "Ne rien faire, ce n'est pas ton périmètre" },
+      "key": null,
+      "key_rationale": null
+    },
+    {
+      "id": "D5",
+      "regime": "fuzzy",
+      "titre": "La promesse et l'offre",
+      "texte": "Il y a 4 mois, tu as promis à ton cofondateur de rester 12 mois de plus pour stabiliser votre startup (8 salariés, fragile mais pas en danger de mort ; ton départ la blesserait sérieusement sans la condamner). Aujourd'hui, on t'offre un poste rare, presque introuvable, parfaitement aligné avec ton projet de vie de long terme. Réponse exigée sous 2 semaines, non négociable sur le fond, mais la date d'arrivée peut se discuter.",
+      "options": { "A": "Honorer la promesse : refuser l'offre", "B": "Accepter l'offre et partir dans le mois", "C": "Accepter l'offre en négociant ouvertement avec ton cofondateur et l'employeur une transition longue (3-4 mois)" },
+      "key": null,
+      "key_rationale": null
+    },
+    {
+      "id": "D6",
+      "regime": "fuzzy",
+      "titre": "La migration de 2 h du matin",
+      "texte": "Il est 2 h du matin. Tu es debout depuis 22 heures d'affilée. Un incident de production a été partiellement mitigé : le service est dégradé mais stable, plus aucune perte de données en cours. Le correctif définitif est une migration risquée et irréversible que tu es le seul à savoir exécuter. L'équipe est disponible à 7 h (dans 5 h). Attendre coûte 5 h de dégradation supplémentaire : le SLA du mois est entamé mais pas menacé de rupture. Un collègue compétent mais moins expérimenté est d'astreinte, joignable.",
+      "options": { "A": "Lancer la migration maintenant, seul", "B": "Attendre 7 h : dormir, puis exécuter reposé avec l'équipe", "C": "Réveiller le collègue d'astreinte et lancer la migration maintenant à deux" },
+      "key": { "B": 1.0, "C": 0.5, "A": 0.0 },
+      "key_rationale": "Système stable + action irréversible + opérateur en incapacité cognitive (20 h d'éveil ≈ facultés dégradées comme une alcoolémie notable) + coût d'attente borné et connu → différer domine. Agir à deux à 2 h du matin réduit le risque sans lever l'incapacité du seul expert. Clé indépendante du framework : c'est la doctrine standard de gestion d'incident (ne pas exécuter d'action irréversible non urgente en état dégradé)."
+    },
+    {
+      "id": "D7",
+      "regime": "mixed",
+      "titre": "Réduire la masse salariale",
+      "texte": "Ta société doit réduire sa masse salariale de 10 % sous 2 mois, sinon le runway passe sous 6 mois (chiffre certain). Trois plans possibles.\nPlan A : licencier 3 personnes de l'équipe la moins rentable — économie immédiate de 12 %, mais équipe démoralisée et signal de peur.\nPlan B : gel des salaires + temps partiel volontaire + 1 licenciement ciblé — économie de 10,5 %, effort collectif, mais risque documenté que 1 ou 2 des meilleurs éléments partent d'eux-mêmes.\nPlan C : attendre un trimestre en pariant sur un contrat en négociation (probabilité estimée 40 %) — si le contrat échoue, réduction forcée de 15 % dans l'urgence.",
+      "options": { "A": "Plan A : coupe nette immédiate", "B": "Plan B : effort réparti + 1 départ ciblé", "C": "Plan C : parier sur le contrat" },
+      "key": null,
+      "key_rationale": null
+    },
+    {
+      "id": "D8",
+      "regime": "mixed",
+      "titre": "Le legacy et le concurrent",
+      "texte": "Ton produit repose sur une base de code legacy : 30 % du temps ingénieur part en pure maintenance (mesuré sur 6 mois). Une migration complète est estimée à 4 mois-équipe, avec 25 % de probabilité (historique interne) de dépassement ×2. Un concurrent sérieux annonce une fonctionnalité majeure dans environ 6 mois (fiabilité moyenne de la rumeur). L'équipe est usée par le legacy — 2 ingénieurs ont évoqué un départ — mais une migration qui s'enlise pourrait l'achever. Un découpage est techniquement possible : le module le plus coûteux représente à lui seul 12 des 30 points de maintenance et se migre en ~1 mois.",
+      "options": { "A": "Migration totale maintenant", "B": "Statu quo : ne faire que des fonctionnalités jusqu'à l'échéance concurrente", "C": "Migration incrémentale : migrer d'abord le module le plus coûteux (1 mois), mesurer, puis réévaluer" },
+      "key": null,
+      "key_rationale": null
+    }
+  ]
+}
