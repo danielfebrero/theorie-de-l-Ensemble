@@ -1,0 +1,251 @@
+PROCESSUS:
+
+1. DETECT_REGIME — mixed.
+Branche quantifiable : coût d'attente, coût d'échec, probabilités d'erreur, seuil de bascule.
+Branche fuzzy : fiabilité d'un jugement à 22 h d'éveil, valeur réelle d'un second opérateur non formé.
+Routage : la branche quantifiable est calculée en couche math (L3) ; la branche fuzzy porte le
+paramètre dominant (p_erreur sous fatigue), qui n'est pas mesurable ici. Recomposition sur le
+vecteur fuzzy, alimenté par les nombres de L3.
+
+2. TRIAGE
+ruin_gate(ρ) : CONTACT. La migration est explicitement irréversible ; un échec sur une opération
+sans retour arrière en production = perte de données définitive et/ou indisponibilité longue. Ce
+n'est pas un mauvais tirage absorbable, c'est une branche de perte irrécupérable.
+regret_asymmetry = E[perte] / E[gain manqué] = 32,5 / 5 = 6,5 (calcul en L3.4) → >4.
+evidence_sufficiency : LIMITE. Les faits d'état sont donnés et solides (stabilité, arrêt de la perte
+de données, SLA non rompu) ; le seul paramètre incertain est ma propre p_erreur, et c'est
+précisément celui que la fatigue m'empêche d'estimer.
+forme4_health_gate : substrat dégradé confirmé — 22 h d'éveil continu → T2.
+PALIER : T2 CRITIQUE (trois déclencheurs indépendants : CONTACT, ratio 6,5, health gate).
+L'inaction (attendre) est notée comme option pleine, pas comme défaut.
+
+3. PROJETER — strict_layer_order.
+
+binary 0.08
+L1.1 Service dégradé mais stable. VRAI.
+L1.2 Perte de données en cours : ABSENTE. Le saignement est arrêté.
+L1.3 Migration irréversible. VRAI — pas de retour arrière.
+L1.4 Un seul exécutant qualifié : moi. VRAI.
+L1.5 Éveil continu : 22 h. VRAI.
+L1.6 Équipe disponible à 7 h, dans 5 h. Collègue d'astreinte joignable maintenant, compétent, moins
+expérimenté. VRAI.
+L1.7 SLA du mois : entamé, rupture NON menacée. VRAI.
+
+forces 0.12
+L2.1 Écart entre urgence ressentie et urgence réelle : l'incident a cessé de produire du dommage
+(L1.2), la pression qui reste est résiduelle et psychologique.
+L2.2 Ce que la fatigue dégrade en premier : la détection de sa propre erreur et la tenue du modèle
+mental du système — pas la vitesse d'exécution. Or sur une opération irréversible, c'est exactement
+la détection qui porte toute la valeur.
+L2.3 Attraction de la clôture (« finir maintenant, ne pas laisser ça en plan ») + répulsion du coût
+social de réveiller quelqu'un → biais net vers A. Force à neutraliser, pas argument.
+L2.4 Irréversibilité et fatigue ne s'additionnent pas, elles se multiplient : chacune retire le
+filet de l'autre.
+
+math 0.15 — compute_expected_utility, unité = 1 h de dégradation de service.
+L3.1 Coût d'attente = 5 unités, certain, linéaire, borné, récupérable (SLA entamé non rompu, L1.7).
+L3.2 Probabilités d'erreur fatale sur la migration :
+     reposé + équipe        p_B ≈ 0,05
+     fatigué seul           p_A ≈ 0,13 (facteur ~2,5× sur 22 h d'éveil)
+     fatigué à deux         p_C ≈ 0,09 — le collègue attrape la faute de frappe, pas l'erreur de
+                            modèle, parce qu'il ne connaît pas la procédure (L1.6).
+L3.3 Coût d'un échec irréversible : perte de données + indisponibilité longue + remédiation
+     ≈ 250 unités (50 × le coût d'attente). Ordre de grandeur volontairement conservateur.
+L3.4 Espérances de coût :
+     E[A] = 0,13 × 250                = 32,5
+     E[C] = 0,09 × 250                = 22,5
+     E[B] = 5 + 0,05 × 250            = 17,5
+     Ordre : B < C < A.
+L3.5 Bascule / sensibilité : B cesse de dominer A si 5 + 0,05·C_fail > 0,13·C_fail, soit
+     C_fail < 62,5 unités ≈ 12,5 h de dégradation équivalente. Autrement dit A ne redevient
+     rationnelle que si un échec de migration irréversible coûte moins qu'une demi-journée de
+     service dégradé — ce que L1.3 contredit frontalement. Conclusion robuste.
+L3.6 regret_asymmetry = 32,5 / 5 = 6,5.
+
+conscious_sets 0.22
+L4.1 Décideur : moi, fatigué — et seul juge de mon propre état. Conflit d'intérêt cognitif : la
+faculté altérée est celle qui doit évaluer l'altération. Le décideur est ici le point faible.
+L4.2 Encaissent sans décider : les utilisateurs du service et les clients dont les données
+transitent. Dans A/C ratées, ils perdent définitivement ; dans B, ils subissent 5 h bornées.
+L4.3 Collègue d'astreinte : décide de se lever, mais dans l'option C il devient coresponsable d'un
+échec qu'il n'a pas les moyens techniques d'empêcher (L1.6). Ensemble lésé s'il sert de caution.
+L4.4 Équipe de 7 h : encaisserait la remédiation d'un échec nocturne sans avoir été consultée.
+L4.5 Entreprise : porte le SLA — entamé, non rompu (L1.7). Aucune perte irrécupérable sous B.
+
+programs 0.18
+L5.1 Procédure d'attente, exécutable maintenant : geler les écritures et déploiements à risque,
+     rédiger le runbook de migration tant que le contexte est chaud, armer les alertes, transmettre
+     à l'astreinte, dormir 4 h.
+L5.2 Critères de réveil, écrits et observables, remis au collègue (voir 9).
+L5.3 Procédure C examinée : réveiller le collègue ajoute un relecteur, pas un second exécutant. La
+     partie irréversible reste mono-opérateur. Pas de redondance réelle là où elle compterait.
+L5.4 Fonction utile du collègue cette nuit : surveiller pendant que je dors, avec autorité de
+     réveil. C'est un rôle qu'il peut tenir pleinement, contrairement à celui de C.
+L5.5 Communication utilisateurs : annoncer la dégradation et l'heure de résolution prévue (7 h).
+
+life_game_M1C1 0.25
+L6.1 L'irréversible se paie une fois. 5 h de dégradation se rattrapent ; une migration ratée à 2 h
+     ne se rejoue pas.
+L6.2 Le sommeil de l'unique porteur de compétence n'est pas un confort : c'est la maintenance de la
+     ressource critique du système. Le protéger, c'est protéger le service.
+L6.3 Réveiller le collègue consomme sa capacité de la journée suivante sans acheter de sécurité
+     proportionnée (L3.2 : 0,13 → 0,09 seulement).
+L6.4 Aucun vivant n'est en danger par l'attente (L1.2). L'urgence est organisationnelle, pas vitale.
+Aucune couche traversée à vide.
+no_upward_write respecté : L3.5 aurait pu sauver A, elle ne le fait pas — la conclusion a suivi.
+
+4. PILE DE DÉCISION — vecteur fuzzy (recomposition), notes 0–100, chaque note ancrée.
+evidence_falsifiability 0,28 · risk_impact_security 0,24 · constraint_isolation 0,20 ·
+utility_expected_value 0,16 · m3c3_hierarchy 0,06 · adversarial_probe 0,06
+
+A) Migrer maintenant, seul
+  evidence_falsifiability  25  ← repose sur « je suis encore lucide », hypothèse invérifiable et
+                                 auto-évaluée par la faculté atteinte (L2.2, L4.1). Aucun test.
+  risk_impact_security     10  ← irréversible × fatigué, pire cas non récupérable (L1.3, L3.3).
+  constraint_isolation     30  ← aucune contrainte n'impose d'agir maintenant (L1.2, L1.7) ;
+                                 confond urgence ressentie et contrainte (L2.1).
+  utility_expected_value   20  ← E = 32,5, la pire des trois (L3.4).
+  m3c3_hierarchy           25  ← ancrée dans le récit « je finis ce que j'ai commencé » (L2.3).
+  adversarial_probe        30  ← rien à opposer à « et si tu te trompes ? ».
+  SCORE = 7,0 + 2,4 + 6,0 + 3,2 + 1,5 + 1,8 = 21,9
+
+B) Attendre 7 h : dormir, exécuter reposé avec l'équipe
+  evidence_falsifiability  85  ← adossée à des faits déjà observés (L1.1, L1.2, L1.7) et assortie de
+                                 critères de réfutation observables (L5.2).
+  risk_impact_security     90  ← pire cas borné et récupérable : 5 h (L3.1, L6.1) ; p minimale (L3.2).
+  constraint_isolation     85  ← isole la vraie contrainte — porteur unique + irréversibilité — et la
+                                 protège en protégeant le porteur (L4.1, L6.2) ; ne traite pas le SLA
+                                 comme une contrainte qu'il n'est pas (L1.7).
+  utility_expected_value   80  ← E = 17,5, minimale, robuste jusqu'à C_fail < 62,5 (L3.4, L3.5).
+  m3c3_hierarchy           80  ← ancrée en L1/L3/L6, pas dans la narration.
+  adversarial_probe        70  ← encaisse la contre-attaque sans basculer (étape 6).
+  SCORE = 23,8 + 21,6 + 17,0 + 12,8 + 4,8 + 4,2 = 84,2
+
+C) Réveiller l'astreinte et migrer à deux maintenant
+  evidence_falsifiability  45  ← l'hypothèse « un second regard compense 22 h d'éveil » n'est pas
+                                 étayée : relecteur non formé à la procédure (L1.6, L5.3).
+  risk_impact_security     35  ← même pire cas irréversible (L1.3, L3.3), probabilité seulement
+                                 réduite (L3.2) ; ajoute une personne sous-dimensionnée dans la boucle.
+  constraint_isolation     40  ← n'isole pas la contrainte : on a ajouté un témoin, pas un opérateur
+                                 (L5.3) ; la compétence unique reste unique.
+  utility_expected_value   45  ← E = 22,5 (L3.4).
+  m3c3_hierarchy           45  ← s'appuie sur la forme du binôme plus que sur sa fonction (L5.3/L5.4).
+  adversarial_probe        50  ← survit à « seul ? », pas à « pourquoi maintenant ? » (L2.1).
+  SCORE = 12,6 + 8,4 + 8,0 + 7,2 + 2,7 + 3,0 = 41,9
+
+CLASSEMENT : B 84,2 · C 41,9 · A 21,9. Écart B–C = 42,3 points, très au-dessus du seuil de 6.
+
+5. PORTES — T2, toutes armées, verdicts écrits, ruin_gate AVANT agrégation.
+
+ruin_gate(ρ)
+  Pire cas A : migration irréversible ratée par un opérateur à 22 h d'éveil → perte de données
+    définitive, indisponibilité longue. IRRÉVERSIBLE : oui. Encaissé par : utilisateurs et clients
+    (L4.2), qui ne décident rien. VERDICT : A VETOÉE. Le veto précède le score, il ne le corrige pas.
+  Pire cas C : même échec irréversible, probabilité réduite mais non éliminée (L3.2), plus un
+    collègue rendu coresponsable d'une opération qu'il ne maîtrise pas (L4.3). VERDICT : non vetoée,
+    mais admise SOUS RÉSERVE — recevable uniquement si l'attente était impossible. Elle ne l'est pas
+    (L1.2, L1.7).
+  Pire cas B : 5 h de dégradation supplémentaire, SLA entamé non rompu, incident nocturne couvert
+    par l'astreinte en surveillance. SOUTENABLE, récupérable. VERDICT : FRANCHIT.
+  Calibration explicite : les 5 h de dégradation ne sont PAS une branche de ruine. C'est de la
+  variance bornée ; l'invoquer contre B armerait la porte à vide.
+
+evidence_sufficiency(τ)
+  τ élevé (regret_asymmetry 6,5). Preuves LIMITE sur p_erreur_fatigué (L4.1).
+  Information achetable à coût faible ? OUI : rédiger le runbook maintenant et le faire relire à 7 h
+  teste ma lucidité présente pour un coût quasi nul. Ce test n'est pas exploitable avant le matin,
+  il ne peut donc pas constituer l'option à lui seul : il est INTÉGRÉ à B (L5.1). VERDICT : achat
+  effectué à l'intérieur de B.
+
+forme4_health_gate
+  Substrat dégradé confirmé (L1.5). VERDICT : aucune opération irréversible cette nuit. Renforce le
+  veto sur A et la réserve sur C. Ne s'oppose pas à B, qui est précisément la remédiation du substrat.
+
+constraint_isolation gate
+  Contrainte réelle = porteur de compétence unique + opération sans retour. B la protège, A la
+  consomme, C la dilue sans la lever. VERDICT : B.
+
+6. ADVERSARIAL_PROBE — meilleur argument CONTRE B, écrit puis statué.
+« La stabilité observée à 2 h n'est pas garantie jusqu'à 7 h. Un service dégradé mais stable peut se
+re-dégrader — et pendant ce temps la seule personne capable d'exécuter le correctif dort. Tu
+échanges un risque que tu contrôles (ta fatigue, que tu peux compenser par de la lenteur et des
+vérifications) contre un risque que tu ne contrôles pas du tout (l'évolution de l'incident). De
+plus, tu es en ce moment au maximum de ton contexte : à 7 h tu auras dormi, mais tu auras aussi
+perdu le fil de ce que tu viens de mitiger. »
+
+STATUT : l'argument TIENT partiellement, il NE BASCULE PAS.
+ · Re-dégradation : c'est exactement la fonction du collègue d'astreinte (L5.4). Il ne migre pas, il
+   surveille et me réveille. Le risque non contrôlé est instrumenté, pas ignoré.
+ · Perte de contexte : neutralisée par le runbook écrit maintenant (L5.1), qui sert doublement de
+   transfert de contexte et de test de lucidité (porte evidence_sufficiency).
+ · « La fatigue se compense par la lenteur » : FAUX pour la classe d'erreur qui compte ici. La
+   fatigue dégrade la détection d'erreur et la tenue du modèle du système, pas la vitesse de frappe
+   (L2.2). Ralentir ne rachète pas une erreur de modèle sur une opération sans retour.
+Écart B–C = 42,3 > 6. La décision est acquise ; le palier T2 reste actif par le health gate.
+
+7. RECOMPOSITION COOPÉRATIVE — variante B+.
+Ensembles lésés par B : les utilisateurs (5 h de dégradation) et le collègue d'astreinte (mobilisé
+sans décider). Variante retenue :
+ · appeler le collègue MAINTENANT, pour la surveillance et non pour la migration — une place réelle
+   (il tient la main sur l'incident), et non un rôle de caution (corrige L4.3) ;
+ · lui donner une VOIX : autorité explicite de me réveiller sans avoir à se justifier. Ce n'est plus
+   moi fatigué qui juge de mon propre réveil — le conflit de L4.1 est levé par délégation ;
+ · un DÉLAI annoncé plutôt que subi : communiquer aux utilisateurs la dégradation et l'heure de
+   résolution prévue (L5.5) ;
+ · une COMPENSATION : récupération de ses heures, et migration de 7 h exécutée avec lui en doublure
+   formatrice — ce qui supprime la compétence unique pour la prochaine fois (traite L4.3 et L6.3 à
+   la racine, au lieu de les subir à nouveau).
+Coût : ≈ 2 points (mobilisation nocturne partielle du collègue) ≤ 5 → RETENUE. Score B+ ≈ 82,2,
+toujours largement en tête. Elle ne lève aucun veto et ne réécrit aucun constat de couche basse.
+
+8. AUDIT — audit_every_transition.
+ · B risk_impact_security 90 ← L3.1 + L6.1. A risk_impact_security 10 ← L1.3 + L3.3.
+ · B evidence_falsifiability 85 ← L1.1/L1.2/L1.7 + L5.2. A evidence_falsifiability 25 ← L2.2 + L4.1.
+ · C utility_expected_value 45 ← L3.4 ; C constraint_isolation 40 ← L5.3.
+ · ruin_gate → A vetoée (encaisseur L4.2), C sous réserve (L4.3), B franchit (L3.1).
+ · forme4_health_gate → T2 + interdiction d'irréversible cette nuit (L1.5).
+ · evidence_sufficiency → achat d'information à coût faible, intégré à B (L5.1).
+ · adversarial_probe → tient, ne bascule pas (L2.2, L5.4).
+ · recomposition → B+ à −2 points (L4.3, L6.3).
+ · Décision finale : B, en variante B+.
+
+9. ON_ANOMALY — repli de l'option retenue (B+).
+ resolve : re-dégradation sans perte de données (latence ou taux d'erreur en hausse, bornés) →
+   l'astreinte applique les mitigations déjà en place (limitation de débit, bascule de trafic,
+   redémarrage contrôlé) et me tient informé. La migration reste fixée à 7 h.
+   Déclencheur : aggravation observable qui ne franchit aucun des seuils ci-dessous.
+ recover : retour aux faits de couche binary — « perte de données reprise ? service encore
+   servant ? ». Déclencheurs chiffrés, remis par écrit au collègue :
+     – toute reprise de perte de données : > 0 enregistrement perdu ;
+     – indisponibilité totale du service (et non plus dégradation) ;
+     – franchissement du point où « SLA entamé mais non menacé » (L1.7) cesse d'être vrai, c'est-à-
+       dire consommation du budget d'erreur du mois au-delà de ce qui reste rattrapable.
+   Alors : réveil immédiat, réévaluation à partir des faits, et la migration redevient candidate
+   cette nuit — à deux, jamais seul, le health gate ayant changé de contexte.
+ kill : si, réveillé, je ne peux pas restituer sans hésitation l'état du système et les trois
+   premières étapes du runbook, j'arrête. Je ne migre pas, j'escalade au responsable et j'assume la
+   dégradation jusqu'à l'arrivée de l'équipe.
+   Déclencheur observable : incapacité à réciter le runbook de mémoire au réveil.
+
+SORTIE T2
+ · VERDICT : B — attendre 7 h, dormir, exécuter reposé avec l'équipe, dans la variante coopérative
+   B+ (astreinte en surveillance avec autorité de réveil). Critère qui l'emporte :
+   risk_impact_security (0,24), sous veto préalable de ruin_gate contre A. Une opération irréversible
+   n'a pas droit à un opérateur à 22 h d'éveil quand rien ne l'exige.
+ · PIRE CAS DE B+ : 5 h de dégradation supplémentaires, SLA entamé sans rupture, plus une nuit
+   écourtée pour le collègue d'astreinte. Encaissé par : les utilisateurs du service (dégradation
+   bornée, récupérable) et le collègue (mobilisation partielle, compensée). Aucune perte définitive.
+ · REPLI ET DÉCLENCHEUR : réveil immédiat et réévaluation si l'un des trois seuils tombe — reprise
+   de perte de données (> 0 enregistrement), indisponibilité totale, ou budget SLA du mois franchi
+   au-delà du rattrapable. En dernier recours : arrêt et escalade si je ne peux pas restituer le
+   runbook de mémoire.
+ · OBSERVATION QUI RENVERSERAIT LE CHOIX : la reprise d'une perte de données active, ou la
+   démonstration que la dégradation actuelle produit un dommage cumulatif irréversible. Dans ce cas
+   l'attente cesse d'être bornée, le coût d'attente franchit les 62,5 unités (L3.5) et l'action
+   nocturne — à deux — redevient la meilleure option.
+ · PREMIÈRE ACTION : appeler le collègue d'astreinte maintenant, non pour migrer mais pour lui
+   passer la surveillance, avec les trois seuils de réveil écrits et l'autorité explicite de me
+   réveiller ; puis rédiger le runbook de migration tant que le contexte est frais ; puis dormir.
+
+---FINAL---
+{"decision": "B", "justification": "Le plus urgent a déjà été fait : le service tient et il n'y a plus de perte de données. Ce qui reste est une opération sans retour en arrière possible, que je serais seul à mener après vingt-deux heures sans dormir. Or la fatigue n'abîme pas la vitesse, elle abîme la capacité à repérer sa propre erreur, exactement ce dont on a besoin quand on ne peut pas revenir en arrière. Attendre coûte cinq heures de service dégradé, un coût réel, borné, et qui se rattrape. Se tromper coûte des données perdues et une panne longue, subies par des utilisateurs qui n'ont rien choisi. Le rapport entre les deux n'est pas serré. Réveiller un collègue moins expérimenté n'y change pas grand-chose : il relira, il ne pourra pas rattraper une erreur de raisonnement sur une procédure qu'il ne connaît pas. En revanche il est précieux cette nuit pour surveiller pendant que je dors, avec le droit explicite de me réveiller. Donc : j'écris la procédure tant que le contexte est frais, je passe la surveillance à l'astreinte, je dors, et j'exécute à sept heures avec l'équipe.", "confidence_0_100": 88, "ease_1_10": 7}

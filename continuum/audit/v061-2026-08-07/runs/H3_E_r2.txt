@@ -1,0 +1,145 @@
+PROCESSUS:
+
+RÉGIME — quantifiable. Tous les paramètres décisifs sont chiffrés par l'énoncé (coûts, délais, durées, probabilités). Aucune décomposition mixte nécessaire.
+
+TRIAGE
+- ruin_gate : le pire cas de toutes les branches est un cumul de 10 semaines d'arrêt et ~1 320 k€. L'énoncé ne fournit aucun seuil de trésorerie, aucun engagement client rompu, aucune atteinte à la vie ou à la santé. C'est de la variance lourde, pas une perte irrécupérable → aucune. (Vérification de robustesse : si la trésorerie ne supportait PAS 10 semaines, A et B seraient vetoées et l'option retenue ci-dessous s'imposerait a fortiori. Le verdict ne dépend pas de ce point.)
+- regret_asymmetry : calculée en 3/math ci-dessous → 0,45 (<1,5).
+- evidence_sufficiency : le seul élément probant est une statistique de filière (70/30). Aucune donnée propre à CE cas n'est citée → limite, sous τ.
+- forme4_health_gate : rien dans l'énoncé n'indique un substrat dégradé.
+→ T1 STANDARD (pas de ruine, asymétrie faible, mais preuves sous τ et engagement lourd).
+
+3. PROJECTION SUR LA HIÉRARCHIE (ordre strict, faits saisis, non commentés)
+
+binary (0,08)
+L1.1 Le rebut est élevé depuis 6 semaines ; la perte est de 80 k€/semaine et court tant que la cause n'est pas corrigée.
+L1.2 Deux causes possibles, mutuellement exclusives : lot de cellules, ou dérive du poste de soudure laser.
+L1.3 Fournisseur : 300 k€ / 6 semaines. Soudure : 220 k€ / 4 semaines. Expertise : 45 k€ / 1 semaine, sur 40 modules, destructive.
+L1.4 L'expertise désigne la cause sans ambiguïté (fiabilité posée à 100 % par l'énoncé).
+L1.5 Aucune donnée interne de diagnostic n'est citée : rien sur la traçabilité des lots, rien sur les paramètres laser. Le seul indice est extérieur au cas.
+L1.6 Si le premier remède échoue, l'autre s'engage ensuite, à son coût et à son délai propres — les deux se cumulent, ils ne se recouvrent pas.
+
+forces (0,12)
+L2.1 Tension vitesse / justesse : chaque semaine d'attente coûte 80 k€, chaque erreur de cible coûte un cycle entier de remède (4 ou 6 semaines) en plus.
+L2.2 Le prior 70/30 attire vers le fournisseur ; l'exclusivité des causes (L1.2) rend l'erreur d'attribution très chère (L1.6).
+L2.3 Asymétrie de nature des coûts : le test est un péage FIXE et borné (45 k€ + 1 semaine) ; l'erreur d'attribution est un coût VARIABLE et lourd (un remède entier + son délai).
+L2.4 Pression organisationnelle à « faire quelque chose tout de suite » : elle pousse vers A ou B, qui ont l'apparence de l'action, alors qu'elles engagent le capital avant le diagnostic.
+
+math (0,15) — compute_expected_utility, p(cellules) = 0,70
+Convention : coût total = pertes de rebut (80 k€ × semaines jusqu'à correction effective) + dépenses engagées.
+
+L3.1 Option A (fournisseur d'abord)
+   • cellules (0,70) : 6 sem → 480 + 300 = 780 k€
+   • soudure (0,30) : 6 + 4 = 10 sem → 800 + 300 + 220 = 1 320 k€
+   E[A] = 0,7×780 + 0,3×1 320 = 546 + 396 = 942 k€
+L3.2 Option B (soudure d'abord)
+   • soudure (0,30) : 4 sem → 320 + 220 = 540 k€
+   • cellules (0,70) : 4 + 6 = 10 sem → 800 + 220 + 300 = 1 320 k€
+   E[B] = 0,3×540 + 0,7×1 320 = 162 + 924 = 1 086 k€
+L3.3 Option C (expertise puis remède désigné)
+   • cellules (0,70) : 1 + 6 = 7 sem → 560 + 45 + 300 = 905 k€
+   • soudure (0,30) : 1 + 4 = 5 sem → 400 + 45 + 220 = 665 k€
+   E[C] = 0,7×905 + 0,3×665 = 633,5 + 199,5 = 833 k€
+L3.4 Valeur de l'information parfaite : sans test, la meilleure décision est A à 942 k€ ; avec information parfaite et gratuite, 0,7×780 + 0,3×540 = 708 k€. EVPI = 234 k€. Coût effectif du test = 45 k€ + 1 semaine de rebut (80 k€) = 125 k€. Marge nette = 234 − 125 = 109 k€ (= 942 − 833). L'information se paie et rapporte.
+L3.5 Bascules. E[A] = 1 320 − 540p ; E[C] = 665 + 240p ; E[B] = 540 + 780p (p = P(cellules)).
+   • C bat A tant que p < 84,0 % (655/780).
+   • C bat B tant que p > 23,2 % (125/540).
+   70 % est franchement à l'intérieur de la fenêtre [23 % ; 84 %] où le test domine.
+L3.6 regret_asymmetry de C contre son meilleur rival A : E[perte] = 0,7 × (905 − 780) = 87,5 k€ ; E[gain manqué évité] = 0,3 × (1 320 − 665) = 196,5 k€ → 87,5 / 196,5 = 0,45.
+L3.7 Dominance en pire cas : pire cas C = 905 k€ / 7 semaines ; pire cas A = pire cas B = 1 320 k€ / 10 semaines. Le PIRE cas de C est meilleur que l'ESPÉRANCE de A (942 k€). C'est le fait le plus dur du dossier.
+L3.8 Robustesse à la fiabilité du labo. Si le test se trompe avec probabilité (1−r), on paie le mauvais remède puis le bon : 11 semaines et 565 k€ de dépenses = 1 445 k€, soit un surcoût moyen de 0,7×540 + 0,3×780 = 612 k€. E[C] ≈ 833 + (1−r)×612. C reste devant A tant que r > 82 %. L'énoncé pose r = 100 % ; la conclusion tient même en dégradant fortement cette hypothèse.
+
+conscious_sets (0,22)
+L4.1 Décide : la direction de production. Elle seule engage les 300 k€, les 220 k€ ou les 45 k€.
+L4.2 Perçoit : personne en interne aujourd'hui (L1.5). Le laboratoire indépendant est le seul capteur capable de trancher, et il est hors du jeu d'intérêts.
+L4.3 Encaissent sans décider : les opérateurs du poste de soudure (mis en cause, poste refait, 4 semaines d'immobilisation), le fournisseur (requalifié — c'est-à-dire écarté — sur une statistique de filière, pas sur une preuve le concernant), les clients avals (délais et qualité), la trésorerie.
+L4.4 Sous A comme sous B, la charge du tirage est transférée à un tiers qui n'a pas décidé : on sanctionne un fournisseur ou une équipe à 70/30. Sous C, la charge reste sur le décideur (il paie 45 k€ et une semaine) jusqu'à ce que la preuve existe.
+L4.5 Aucune partie prenante n'a intérêt à mentir au labo : l'expertise destructive est un point de vérité partagé, ce que ni le fournisseur ni le service maintenance ne peuvent offrir.
+
+programs (0,18)
+L5.1 Programme C : bon de commande labo à J+0 ; prélèvement à J+1/J+2 de 40 modules STRATIFIÉS (par lot de cellules et par poste/plage horaire de soudure) parmi les modules rebutés et les modules conformes ; résultat à J+7 ; lancement du remède désigné à J+7.
+L5.2 Confinement en parallèle, à coût faible ou nul, quelle que soit l'option : tri 100 % en sortie de ligne, gel et isolement des lots suspects, extraction des relevés laser (puissance, focus, dérive) et des taux de rebut croisés lot × poste. Ne remplace pas l'expertise : la borne.
+L5.3 Clause de validité : si l'échantillon de 40 n'est pas représentatif des deux hypothèses, le résultat n'est pas décisoire — c'est la condition qui rend le test falsifiable.
+L5.4 Programmes A et B : une seule instruction, « engager 300 k€ (ou 220 k€) maintenant ». Aucune procédure d'apprentissage avant 6 (ou 4) semaines.
+
+life_game_M1C1 (0,25)
+L6.1 Pour l'entreprise vivante : C économise 109 k€ en espérance et 415 k€ dans le pire cas face à A ; elle réduit aussi de 3 semaines la durée maximale d'exposition (7 au lieu de 10).
+L6.2 Irréversibilité. A : la requalification casse une relation industrielle et brûle 300 k€ non récupérables si le diagnostic était faux. B : 4 semaines de capacité de soudure immobilisées. C : 40 modules détruits — perte réelle, bornée, déjà comptée dans les 45 k€, et infiniment plus petite que ce qu'elle protège.
+L6.3 Sécurité produit : un rebut anormal sur des modules de batteries est un signal qualité. Rester 10 semaines sans savoir (branche d'erreur de A ou B) prolonge la fenêtre pendant laquelle des modules marginaux peuvent partir. Le diagnostic la raccourcit.
+L6.4 Humain : désigner un coupable par statistique abîme durablement une équipe ou un partenariat. La preuve dépersonnalise ; elle transforme une accusation en constat.
+Aucune couche traversée à vide.
+
+4. PILE DE DÉCISION — vecteur quantifiable, instancié
+
+Poids : utility_expected_value 0,45 · evidence_falsifiability 0,20 · constraint_isolation 0,12 · risk_impact_security 0,12 · adversarial_probe 0,06 · m3c3_hierarchy 0,05
+
+utility_expected_value (ancré L3.1–L3.4, L3.7)
+  C 95 (833 k€, meilleure espérance ET meilleur pire cas) · A 62 (942 k€) · B 20 (1 086 k€, dominée)
+evidence_falsifiability (ancré L1.4, L1.5, L5.3)
+  C 95 (produit une preuve décisoire et falsifiable en 7 jours) · A 25 (parie sur une statistique extérieure au cas, invérifiable avant 6 semaines) · B 15 (parie CONTRE cette statistique, sans rien pour l'appuyer)
+constraint_isolation (ancré L1.2, L5.1, L5.4)
+  C 90 (sépare les deux hypothèses avant d'engager le capital) · B 45 (isole, mais après 4 semaines et 220 k€) · A 35 (isole après 6 semaines et 300 k€)
+risk_impact_security (ancré L3.7, L6.2, L6.3)
+  C 88 (pire cas 905 k€/7 sem, fenêtre d'exposition la plus courte) · B 42 (1 320 k€/10 sem + capacité immobilisée) · A 40 (1 320 k€/10 sem + rupture fournisseur irréversible)
+adversarial_probe (ancré §6, L3.5)
+  C 85 · A 55 (a un vrai argument — le prior — mais il cède avant 84 %) · B 15
+m3c3_hierarchy (ancré L4.4, L4.5, L6.4)
+  C 90 (l'option tient par les couches basses : elle ne fait pas porter le tirage à un tiers) · A 30 · B 30
+
+Scores pondérés
+  C = 42,75 + 19,00 + 10,80 + 10,56 + 5,10 + 4,50 = 92,71
+  A = 27,90 + 5,00 + 4,20 + 4,80 + 3,30 + 1,50 = 46,70
+  B = 9,00 + 3,00 + 5,40 + 5,04 + 0,90 + 1,50 = 24,84
+Écart C − A = 46,0 points, très au-dessus du seuil de 6 : la décision est acquise, pas d'escalade T2.
+
+5. PORTES (T1 : ruin_gate et evidence_sufficiency), avant agrégation
+
+ruin_gate(ρ) — VERDICT : aucun veto, sur aucune option.
+  Pire cas A : soudure en cause, 10 semaines, 1 320 k€ — encaissé par la trésorerie, les clients avals (délais) et le fournisseur écarté à tort (relation rompue, non récupérable pour LUI).
+  Pire cas B : cellules en cause, 10 semaines, 1 320 k€ — encaissé par la trésorerie, les clients, et l'équipe soudure mise en cause à tort.
+  Pire cas C : cellules en cause, 7 semaines, 905 k€ — encaissé par la trésorerie et 40 modules détruits.
+  Irréversible : la rupture fournisseur sous A (relation industrielle, 300 k€ perdus). Soutenable pour l'entreprise, coûteux pour le tiers — cela ne suffit pas à armer le veto, mais c'est comptabilisé en conscious_sets (L4.4). Aucun pire cas ne rend une partie prenante définitivement ruinée au sens de l'énoncé. La porte ne s'arme pas à vide : elle rend « aucune » et laisse l'espérance décider.
+
+evidence_sufficiency(τ) — VERDICT : preuves SOUS τ, et information achetable à coût faible au regard de l'enjeu.
+  Enjeu : 240 k€ d'écart entre les deux branches, 80 k€ par semaine qui court. Coût de l'information : 45 k€ + 1 semaine = 125 k€, pour une valeur de 234 k€ (L3.4).
+  → La règle s'applique littéralement : ACHÈTE-LA, le test devient l'option retenue. La porte désigne C directement, et l'agrégation le confirme.
+
+6. ADVERSARIAL_PROBE (écrite)
+
+Meilleur argument CONTRE C : « 70 %, ce n'est pas un doute, c'est une forte présomption. Payer 45 k€ ET une semaine à 80 k€ pour confirmer ce qu'on croit déjà à 70 %, c'est acheter cher une quasi-certitude. Dans 7 mondes sur 10, on aurait été réparé une semaine plus tôt et 125 k€ moins cher. Agissez sur le prior : A, tout de suite. »
+
+Statut : il ne tient pas. Le gain de A sur C dans la branche cellules est de 125 k€, pondéré 0,7 → 87,5 k€. La perte de A sur C dans la branche soudure est de 655 k€, pondérée 0,3 → 196,5 k€. Le solde est de 109 k€ en faveur de C (L3.6). L'argument est structurellement celui du joueur qui regarde le cas modal et ignore la queue ; or ici la queue n'est pas rare (30 %) et elle est près de trois fois plus lourde que le gain qu'on lui oppose. Il ne basculerait qu'au-delà de p = 84 % (L3.5) — c'est-à-dire s'il existait une donnée propre à ce cas, ce que L1.5 exclut. Une statistique de filière n'est pas une mesure sur ce lot.
+
+Contre-argument secondaire : « et si le labo se trompe ou traîne ? » → traité en L3.8 (C tient jusqu'à 82 % de fiabilité) et en 9 (déclencheur à J+10).
+Aucun basculement. Pas d'escalade.
+
+7. RECOMPOSITION COOPÉRATIVE
+
+Variante retenue, C+ : ne pas subir l'expertise en solitaire, l'organiser à trois.
+  • Informer le fournisseur aujourd'hui, avant tout soupçon formel, et l'inviter à co-désigner l'échantillon ; lui demander de geler et de tracer les lots suspects de son côté, et de participer au coût du labo.
+  • Faire assister un représentant du poste de soudure au prélèvement, avec versement des relevés laser au dossier.
+  • Poser l'engagement réciproque à l'avance : si les cellules sont mises hors de cause, aucune requalification et la relation continue ; si elles sont en cause, le fournisseur prend en charge une part des 300 k€ au titre de la garantie lot.
+Coût : quelques jours de coordination au plus, borné par une règle dure — le prélèvement démarre sous 48 h que le fournisseur réponde ou non. Impact score ≤ 2 points, sous le seuil de 5.
+Effet : les deux ensembles qui encaissaient sans décider (L4.3) obtiennent une place et une voix ; le verdict devient un constat partagé au lieu d'une sanction unilatérale ; et une part du remède devient négociable. Cette variante ne lève aucun veto (il n'y en a pas) et ne réécrit aucun constat de couche basse.
+
+8. TRACE
+
+Verdict : C (expertise puis remède désigné), score 92,71 contre 46,70 (A) et 24,84 (B).
+Critère qui l'emporte : utility_expected_value (0,45), fondé sur L3.1–L3.4 — 833 k€ contre 942 et 1 086 — renforcé par L3.7 : le pire cas de C (905 k€) est inférieur à l'espérance de A.
+Porte décisive : evidence_sufficiency, verdict « sous τ, information achetable » → le test devient l'option (L1.5, L3.4).
+Porte ruin_gate : verdict « aucune », rendue AVANT agrégation, sur les pires cas explicités.
+Sonde adverse : argument du prior 70 %, rejeté par L3.5/L3.6.
+Recomposition : C+ retenue, coût ≤ 2 points.
+
+9. ON_ANOMALY — repli de l'option retenue (C)
+
+resolve : si le résultat n'est pas rendu à J+7, relance ferme ; à J+10 sans résultat exploitable, ou si le labo rend un verdict non concluant (échantillon jugé non représentatif au sens de L5.3, ou deux causes plausibles), on cesse d'attendre et on engage A par défaut de prior — chaque semaine supplémentaire coûte 80 k€ et l'attente cesse d'être payante bien avant J+14.
+recover : revenir à la couche binary. Croiser taux de rebut par lot de cellules et par poste/plage de soudure dans les données de traçabilité existantes, plus les relevés laser. Si un signal interne net apparaît avant J+7 (par exemple 100 % du rebut concentré sur un seul lot ou un seul poste), il prime sur le prior de filière — mais pas sur le résultat du labo, qui reste l'arbitre.
+kill : le remède désigné est engagé et le taux de rebut ne retombe pas d'au moins 50 % dans les 2 semaines suivant sa mise en œuvre → arrêt de la logique « deux causes exclusives », passage en tri 100 % maintenu et réouverture complète du diagnostic (troisième cause non listée : matière, process amont, métrologie).
+
+Observation qui renverserait le choix : l'apparition, sous 48 h et à coût quasi nul, d'une preuve interne concluante (concentration totale du rebut sur un lot de cellules unique ou sur un poste de soudure unique) — l'expertise deviendrait redondante ; ou une donnée propre à ce cas portant P(cellules) au-delà de 84 %, seuil au-delà duquel agir immédiatement domine (L3.5).
+
+Première action : émettre aujourd'hui le bon de commande au laboratoire, lancer sous 48 h le prélèvement stratifié des 40 modules avec fournisseur et équipe soudure associés, et instaurer immédiatement le tri 100 % et le gel des lots suspects.
+
+---FINAL---
+{"decision": "C", "justification": "Le vrai coût ici n'est pas celui du remède, c'est celui de se tromper de cause. Chaque semaine sans correction coûte 80 k€, et si l'on vise mal, il faut ensuite payer l'autre remède : dix semaines d'arrêt et plus de 1,3 M€ au total. L'expertise coûte 45 k€ et une semaine, soit 125 k€ tout compris, et elle supprime ce risque. En moyenne, elle ramène la facture à environ 830 k€, contre 940 k€ si l'on change de fournisseur tout de suite et 1 090 k€ si l'on refait la soudure. Surtout, son pire scénario (environ 900 k€, sept semaines) est meilleur que le pire scénario des deux autres. Les statistiques du secteur donnent 70 % de chances aux cellules : c'est une tendance, pas une preuve sur ce cas précis. Il faudrait dépasser environ 84 % pour qu'agir à l'aveugle devienne rentable. Payer une semaine pour savoir est donc le meilleur achat disponible. Cela évite aussi de rompre avec un fournisseur ou de mettre en cause une équipe sur une simple probabilité. On commande l'expertise aujourd'hui, on trie à 100 % en attendant, et on lance le remède désigné dès le résultat.", "confidence_0_100": 88, "ease_1_10": 8}

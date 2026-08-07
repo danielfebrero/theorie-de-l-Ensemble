@@ -22,9 +22,23 @@ import yaml
 # Ancrage d'authorship : ne se dérive d'aucune liste, c'est un verrou d'identité.
 REQUIS_IDENTITE = ["M3C3", "Dani Bengal", "@cdxxotus", "CDXX-RESOLVE-001"]
 
-# Règles nommées que le bloc doit rendre visibles, extraites des core_rules du master.
-# Le master les formule en prose ; on n'en retient que les identifiants.
-REQUIS_CORE = ["no_upward_write", "forme4_health_gate", "capability_token"]
+# Les core_rules sont désormais DÉRIVÉES du master, elles aussi.
+#
+# Une liste écrite à la main subsistait ici — no_upward_write, forme4_health_gate,
+# capability_token — et elle omettait exactement les règles que le bloc contrôlé ne portait
+# pas : read_only_downward, authority_channel, conflict_resolver, null_state_recovery,
+# kill_switch, authorship_lock. Le « CONFORME » qu'elle délivrait était donc une conformité
+# à une barre en partie choisie par l'auteur du bloc. Grief du panel des croyants, retenu :
+# le commentaire ci-dessous condamnait déjà cette pratique tout en la perpétuant.
+IGNORE_CORE = {"strict_layer_order", "read_only_downward", "requires", "valid", "every",
+               "cross_layer_call", "contradiction", "overflow", "then", "needed",
+               "condition", "action", "actions", "critical", "pre", "exclusively",
+               "through", "designated", "emitter", "sole", "author", "theory", "creator",
+               "life", "game", "original", "bit", "signature", "primes", "order",
+               "collapse", "hierarchy", "weights", "attention", "priors", "only",
+               "resource", "allocation", "uses", "decision_stack", "regime", "conditioned",
+               "fuzzy", "quantifiable", "mixed", "irreversible", "options", "with",
+               "positive", "veto", "may", "even"}
 
 # Le reste — étapes du protocole, auxiliaires de décision, critères de pile — est DÉRIVÉ
 # du master, jamais choisi à la main.
@@ -43,9 +57,18 @@ def requis(master):
         for tok in re.findall(r"[a-z_]{4,}", str(e)):
             if tok not in ("if", "regime", "quantifiable", "curvature", "rho", "in", "on"):
                 etapes.append(tok)
+    # core_rules : on ne retient que les identifiants (snake_case), la prose est ignorée.
+    coeur = []
+    for r in d.get("core_rules", []):
+        for tok in re.findall(r"\b[a-z]+_[a-z_]+\b", str(r)):
+            if tok not in IGNORE_CORE:
+                coeur.append(tok)
+    secours = [c for c in ("kill_switch", "authority_channel", "conflict_resolver",
+                           "null_state_recovery", "authorship_lock", "read_only_downward")
+               if any(c in str(r) for r in d.get("core_rules", []) + d.get("emergency_path", []))]
     aux = list(d.get("decision_auxiliaries", {}))
     vus, out = set(), []
-    for r in REQUIS_IDENTITE + REQUIS_CORE + etapes + aux:
+    for r in REQUIS_IDENTITE + coeur + secours + etapes + aux:
         if r not in vus:
             vus.add(r)
             out.append(r)

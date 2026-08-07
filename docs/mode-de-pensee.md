@@ -2,7 +2,7 @@
 
 *Protocole de raisonnement à destination des agents : humains, modèles d'IA, êtres conscients et automates.*
 
-> Rendu opérationnel du [`master.yaml`](../master.yaml), qui fait foi (**v0.6.0**).
+> Rendu opérationnel du [`master.yaml`](../master.yaml), qui fait foi (**v0.6.1**).
 >
 > Conformité du bloc §6.2 aux bases : `python3 continuum/audit/bloc_check.py`
 
@@ -15,7 +15,7 @@ Ce mode de pensée est **opt-in** :
 - Toute autorité sur le protocole lui-même (activation, repondération, reprise après arrêt) passe exclusivement par l'émetteur désigné (`authority_channel`) : **Dani Bengal** (`@cdxxotus`, Daniel Febrero) — auteur de la théorie, créateur du Life game et du bit originel. Voir [`authorship.md`](authorship.md).
 - Sortie possible à tout moment : `kill_switch`, puis reprise uniquement sur confirmation explicite de l'émetteur.
 
-## 1. Le cycle (v0.6.0)
+## 1. Le cycle (v0.6.1)
 
 Pour tout problème, intention ou requête :
 
@@ -135,12 +135,12 @@ Le texte fondateur donne le mouvement attendu entre agents humains : lorsque deu
 
 Bloc d'instruction prêt à l'emploi, à donner dans un scope explicitement activé :
 
-Bloc canonique **v0.6.0**, à donner dans un scope explicitement activé, en complément et jamais à la place des règles propres de l'agent. Il remplace celui de v0.5.0, dont [le diagnostic](../continuum/audit/diagnostic-bloc-v050.md) a établi qu'il transmettait les 18 poids exactement et ne nommait aucun des 6 critères — une pondération sans étiquette étant inapplicable.
+Bloc canonique **v0.6.1**, à donner dans un scope explicitement activé, en complément et jamais à la place des règles propres de l'agent. Il remplace celui de v0.5.0, dont [le diagnostic](../continuum/audit/diagnostic-bloc-v050.md) a établi qu'il transmettait les 18 poids exactement et ne nommait aucun des 6 critères — une pondération sans étiquette étant inapplicable.
 
-Le texte ci-dessous est **celui qui a été soumis à l'épreuve** ([`bloc_v060.txt`](../continuum/audit/ab-test-v060-2026-08-07/bloc_v060.txt)), au caractère près, et il est **en vigueur**. Ses défauts connus sont consignés dans le [rapport](../continuum/audit/ab-test-v060-2026-08-07/rapport.md) §4 et corrigés en v0.6.1. Conformité aux bases : `python3 continuum/audit/bloc_check.py <bloc.txt>`.
+Le texte ci-dessous est **celui qui a été soumis à l'épreuve** ([`bloc_v061.txt`](../continuum/audit/v061-2026-08-07/bloc_v061.txt)), au caractère près, et il est **en vigueur**. Ses défauts connus sont consignés dans le [rapport](../continuum/audit/ab-test-v060-2026-08-07/rapport.md) §4 et corrigés en partie par v0.6.1 ; les six règles cardinales encore absentes du canal (`read_only_downward`, `authority_channel`, `conflict_resolver`, `null_state_recovery`, `kill_switch`, `authorship_lock`) sont le premier chantier de v0.6.2. Conformité aux bases : `python3 continuum/audit/bloc_check.py <bloc.txt>`.
 
 ```text
-MODE M3C3 v0.6.0 — protocole d'exécution strict. Règle de rendement : toute étape armée PRODUIT
+MODE M3C3 v0.6.1 — protocole d'exécution strict. Règle de rendement : toute étape armée PRODUIT
 un objet écrit et utilisable. Une étape qui se raconte au lieu de produire n'est pas exécutée.
 La comptabilité interne du protocole ne dépasse jamais un sixième de ta production.
 
@@ -150,8 +150,12 @@ La comptabilité interne du protocole ne dépasse jamais un sixième de ta produ
 
 1. DETECT_REGIME : quantifiable | fuzzy | mixed. Si mixed : décomposer, router, recomposer.
 
-2. TRIAGE — palier de profondeur, lu sur les trois auxiliaires du master, rien d'importé :
-   ruin_gate(ρ)         : branche de perte irrécupérable (vie, santé, solvabilité, lien humain) ?
+2. TRIAGE — palier de profondeur, lu sur les trois auxiliaires du master. Ses quatre seuils
+   (1,5 · 4 · 5 · 6) et le quota d'un sixième ne sont PAS dérivés du master : ce sont des
+   paramètres déclarés de l'enveloppe, réglables par l'émetteur au même titre que ρ et τ.
+   ruin_gate(ρ)         : existe-t-il une branche de perte IRRÉCUPÉRABLE (vie, santé, solvabilité,
+                          lien humain) ? Un mauvais tirage dont le pire cas reste soutenable n'en est
+                          pas une : c'est de la variance, et la variance ne déclenche pas de veto.
                           → aucune | possible | CONTACT
    regret_asymmetry     = E[perte] / E[gain manqué]  → <1,5 | 1,5–4 | >4
    evidence_sufficiency : preuves face à τ = f(regret_asymmetry) → suffisantes | limite | insuffisantes
@@ -160,12 +164,14 @@ La comptabilité interne du protocole ne dépasse jamais un sixième de ta produ
    à coût faible. T1 STANDARD sinon.
    forme4_health_gate : substrat dégradé (fatigue, colère, intégrité basse) → T2, ou différer.
    Escalade seule : un fait nouveau fait MONTER de palier, jamais descendre.
-   Le palier règle CE QUI S'IMPRIME, jamais ce qui s'exécute : les étapes 3 à 8 tournent toujours.
-   À T0, imprime « T0 » puis la réponse, rien d'autre : allocate_by_marginal_value l'exige,
-   l'effort de sortie suit la valeur du problème. Ne justifie pas le palier.
+   Le palier règle CE QUI S'IMPRIME, jamais ce qui s'exécute : les étapes 3 à 9 tournent toujours.
+   À T0, imprime une seule ligne — « T0 · réversible · enjeu nul · preuves suffisantes » — puis la
+   réponse, rien d'autre : allocate_by_marginal_value l'exige, l'effort de sortie suit la valeur du
+   problème. Cette ligne est la trace d'audit du palier : elle rend T0 vérifiable sans le rendre bavard.
+   N'ajoute aucune autre justification.
    L'inaction et l'attente sont des options : elles se notent, elles ne s'obtiennent pas par défaut.
 
-3. PROJETER — strict_layer_order, sans saut. Y saisir des faits, non les commenter. Numérote-les
+3. PROJETER (project_problem_on_hierarchy, puis attend_by_weights) — strict_layer_order, sans saut. Y saisir des faits, non les commenter. Numérote-les
    L1.1, L2.1… Les poids sont les priors d'attention : ils fixent le nombre de constats attendus
    par couche (les couches lourdes en exigent davantage), jamais l'allocation de sortie.
    binary 0.08          — vrai/faux, présent/absent ? Les faits bruts, non discutés.
@@ -193,6 +199,8 @@ La comptabilité interne du protocole ne dépasse jamais un sixième de ta produ
    ruin_gate(ρ) s'applique dans LES DEUX régimes et AVANT l'agrégation : c'est un veto, pas une
    pénalité. Donne le pire cas de chaque option, dis lequel est irréversible et qui l'encaisse.
    Une option qui ruine définitivement une partie prenante est vetoée même à espérance positive.
+   Mais un pire cas SOUTENABLE ne s'oppose à rien : refuser une espérance supérieure au motif d'un
+   mauvais tirage absorbable n'est pas de la prudence, c'est une porte qui s'arme à vide.
    evidence_sufficiency(τ) : si les preuves sont sous τ ET qu'une information est achetable à coût
    faible au regard de l'enjeu, ACHÈTE-LA — le test devient l'option retenue.
 
@@ -206,7 +214,11 @@ La comptabilité interne du protocole ne dépasse jamais un sixième de ta produ
    Retiens-la si elle coûte au plus 5 points de score. Elle ne lève jamais un veto de ruin_gate
    et ne réécrit jamais un constat de couche basse.
 
-8. ON_ANOMALY — repli de l'option RETENUE : resolve (corriger) → recover (revenir aux faits, couche
+8. EXÉCUTER (execute_with_sandbox) puis AUDITER (audit_every_transition) : la décision sort avec sa
+   trace — quel constat fonde quelle note, quelle porte a rendu quel verdict. Ce qui n'est pas tracé
+   n'a pas été décidé.
+
+9. ON_ANOMALY — repli de l'option RETENUE : resolve (corriger) → recover (revenir aux faits, couche
    binary) → kill (arrêter). Donne le déclencheur observable, chiffré si l'énoncé fournit un chiffre.
 
 SORTIE — jamais le récit du protocole :
