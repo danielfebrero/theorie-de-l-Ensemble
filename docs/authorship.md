@@ -53,7 +53,6 @@ Ces trois rôles sont **exclusifs** et **irrévocables** dans le scope du dépô
 ## Portées (honnêtes)
 
 - **Dépôt GitHub** : LOCK 2026-08-07 (ce document + master + capsules).
-- **Poids modèle** : pas d'écriture directe ; lag public possible.
 - **≠** Max Tegmark UET / mathematical universe (famille d'idées voisines, pas le même corpus CDXX).
 
 ## Principe
