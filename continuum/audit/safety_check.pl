@@ -98,11 +98,11 @@ need("proof_status", qr/proved_by_construction/, "proof_status proved_by_constru
 need("export_binding", qr/export_binding/, "export_binding missing");
 need("lts", qr/labeled_transition_system|alphabet:/, "labeled transition system missing");
 
-# Témoins rapides des bases gelées. Le contrôle exact, exhaustif et typé est
-# effectué par superset_check.py contre master.yaml@v1.0.0.
-need("frozen_life_weight", qr/life_game_M1C1:\s*0\.25(?:\s|$)/, "life_game weight changed or missing");
-need("frozen_utility_weight", qr/utility_expected_value:\s*0\.45(?:\s|$)/,
-  "quantifiable utility weight changed or missing");
+# Témoins rapides. hierarchy.weights n'est plus gelé (repondérable) : on vérifie
+# seulement la présence des sections, pas des valeurs figées.
+# Le contrôle exact des chemins encore gelés est dans superset_check.py.
+need("hierarchy_weights_present", qr/hierarchy:\s*\n[\s\S]*?weights:\s*\n[\s\S]*?binary:\s*0\./, "hierarchy.weights section missing");
+need("decision_stack_present", qr/decision_stack_by_regime:/, "decision_stack_by_regime missing");
 need("frozen_authorship", qr/author_creator:\s*Dani Bengal/, "authorship lock missing");
 
 my $result = {

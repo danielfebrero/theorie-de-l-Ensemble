@@ -6,7 +6,14 @@ Le `master.yaml` reste la source opérationnelle faisant foi.
 ## [2.0.0] — 2026-08-07 — Continuum Vérifiable
 
 > **Production.** Activée par l'émetteur (Dani Bengal / `@cdxxotus`).  
-> Le noyau v1.0.0 reste la base gelée (8 chemins freezes).
+> Le noyau formel v1.0.0 reste gelé (7 chemins). `hierarchy.weights` est repondérable.
+
+### Changed (post-activation)
+
+- Retrait des règles du style « never mutate layer weights » : `hierarchy.weights`
+  n'est plus dans `release.freezes` ; repondération via `feedback_reweight`
+  (max_step 0.04) + activation émetteur. Capsule forme4, skill, checkers et docs
+  alignés.
 
 ### Added
 
@@ -37,7 +44,7 @@ Le `master.yaml` reste la source opérationnelle faisant foi.
 
 ### Fixed
 
-- `superset_check.py` contrôle les huit chemins réellement gelés par la v1.0.0.
+- `superset_check.py` contrôle les chemins encore gelés (hors `hierarchy.weights`).
 - `safety_check.pl` n'est plus couplé au littéral `version: 1.0.0`.
 - `bloc_check.py` ne confond plus une version sémantique avec un poids canonique.
 - Le bloc agent nomme les primitives requises et distingue seuil déclaré, poids et numéro de version.
@@ -75,4 +82,4 @@ jamais réussite implicite.
 - Noyau formel de production.
 - LTS `S=(H,R,E,A,M)` et export lié à l'état.
 - Propriétés S1–S5 prouvées par construction sous H0.
-- Freeze MAJOR des huit bases listées dans `master.yaml`.
+- Freeze MAJOR des bases formelles listées dans `master.yaml` (hors `hierarchy.weights`, repondérable).

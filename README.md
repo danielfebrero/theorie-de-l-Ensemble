@@ -63,13 +63,13 @@ la sauvegarde `--force` et le retrait sûr.
 
 ## Noyau v1 préservé
 
-Les chemins suivants restent inchangés : `hierarchy.weights`,
-`decision_stack_by_regime`, `formal_semantics.layer_types`,
+Chemins gelés : `decision_stack_by_regime`, `formal_semantics.layer_types`,
 `formal_semantics.write_rule`, `transition_system.state`,
 `transition_system.transition.enabled_iff`,
 `transition_system.safety_properties`, `authorship`.
 
-Hiérarchie :
+`hierarchy.weights` est **repondérable** (proposal `feedback_reweight`,
+max_step 0.04, activation émetteur). Valeurs courantes (priors d'attention) :
 
 `binary (0.08) → forces (0.12) → math (0.15) → conscious_sets (0.22) → programs (0.18) → life_game_M1C1 (0.25)`
 

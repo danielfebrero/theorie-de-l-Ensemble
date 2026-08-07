@@ -7,7 +7,8 @@
 
 La v2 change les interfaces publiques du framework : activation par scope, runtime et export
 versionnés, profils de distribution, mémoire matérialisée et rapports de weights typés par
-preuve. Elle conserve sans modification les huit bases gelées du noyau v1.
+preuve. Elle conserve les bases formelles gelées du noyau v1 ; `hierarchy.weights`
+est repondérable via `feedback_reweight`.
 
 ## Rupture assumée
 

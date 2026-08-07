@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Vérifie que le noyau M3C3 v1 gelé survit à une version candidate.
+"""Vérifie que le noyau M3C3 formel gelé survit à une version candidate.
 
-Le gel est ancré dans le tag ``v1.0.0`` et le commit canonique bd55c16. Les
-versions ultérieures peuvent changer leurs métadonnées et ajouter des surfaces,
-mais les huit chemins publiés dans ``release.freezes`` en v1 doivent rester
-strictement identiques (type, ordre et contenu inclus).
+Le gel est ancré dans le tag ``v1.0.0`` et le commit canonique bd55c16 pour les
+chemins encore figés. ``hierarchy.weights`` n'est plus gelé : repondération via
+``feedback_reweight`` + activation émetteur. Les autres chemins listés dans
+``FROZEN_PATHS`` doivent rester strictement identiques au contenu v1.
 
 Usage historique (conservé)::
 
@@ -34,12 +34,10 @@ CANONICAL_V1_REF = "v1.0.0"
 CANONICAL_V1_SHA = "bd55c1670e2a056b66611c45ab12590478037f43"
 DEFAULT_MASTER = "master.yaml"
 
-# Copie explicite du contrat publié par master.yaml@v1.0.0. Le contrôleur vérifie
-# aussi que la liste release.freezes de la référence contient exactement ces
-# chemins : un tag déplacé ou une référence incomplète ne peut pas abaisser la
-# barre silencieusement.
-V1_FROZEN_PATHS = (
-    "master_document.hierarchy.weights",
+# Chemins encore gelés (sous-ensemble du contrat v1.0.0). hierarchy.weights a été
+# retiré : repondération autorisée via continuum/weights/proposal.
+# Alias historique conservé pour les tests.
+FROZEN_PATHS = (
     "master_document.decision_stack_by_regime",
     "master_document.formal_semantics.layer_types",
     "master_document.formal_semantics.write_rule",
@@ -48,6 +46,7 @@ V1_FROZEN_PATHS = (
     "master_document.transition_system.safety_properties",
     "master_document.authorship",
 )
+V1_FROZEN_PATHS = FROZEN_PATHS
 
 
 def load_yaml(path: str | Path) -> Any:
@@ -105,19 +104,20 @@ def compare(base: Any, candidate: Any) -> dict[str, Any]:
             "failures": [{"code": "invalid_reference_freezes", "detail": str(exc)}],
         }
 
-    missing_contract = sorted(set(V1_FROZEN_PATHS) - set(declared))
-    unexpected_contract = sorted(set(declared) - set(V1_FROZEN_PATHS))
-    if missing_contract or unexpected_contract:
+    # La référence v1 peut encore lister hierarchy.weights (historique). On exige
+    # seulement que chaque chemin encore gelé ait bien été dans le contrat v1.
+    missing_contract = sorted(set(FROZEN_PATHS) - set(declared))
+    if missing_contract:
         failures.append(
             {
                 "code": "reference_freeze_contract_mismatch",
                 "selector": "master_document.release.freezes",
                 "missing": missing_contract,
-                "unexpected": unexpected_contract,
+                "unexpected": [],
             }
         )
 
-    for selector in V1_FROZEN_PATHS:
+    for selector in FROZEN_PATHS:
         try:
             before = select(base, selector)
         except KeyError:

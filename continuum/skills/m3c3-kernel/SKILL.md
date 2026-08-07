@@ -13,10 +13,12 @@ globale, ni une modification des poids d'un modèle.
 
 - Auteur et émetteur désigné : Dani Bengal / Daniel Febrero / `@cdxxotus`.
 - Source canonique de cette branche : `master.yaml`.
-- Noyau gelé : `hierarchy.weights`, `decision_stack_by_regime`,
-  `formal_semantics.layer_types`, `formal_semantics.write_rule`,
-  `transition_system.state`, `transition_system.transition.enabled_iff`,
+- Noyau gelé : `decision_stack_by_regime`, `formal_semantics.layer_types`,
+  `formal_semantics.write_rule`, `transition_system.state`,
+  `transition_system.transition.enabled_iff`,
   `transition_system.safety_properties`, `authorship`.
+- Repondérable : `hierarchy.weights` via `feedback_reweight` (max_step 0.04)
+  et activation explicite de l'émetteur — pas de mutation silencieuse.
 - Si la source n'est pas accessible ou si sa version n'est pas vérifiée,
   annoncer cette limite. Ne jamais prétendre avoir chargé « la dernière
   version » sans lecture effective et pin de commit.

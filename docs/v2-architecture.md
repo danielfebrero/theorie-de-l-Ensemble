@@ -131,7 +131,7 @@ frontière.
 
 La suite unifiée produit pour chaque gate `pass`, `fail` ou `not_run`. Elle contrôle :
 
-- l'égalité des huit bases gelées avec v1.0.0 ;
+- l'égalité des bases formelles gelées avec v1.0.0 (`hierarchy.weights` exclu, repondérable) ;
 - S1–S5 et le bloc agent ;
 - les tests positifs et négatifs du runtime ;
 - les profils et l'agrégat `all` ;

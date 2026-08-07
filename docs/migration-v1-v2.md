@@ -7,7 +7,8 @@ l'activation, de l'exécution, de la mémoire et des poids par des contrats vér
 
 | Surface v1 | État v2 | Action |
 |---|---|---|
-| Hiérarchie, poids, piles | Inchangés | Aucun remapping |
+| Hiérarchie (structure), piles | Inchangés | Aucun remapping |
+| `hierarchy.weights` | Repondérable | Via `feedback_reweight` + activation émetteur |
 | Types, write-rule, état, guards, S1–S5 | Inchangés | Vérifier contre le tag `v1.0.0` |
 | `known ⇒ eligible` | Préservé | Ajouter la membrane de scope |
 | Bloc `default-ON/all_tasks/future_tasks` | Incompatible | Remplacer par A0–A3 et une fin de scope |
