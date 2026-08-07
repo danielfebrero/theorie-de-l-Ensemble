@@ -182,11 +182,30 @@ def main():
     }
     reussi = all(V.values())
 
+    # Pourquoi V2 échoue, le cas échéant. Purement explicatif : aucun seuil, aucune règle
+    # et aucun calcul n'en dépendent. Sans cette distinction, un lecteur conclurait à tort
+    # qu'un échec de V2 signifie « v0.6.0 décide moins bien », alors que le cas attendu ici
+    # est « aucun bras ne peut dépasser un contrôle déjà à 100 % ».
+    m2 = {a: M[a]["M2_justesse_dur"] for a in ARMS}
+    if V["V2_decide_mieux"]:
+        V2_cause = None
+    elif all(v is not None for v in m2.values()) and len(set(m2.values())) == 1:
+        V2_cause = (f"PLAFOND — les 4 bras sont à {m2['A']} : aucun ne peut dépasser le contrôle. "
+                    "V2 exige une inégalité stricte D > A, impossible à saturation. "
+                    "Ce n'est pas une infériorité de v0.6.0.")
+    elif m2["D"] is None:
+        V2_cause = "Justesse non calculable — aucune clé exploitable sur le banc."
+    elif m2["D"] < m2["A"] or m2["D"] < m2["C"]:
+        V2_cause = f"INFÉRIORITÉ RÉELLE — D={m2['D']} contre A={m2['A']} et C={m2['C']}."
+    else:
+        V2_cause = f"Non-régression insuffisante sur le banc d'origine : M2b(D)={M['D']['M2b_justesse_orig']}."
+
     out = {
         "metriques": M, "tests_signes": S, "bootstrap_IC95": CI,
         "surconfiance": surconf, "fidelite_M7": fidelite,
         "M9_superset": {"conforme": M9, "sortie": M9_sortie},
         "conditions_verdict": V,
+        "V2_cause": V2_cause,
         "verdict": ("RÉUSSIE — v0.6.0 valide les 5 conditions"
                     if reussi else
                     "ÉCHEC — condition(s) non remplie(s) : "
@@ -223,6 +242,8 @@ def main():
     print("\n=== CONDITIONS DE VERDICT ===")
     for k, v in V.items():
         print(f"  {'OK ' if v else 'NON'} {k}")
+    if V2_cause:
+        print(f"      └─ {V2_cause}")
     print("\nVERDICT:", out["verdict"])
 
 
