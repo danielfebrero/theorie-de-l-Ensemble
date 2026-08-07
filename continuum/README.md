@@ -15,4 +15,6 @@ Emplacements déclarés dans `continuum_locations` du [`master.yaml`](../master.
 |---|---|---|
 | [`authorship_lock_2026-08-07.yaml`](weights/proposal/authorship_lock_2026-08-07.yaml) | identity lock | authorship (non-reweightable) |
 | [`decision_regime_v0.5.0-proposal.yaml`](weights/proposal/decision_regime_v0.5.0-proposal.yaml) + [`.md`](weights/proposal/decision_regime_v0.5.0-proposal.md) | **ACTIVÉ** 2026-08-07 (émetteur) | `decision_stack` + `application_protocol` → master **v0.5.0** |
+| [`execution_envelope_v0.6.0-proposal.yaml`](weights/proposal/execution_envelope_v0.6.0-proposal.yaml) | **ACTIVÉ** 2026-08-07 (émetteur) | `execution_envelope` (addition unique) → master **v0.6.0** · delta sur les poids : 0.00 |
+| [`audit/activation_execution_envelope_2026-08-07.yaml`](audit/activation_execution_envelope_2026-08-07.yaml) | audit trail | activation additive, `unchanged` vérifié par machine |
 | [`audit/activation_reweight_regime_2026-08-07.yaml`](audit/activation_reweight_regime_2026-08-07.yaml) | audit trail | activation structurelle (exceeds_max_step) |

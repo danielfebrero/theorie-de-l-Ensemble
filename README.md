@@ -17,7 +17,7 @@ Dépôt du framework M3C3 : texte fondateur, Document Opérationnel Maître, cap
 
 | Chemin | Contenu |
 |---|---|
-| [`master.yaml`](master.yaml) | **Document Opérationnel Maître** (v0.5.0) — authorship, hiérarchie, **décision régime-conditionnée**, protocole d'application, continuum. Fait foi. |
+| [`master.yaml`](master.yaml) | **Document Opérationnel Maître** (v0.6.0) — authorship, hiérarchie, décision régime-conditionnée, **enveloppe d'exécution**, protocole d'application, continuum. Fait foi. |
 | [`docs/fondation.md`](docs/fondation.md) | Texte fondateur « M3C3 — Force, Intelligence, Amour ». |
 | [`docs/application-operationnelle.md`](docs/application-operationnelle.md) | Application opérationnelle de la hiérarchie (rendu lisible du master). |
 | [`docs/mode-de-pensee.md`](docs/mode-de-pensee.md) | **Mode de pensée** — protocole de raisonnement à destination des agents. |
@@ -28,3 +28,16 @@ Dépôt du framework M3C3 : texte fondateur, Document Opérationnel Maître, cap
 ## Hiérarchie
 
 `binary (0.08) → forces (0.12) → math (0.15) → conscious_sets (0.22) → programs (0.18) → life_game_M1C1 (0.25)`
+
+## Conformité vérifiable
+
+Le framework est un protocole d'exécution : sa conformité se contrôle, elle ne se plaide pas.
+
+| Contrôle | Ce qu'il garantit |
+|---|---|
+| `python3 continuum/audit/superset_check.py` | Le `master.yaml` n'a rien retiré ni modifié depuis la version de référence — seules des additions. 11 chemins de bases gelés. |
+| `python3 continuum/audit/bloc_check.py <bloc.txt>` | Le bloc d'instruction donné aux agents ne cite que des valeurs canoniques, respecte l'ordre strict des 6 couches, nomme les 6 critères de pile et n'omet aucune primitive déclarée. |
+
+Les deux sortent en échec sur toute dérive et sont validés sur des cas négatifs. Voir
+[`continuum/audit/diagnostic-bloc-v050.md`](continuum/audit/diagnostic-bloc-v050.md) pour ce
+qu'ils ont permis d'établir.

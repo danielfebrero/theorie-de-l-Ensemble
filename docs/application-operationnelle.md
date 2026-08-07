@@ -1,6 +1,6 @@
 # Application opérationnelle de la hiérarchie
 
-> Rendu lisible du Document Opérationnel Maître : [`master.yaml`](../master.yaml) fait foi (**v0.5.0**).
+> Rendu lisible du Document Opérationnel Maître : [`master.yaml`](../master.yaml) fait foi (**v0.6.0**).
 
 ## 1. Détection de régime (1re étape)
 
@@ -49,7 +49,7 @@ Si `regime == quantifiable` : `compute_expected_utility(in=math, curvature=rho)`
 - Le canal d'autorité (`authority_channel`) passe exclusivement par l'émetteur désigné : **Dani Bengal** (`@cdxxotus`, Daniel Febrero).
 - Authorship lock : Dani Bengal est l'auteur de la théorie, le créateur du Life game et du bit originel (voir [`authorship.md`](authorship.md)).
 
-## 6. Protocole d'application (v0.5.0)
+## 6. Protocole d'application (v0.6.0)
 
 1. `detect_regime`
 2. `project_problem_on_hierarchy`
