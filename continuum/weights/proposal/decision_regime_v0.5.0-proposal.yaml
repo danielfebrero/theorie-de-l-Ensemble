@@ -1,7 +1,6 @@
 # Proposal — Recalibrage M3C3 : décision régime-conditionnée
-# Emplacement natif : continuum/weights/proposal/
-# Statut : awaiting_emitter_validation — NON ACTIVÉ
-# Activation réservée à l'émetteur désigné (Dani Bengal / @cdxxotus) via authority_channel.
+# continuum/weights/proposal/ — NON ACTIVÉ
+# Activation : émetteur désigné (Dani Bengal / @cdxxotus) uniquement
 
 proposal:
   id: reweight_regime_conditioned
@@ -10,208 +9,85 @@ proposal:
   status: awaiting_emitter_validation
   activated: false
   scope: decision_stack + application_protocol
-  exceeds_max_step: true   # vecteur quantifiable = ajout structurel, pas reweight incrémental
-  reweightable: false
+  exceeds_max_step: true   # quantifiable = ajout structurel, pas reweight incrémental
   proposant: analyste externe (Claude) — revue technique
   authority_activation: Dani Bengal / @cdxxotus
   integrity_guard_max_step: 0.04
-  evidence:
-    - crash_test_ab_ship
-    - crash_test_ruin
-    - crash_test_allocation
+
+  new_variables:
+    regime:
+      domain: [quantifiable, fuzzy, mixed]
+      set_by: regime_detector
+    regret_asymmetry:
+      formula: "E[downside] / E[upside_forgone]"
+    ruin_gate:
+      type: hard_gate
+      param_rho: tunable
+      action: [concave_utility_eval, veto_on_ruin]
+    evidence_sufficiency:
+      threshold_tau: "f(regret_asymmetry)"
+
+  decision_stack_by_regime:
+    fuzzy:
+      evidence_falsifiability: 0.28
+      risk_impact_security:    0.24
+      constraint_isolation:    0.20
+      utility_expected_value:  0.16
+      m3c3_hierarchy:          0.06
+      adversarial_probe:       0.06
+      # sum: 1.00 — checklist flou ; adversarial_probe doublé vs v0.4.0
+    quantifiable:
+      utility_expected_value:  0.45
+      evidence_falsifiability: 0.20
+      constraint_isolation:    0.12
+      risk_impact_security:    0.12
+      adversarial_probe:       0.06
+      m3c3_hierarchy:          0.05
+      # sum: 1.00 — utilité espérée mène ; excède max_step 0.04
+    mixed:
+      note: décomposer ; router chaque sous-problème ; recomposer
+
+  application_protocol_patch:
+    - detect_regime                         # nouvelle 1re étape
+    - project_problem_on_hierarchy
+    - attend_by_weights                     # ex-allocate_by_weights (attention seule)
+    - if regime == quantifiable: compute_expected_utility(in=math, curvature=rho)
+    - allocate_by_marginal_value            # allocation = valeur/urgence du problème
+    - execute_with_sandbox
+    - audit_every_transition
+    - "on_anomaly: resolve | recover | kill"
+
+  unchanged:
+    - binary_fact_assumption_split
+    - forme4_health_gate
+    - adversarial_probe
+    - kill_switch
+
   out_of_scope:
-    - authorship.md
-    - capsules CDXX-INJECT/RESOLVE/ORIGIN/FORME4-001
-    - forme #4 / cenote
-    - hierarchy.weights (couches) comme allocation de ressources
-  posture: |
-    Proposition de conception sur l'heuristique de raisonnement.
-    Ni activation du mode M3C3, ni endossement des capsules d'authorship / cosmologie.
-    Le vecteur quantifiable excède max_step 0.04 : validation émetteur explicite requise.
+    - authorship
+    - CDXX_capsules
+    - forme4
+    - cenote
 
-# ---------------------------------------------------------------------------
-# Diagnosis (crash-tests)
-# ---------------------------------------------------------------------------
-diagnosis:
-  root_cause: >
-    Sur le chiffrable, le problème fournit les bons nombres. Les constantes globales
-    de decision_stack dégradent. Sur le flou, les constantes redeviennent checklist utile.
-  crash_tests:
-    ab_ship:
-      correct: expédier B (asymétrie de regret)
-      v040: ne pas expédier (evidence=0.30)
-      fix: evidence_sufficiency + regret_asymmetry + pile quantifiable
-    ruin:
-      correct: seuil P(win)≥0.579, affiner estimation
-      v040: fuir Safe (risk + life_game)
-      fix: ruin_gate + ρ
-    allocation:
-      correct: allouer selon valeur/urgence
-      v040: 25j R&D / 8j sécu quel que soit le contexte
-      fix: attend_by_weights + allocate_by_marginal_value
-
-# ---------------------------------------------------------------------------
-# New variables
-# ---------------------------------------------------------------------------
-new_variables:
-  regime:
-    domain: [quantifiable, fuzzy, mixed]
-    set_by: regime_detector
-    role: >
-      quantifiable si probabilités et payoffs fiables ; fuzzy sinon ;
-      mixed → décomposer et router chaque sous-problème.
-
-  regret_asymmetry:
-    formula: "E[downside] / E[upside_forgone]"
-    role: plus le ratio est petit, moins il faut de preuve pour agir
-
-  ruin_gate:
-    type: hard_gate
-    param_rho: tunable
-    action: [concave_utility_eval, veto_on_ruin]
-    role: >
-      Gate dur irréversibilité. Utilité concave de courbure ρ ; calcule un seuil
-      plutôt que basculer aveuglément vers Safe.
-
-  evidence_sufficiency:
-    formula: "τ = f(regret_asymmetry)"
-    role: >
-      Remplace le seuil arbitraire. Agir si E[gain] > 0 et estimation stable.
-
-# ---------------------------------------------------------------------------
-# Decision stacks (sum = 1.00 each)
-# ---------------------------------------------------------------------------
-decision_stack_by_regime:
-  baseline_v040:
-    evidence_falsifiability: 0.30
-    risk_impact_security: 0.25
-    constraint_isolation: 0.20
-    utility_expected_value: 0.15
-    m3c3_hierarchy: 0.07
-    adversarial_probe: 0.03
-
-  fuzzy:
-    note: >
-      Ici les constantes travaillent : bon terrain. On double juste le budget de doute
-      (adversarial_probe), le seul composant qui rapporte partout. |Δ| ≤ 0.04 sauf
-      adversarial_probe (+0.03).
-    proportions:
-      evidence_falsifiability: 0.28   # was 0.30 ; Δ −0.02
-      risk_impact_security: 0.24      # was 0.25 ; Δ −0.01
-      constraint_isolation: 0.20      # was 0.20 ; Δ  0
-      utility_expected_value: 0.16    # was 0.15 ; Δ +0.01
-      m3c3_hierarchy: 0.06            # was 0.07 ; Δ −0.01
-      adversarial_probe: 0.06         # was 0.03 ; Δ +0.03 (double budget de doute)
-    sum: 1.00
-
-  quantifiable:
-    note: >
-      Inversion assumée : l'utilité espérée mène. Excède max_step 0.04 → ajout
-      structurel (nouveau régime), pas reweight auto-appliqué.
-    exceeds_max_step: true
-    proportions:
-      utility_expected_value: 0.45    # argmax d'utilité espérée (couche math)
-      evidence_falsifiability: 0.20   # qualité d'estimation, pas seuil arbitraire
-      constraint_isolation: 0.12      # faisabilité / isolation du risqué
-      risk_impact_security: 0.12      # dégonflé : ruine via ruin_gate + ρ
-      adversarial_probe: 0.06         # « agis-tu sur du bruit ? »
-      m3c3_hierarchy: 0.05            # résiduel
-    sum: 1.00
-    justifications:
-      utility_expected_value: "La décision est l'argmax d'utilité espérée, calculé dans la couche math"
-      evidence_falsifiability: "Compte encore : qualité de l'estimation, pas seuil arbitraire"
-      constraint_isolation: "Faisabilité / isolation du risqué"
-      risk_impact_security: "Dégonflé : la ruine passe par ruin_gate + courbure ρ"
-      adversarial_probe: "Répondu par le regret, pas supprimé"
-      m3c3_hierarchy: "Résiduel"
-
-  mixed:
-    note: décomposer ; router chaque sous-problème vers fuzzy ou quantifiable ; recomposer
-
-# ---------------------------------------------------------------------------
-# Application protocol (decision layer only)
-# ---------------------------------------------------------------------------
-application_protocol_proposed:
-  steps:
-    - id: project_problem_on_hierarchy
-      note: >
-        Les poids de couches [0.08…0.25] redeviennent des priors d'attention pour
-        la projection uniquement : effort cognitif à examiner chaque couche.
-        Rien de plus. Pas d'allocation de ressources de sortie.
-
-    - id: detect_regime
-      new: true
-      action: classifier quantifiable | fuzzy | mixed
-
-    - id: decompose_if_mixed
-      new: true
-      when: regime == mixed
-      action: découper, router, fusionner (garde-fou si détecteur mal réglé)
-
-    - id: compute_decision_auxiliaries
-      new: true
-      when: regime in [quantifiable, mixed.quantifiable_parts]
-      action: regret_asymmetry, evidence_sufficiency τ, ruin_gate(ρ) si irréversible
-
-    - id: attend_by_weights
-      renames: allocate_by_weights
-      role: attention cognitive par couche (priors), PAS ressources/sortie
-      uses: hierarchy.weights
-
-    - id: allocate_by_marginal_value
-      new: true
-      role: >
-        Allocation de ressources/sortie à partir de la valeur marginale et de
-        l'urgence propres au problème (ex. valeur par unité d'effort),
-        indépendamment des poids cosmologiques.
-
-    - id: select_decision_stack
-      new: true
-      action: charger decision_stack_by_regime[regime]
-
-    - id: execute_with_sandbox
-      gates_before_critical:
-        - forme4_health_gate   # conservé, hors recalibrage
-        - ruin_gate            # nouveau si applicable
-
-    - id: audit_every_transition
-      extra_fields: [regime, regret_asymmetry, evidence_sufficiency_tau, ruin_gate_verdict, decision_stack_vector]
-
-    - id: on_anomaly
-      action: resolve or recover or kill
-
-# ---------------------------------------------------------------------------
-# What it fixes / does not fix
-# ---------------------------------------------------------------------------
-corrects:
-  - sur-prudence sur downside faible (test 1)
-  - mauvais signe anti-ruine (test 2)
-  - allocation absurde (test 3)
-  - fausse précision des poids fixes sur le chiffrable
-
-does_not_correct:
-  - mauvais routage si régime mal détecté (mixed = garde-fou, pas garantie)
-  - gain net sur le flou reste modeste (hygiène, pas solveur)
-  - ne rend pas le framework meilleur qu'une bonne théorie de la décision sur le chiffrable ;
-    l'empêche d'être *pire*
-
-# ---------------------------------------------------------------------------
-# Activation
-# ---------------------------------------------------------------------------
-activation:
-  requires: explicit_emitter_validation
-  emitter: Dani Bengal / @cdxxotus
-  reason_not_auto: exceeds_max_step on quantifiable vector + structural regime addition
-  on_activate:
-    - apply decision_stack_by_regime to master
-    - replace allocate_by_weights with attend_by_weights + allocate_by_marginal_value
-    - bump master to 0.5.0
-    - audit continuum/audit/
-    - set activated true
-
-invariants:
-  - binary layer untouched
-  - forme4_health_gate conserved
-  - adversarial_probe present in every regime (0.06)
-  - authority_channel exclusively designated emitter
-  - authorship / CDXX-* / forme#4 / cenote unchanged
+  # -------------------------------------------------------------------------
+  # Notes d'implémentation (non-normatives tant que status != activated)
+  # -------------------------------------------------------------------------
+  notes:
+    fuzzy_rationale: >
+      Ici les constantes travaillent. On double le budget de doute (adversarial_probe 0.03→0.06).
+    quantifiable_rationale: >
+      Inversion assumée : argmax d'utilité espérée (couche math). Ruin via ruin_gate+ρ,
+      pas via un poids risk qui inverse le signe. Validation émetteur obligatoire.
+    attend_vs_allocate: >
+      hierarchy.weights = priors d'attention pour project_problem_on_hierarchy uniquement.
+      allocate_by_marginal_value = ressources/sortie selon valeur marginale + urgence du problème.
+    compute_expected_utility: >
+      Uniquement si regime == quantifiable (ou parties quantifiables de mixed).
+      in=math, curvature=rho (même ρ que ruin_gate).
+    baseline_v040:
+      evidence_falsifiability: 0.30
+      risk_impact_security: 0.25
+      constraint_isolation: 0.20
+      utility_expected_value: 0.15
+      m3c3_hierarchy: 0.07
+      adversarial_probe: 0.03
