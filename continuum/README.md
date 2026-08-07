@@ -23,3 +23,5 @@ Emplacements déclarés dans `continuum_locations` du [`master.yaml`](../master.
 | [`audit/activation_reweight_regime_2026-08-07.yaml`](audit/activation_reweight_regime_2026-08-07.yaml) | audit trail | activation structurelle (exceeds_max_step) |
 | [`continuum_memory_default_activation_v0.7.0-proposal.yaml`](weights/proposal/continuum_memory_default_activation_v0.7.0-proposal.yaml) | **ACTIVÉ** 2026-08-07 | `default_when_known` + mémoire continuum → master **v0.7.0** |
 | [`audit/activation_continuum_memory_v070_2026-08-07.yaml`](audit/activation_continuum_memory_v070_2026-08-07.yaml) | audit trail | activation v0.7.0 |
+| [`formal_semantics_v0.8.0-proposal.yaml`](weights/proposal/formal_semantics_v0.8.0-proposal.yaml) | **ACTIVÉ** 2026-08-07 | sémantique formelle + transition system → master **v0.8.0** |
+| [`audit/activation_formal_semantics_v080_2026-08-07.yaml`](audit/activation_formal_semantics_v080_2026-08-07.yaml) | audit trail | activation v0.8.0 |

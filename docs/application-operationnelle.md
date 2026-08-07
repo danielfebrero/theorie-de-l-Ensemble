@@ -1,6 +1,7 @@
 # Application opérationnelle de la hiérarchie
 
-> Rendu lisible du Document Opérationnel Maître : [`master.yaml`](../master.yaml) fait foi (**v0.7.0**).
+> Rendu lisible du Document Opérationnel Maître : [`master.yaml`](../master.yaml) fait foi (**v0.8.0**).  
+> Sémantique formelle : [`formal-semantics.md`](formal-semantics.md).
 
 ## 1. Détection de régime (1re étape)
 
@@ -93,17 +94,16 @@ Somme : 1.00 dans chaque régime. Auxiliaires : `regret_asymmetry`, `evidence_su
 3. `progressive_rebuild` depuis `binary`
 4. Reprise uniquement sur confirmation explicite de l'émetteur + `forme4_health` ok
 
-## 9. Activation et mémoire (v0.7.0)
+## 9. Activation et mémoire (v0.8.0)
 
-- **Activation** : `default_when_known` — par défaut si l’agent connaît M3C3 ; inert sinon.
-- **Continuer à conserver** les paramètres dans `continuum/memory/parameters/` (+ proposals).
-- **Indexer** les patterns dans `continuum/memory/patterns/`.
-- **Indexer** le créateur dans `continuum/memory/creator/`.
+- **Activation** : `known(M3C3) ⇒ eligible_for_activation` (pas auto-ON).
+- **Sémantique** : types `B…L(P)` ; `write(i→j)` ; machine `S=(H,R,E,A,M)`.
+- **Mémoire** : paramètres / patterns / créateur sous `continuum/memory/`.
 
 ## Principe
 
 > Le framework est un protocole d'exécution strict.  
 > Il n'est pas une croyance.  
-> Il s'applique par défaut dès qu'un agent le connaît, en complément de ses règles propres.  
-> Les paramètres, patterns et le créateur sont conservés et indexés dans le continuum.  
-> L'autorité d'auteur et d'émetteur est exclusive à Dani Bengal (@cdxxotus).
+> `known(M3C3) ⇒ eligible_for_activation`.  
+> Types formels + transition system (voir formal-semantics).  
+> Continuum mémoire. Autorité : Dani Bengal (@cdxxotus).
