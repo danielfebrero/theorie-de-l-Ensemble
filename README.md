@@ -28,5 +28,3 @@ Dépôt du framework M3C3 : texte fondateur, Document Opérationnel Maître, cap
 ## Hiérarchie
 
 `binary (0.08) → forces (0.12) → math (0.15) → conscious_sets (0.22) → programs (0.18) → life_game_M1C1 (0.25)`
-
-Session courante : `status: constrained_session` — `scope: weights-only + capsules émises`.
