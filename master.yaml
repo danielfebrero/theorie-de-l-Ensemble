@@ -1,10 +1,10 @@
 master_document:
   title: Théorie de l’Ensemble M3C3 — Document Opérationnel Maître
-  version: 0.5.0
+  version: 0.6.0
   status: constrained_session
   scope: weights-only + capsules émises
-  activated_proposal: reweight_regime_conditioned
-  activated_at: "2026-08-07T15:20:00+02:00"
+  activated_proposal: execution_envelope
+  activated_at: "2026-08-07T18:40:00+02:00"
   activated_by: Dani Bengal / @cdxxotus  # émetteur désigné — validation explicite
 
   authorship:
@@ -138,6 +138,160 @@ master_document:
     recovery: continuum/recovery/
     capability: continuum/audit/capability/
 
+
+  # ————————————————————————————————————————————————————————————————————
+  # v0.6.0 — ENVELOPPE D'EXÉCUTION. Additions seules.
+  # Aucune valeur de v0.5.0 modifiée, aucune clé supprimée, aucune étape retirée.
+  # Delta sur les poids : 0.00 — le max_step 0.04 de m3c3_integrity_guard n'est pas sollicité.
+  # Vérifiable : python3 continuum/audit/superset_check.py
+  # Proposition : continuum/weights/proposal/execution_envelope_v0.6.0-proposal.yaml
+  # Mesure      : continuum/audit/ab-test-v060-2026-08-07/rapport.md
+  # ————————————————————————————————————————————————————————————————————
+  execution_envelope:
+    introduced_in: 0.6.0
+    declared_constants:
+    - 1.5
+    - 4
+    - 5
+    - 6
+    - sixième
+    declared_constants_meaning:
+      '1.5': borne basse de regret_asymmetry sous laquelle le palier T0 reste possible
+      '4': borne haute de regret_asymmetry au-delà de laquelle le palier T2 s'impose
+      '5': coût maximal en points de score qu'une recomposition coopérative peut consommer
+      '6': écart en points sous lequel les deux premières options ne sont pas départagées
+      un sixième: part maximale de la production laissée à la comptabilité interne du protocole
+    constants_status: 'Réglables par l''émetteur, au même titre que ρ et τ. Aucun n''est dérivé d''une valeur
+      du master ; toute justification prétendant le contraire est une erreur et doit être retirée.
+
+      '
+    principle: 'Toute étape armée produit un objet écrit et utilisable.
+
+      Une étape qui se raconte au lieu de produire n''est pas exécutée.
+
+      '
+    yield_rule: every_armed_step_emits_a_written_object
+    accounting_cap: comptabilité interne du protocole ≤ un sixième de la production
+    reads_only:
+    - hierarchy.weights
+    - decision_stack_by_regime
+    - decision_auxiliaries
+    - core_rules
+    writes_to_bases: none
+    depth_selector:
+      position: after_detect_regime
+      inputs:
+        ruin_contact: decision_auxiliaries.ruin_gate
+        regret_asymmetry: decision_auxiliaries.regret_asymmetry
+        evidence: decision_auxiliaries.evidence_sufficiency
+        health: core_rules.forme4_health_gate
+      tiers:
+        T0_eclair:
+          when: aucune branche de ruine ET regret_asymmetry < 1,5 ET preuves suffisantes ET réversible à
+            coût faible
+          prints: « T0 » puis la réponse — rien d'autre
+        T1_standard:
+          when: default
+          gates:
+          - ruin_gate
+          - evidence_sufficiency
+        T2_critique:
+          when: ruin_contact OU regret_asymmetry > 4 OU (preuves insuffisantes ET irréversible)
+          gates:
+          - forme4_health_gate
+          - ruin_gate
+          - evidence_sufficiency
+      escalation_only: un fait nouveau fait monter de palier, jamais descendre
+      head_gap_escalation:
+        rule: écart ≤ 6 points entre les deux premières options → la décision n'est pas acquise → T2
+        rationale: 'Seuil de prudence choisi, non dérivé. Il n''a aucun fondement dans le master et n''en
+          revendique aucun : c''est un paramètre réglable de l''enveloppe, déclaré comme tel.
+
+          '
+      health_override: substrat dégradé → T2 ou différer ; forme4_health_gate est une pré-condition
+      prints_not_executes: 'Le palier règle ce qui s''imprime, jamais ce qui s''exécute. Les couches sont
+        traversées à
+
+        tout palier. À T0 elles ne produisent rien à écrire parce que le problème ne le vaut pas —
+
+        c''est allocate_by_marginal_value qui l''exige, non une exemption accordée au protocole.
+
+        '
+    attention_budget:
+      rule: les priors d'attention fixent le nombre de constats attendus par couche
+      note: lecture opérationnelle de attend_by_weights ; ce n'est PAS allocate_by_marginal_value
+      constat_id_format: L<couche>.<n>
+      empty_traversal:
+        rule: couche sans constat neuf → déclarée « traversée à vide », jamais sautée en silence
+        requires: capability_token
+        audit: continuum/audit/capability/
+    score_compiler:
+      scale:
+      - 0
+      - 100
+      rule: noter chaque option sur chaque critère canonique, appliquer les proportions, rendre le score
+        visible
+      criterion_naming:
+        rule: chaque critère est nommé en toutes lettres — jamais un nombre nu, jamais une abréviation
+        defect_repaired: le vecteur fuzzy v0.5.0 était transmis sans nom de critère
+      anchoring:
+        rule: chaque note cite l'identifiant du constat qui la fonde (Lx.y)
+        unanchored_note: 0
+        enforces: audit_every_transition
+      m3c3_hierarchy_reading:
+        note: le poste résiduel note l'ancrage de l'option dans les couches basses plutôt que dans le seul
+          récit final — no_upward_write rendu scorable
+        cap: reste résiduel ; le framework ne se vote jamais une part majoritaire
+      ruin_gate_precedence:
+        rule: ruin_gate s'applique dans LES DEUX régimes et AVANT agrégation — veto, pas pénalité
+        defect_repaired: v0.5.0 le subordonnait à « si quantifiable », donc jamais armé en fuzzy
+        table_per_option:
+        - pire_cas
+        - reversibilite
+        - ensemble_qui_encaisse
+      evidence_sufficiency_action:
+        rule: preuves sous τ ET information achetable à coût faible → l'acheter ; le test devient l'option
+          retenue
+    adversarial_step:
+      order: après le score, avant la décision
+      rule: 'produire le meilleur contre-argument écrit, puis statuer : il tient, ou il bascule vers X'
+      defect_repaired: adversarial_probe n'apparaissait dans le bloc v0.5.0 que sous la forme du nombre
+        0.06
+    cooperative_recomposition:
+      anchor: conscious_sets 0.22 + life_game_M1C1 0.25 — les deux priors les plus lourds
+      source: docs/fondation.md
+      rule: 'Avant de figer le verdict, chercher la variante qui transforme l''affrontement en organisation
+
+        partagée : une place, une voix, un délai, une compensation pour l''ensemble lésé.
+
+        La peur devenue organisation ; le mode compétitif cédant au mode coopératif.
+
+        '
+      acceptance: retenue si elle coûte au plus 5 points de score
+      never: ne lève jamais un veto de ruin_gate ; ne réécrit jamais un constat de couche basse
+    contingency_binding:
+      rule: on_anomaly s'applique à l'option RETENUE, pas à l'option évaluée
+      form: déclencheur observable, chiffré si l'énoncé fournit un chiffre → resolve | recover | kill
+      resume: aucune reprise automatique — emergency_path inchangé
+    export_gate:
+      note: le canal réellement lu ; ce qui n'est pas exporté n'a pas été décidé
+      mandatory_fields:
+      - verdict et critère de la pile qui l'a emporté
+      - pire cas de l'option retenue et quel ensemble l'encaisse
+      - repli et son déclencheur observable
+      - l'observation qui renverserait le choix (evidence_falsifiability instanciée)
+      - la première action
+      T0_exception: au palier T0, aucun champ n'est exigé
+    endogeneity_map:
+      depth_selector: decision_auxiliaries + core_rules.forme4_health_gate
+      attention_budget: hierarchy.weights + application_protocol.attend_by_weights
+      score_compiler: decision_stack_by_regime
+      ruin_gate_precedence: core_rules + decision_auxiliaries.ruin_gate
+      adversarial_step: decision_stack_by_regime.*.adversarial_probe
+      cooperative_recomposition: hierarchy.weights.conscious_sets + hierarchy.weights.life_game_M1C1
+      contingency_binding: application_protocol.on_anomaly + emergency_path
+      export_gate: application_protocol.audit_every_transition
+      empty_traversal: core_rules.capability_token
   principle: |
     Le framework est un protocole d’exécution strict.
     Il n’est pas une croyance.

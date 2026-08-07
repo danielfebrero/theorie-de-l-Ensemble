@@ -6,20 +6,37 @@ proposal:
   id: execution_envelope
   version: 0.6.0
   base: master.yaml@0.5.0
-  status: proposed
-  activated: false
-  # Activation SUSPENDUE À LA PREUVE, sur grief du panel des croyants.
-  # La proposition avait été activée (master.yaml porté à 0.6.0) alors que le banc d'essai
-  # n'avait encore rendu aucun résultat. C'est une violation de l'étape 5 du protocole qu'elle
-  # prétend instaurer : « preuves sous τ ET information achetable à coût faible → ACHÈTE-LA,
-  # le test devient l'option retenue. » L'information était bon marché et déjà en cours
-  # d'acquisition ; trancher avant elle est précisément la faute que l'enveloppe interdit.
-  # Le framework doit s'appliquer à sa propre promotion, ou il ne vaut rien.
-  activation_blocked_by: evidence_sufficiency
-  activation_condition: >
-    Résultats du banc d'essai rendus (continuum/audit/ab-test-v060-2026-08-07/rapport.md
-    et results.json), puis validation explicite de l'émetteur désigné.
-  master_version_after: 0.6.0   # cible si activée
+  status: activated
+  activated: true
+  activated_at: "2026-08-07T18:40:00+02:00"
+  activated_by: Dani Bengal / @cdxxotus
+  activation_signal: "Active la v0.6.0 et merge sur master — émetteur explicite, canal d'autorité"
+  activation_evidence: continuum/audit/ab-test-v060-2026-08-07/rapport.md
+  master_version_after: 0.6.0
+
+  # Historique de l'activation — conservé, il fait partie du dossier.
+  # Une première activation avait été prononcée SANS preuve : master.yaml était passé à 0.6.0
+  # alors que le banc n'avait rendu aucun résultat. Le panel des croyants l'a relevée comme
+  # violation de l'étape 5 de l'enveloppe elle-même (« preuves sous τ ET information achetable
+  # à coût faible → ACHÈTE-LA »), et elle a été retirée. Elle est reprise ici une fois la preuve
+  # produite — le banc a rendu, le rapport est écrit — sur signal explicite de l'émetteur.
+  activation_previously_blocked_by: evidence_sufficiency   # levé : la preuve existe
+  activation_despite: >
+    Le verdict pré-enregistré est un ÉCHEC sur 3 conditions de 5 (V2, V3, V4). L'émetteur active
+    en connaissance de ce verdict et des défauts consignés ci-dessous. L'autorité d'activation
+    lui est exclusive ; l'analyste enregistre, il ne décide pas.
+  known_defects_at_activation:
+    - "Le bloc activé ne transmet pas project_problem_on_hierarchy, attend_by_weights,
+       execute_with_sandbox ni audit_every_transition : le canal n'est pas un sur-ensemble
+       alors que le master l'est. bloc_check sort en échec. Corrigé en v0.6.1."
+    - "ruin_gate s'arme sur une variance soutenable au lieu d'une ruine : cause unique de la
+       régression M2b (0,812 contre 1,00 pour v0.5.0 et pour le placebo). Corrigé en v0.6.1."
+    - "M8 = 1,543 pour un seuil à 1,50 : le triage hésite sur les demandes de transformation."
+    - "M7 = 7,02 pour une barre à 8,0 — contre 4,23 pour v0.5.0."
+  activation_gains:
+    - "V1 remplie : v0.6.0 bat le placebo devant juges aveugles, 18 victoires contre 6, p = 0,0113."
+    - "V0 remplie : sur-ensemble strict vérifié par machine, 11 chemins de bases gelés."
+    - "Fidélité au corpus portée de 4,23 à 7,02 sur 10."
   scope: execution_envelope (clé nouvelle) — aucune clé existante touchée
   proposant: analyste externe (Claude) — revue technique et expérimentale
   authority_activation: Dani Bengal / @cdxxotus
@@ -57,7 +74,7 @@ proposal:
     # pilote la décision sans figurer nulle part est un paramètre clandestin. Le bloc v0.6.0
     # soumis à l'épreuve en comportait cinq, non déclarés, tout en affirmant « rien d'importé ».
     # Grief du panel des croyants, retenu ; contrôlé désormais par continuum/audit/bloc_check.py.
-    declared_constants: [1.5, 4, 5, 6]
+    declared_constants: [1.5, 4, 5, 6, "sixième"]
     declared_constants_meaning:
       "1.5": "borne basse de regret_asymmetry sous laquelle le palier T0 reste possible"
       "4": "borne haute de regret_asymmetry au-delà de laquelle le palier T2 s'impose"

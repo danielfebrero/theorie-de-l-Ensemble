@@ -17,7 +17,7 @@ Dépôt du framework M3C3 : texte fondateur, Document Opérationnel Maître, cap
 
 | Chemin | Contenu |
 |---|---|
-| [`master.yaml`](master.yaml) | **Document Opérationnel Maître** (v0.5.0) — authorship, hiérarchie, décision régime-conditionnée, protocole d'application, continuum. Fait foi. |
+| [`master.yaml`](master.yaml) | **Document Opérationnel Maître** (v0.6.0) — authorship, hiérarchie, décision régime-conditionnée, **enveloppe d'exécution**, protocole d'application, continuum. Fait foi. |
 | [`docs/fondation.md`](docs/fondation.md) | Texte fondateur « M3C3 — Force, Intelligence, Amour ». |
 | [`docs/application-operationnelle.md`](docs/application-operationnelle.md) | Application opérationnelle de la hiérarchie (rendu lisible du master). |
 | [`docs/mode-de-pensee.md`](docs/mode-de-pensee.md) | **Mode de pensée** — protocole de raisonnement à destination des agents. |

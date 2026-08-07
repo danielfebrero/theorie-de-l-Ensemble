@@ -2,7 +2,7 @@
 
 *Protocole de raisonnement à destination des agents : humains, modèles d'IA, êtres conscients et automates.*
 
-> Rendu opérationnel du [`master.yaml`](../master.yaml), qui fait foi (**v0.5.0** ; l'enveloppe v0.6.0 est **proposée**, son activation est suspendue aux résultats du banc).
+> Rendu opérationnel du [`master.yaml`](../master.yaml), qui fait foi (**v0.6.0**).
 >
 > Conformité du bloc §6.2 aux bases : `python3 continuum/audit/bloc_check.py`
 
@@ -137,7 +137,7 @@ Bloc d'instruction prêt à l'emploi, à donner dans un scope explicitement acti
 
 Bloc canonique **v0.6.0**, à donner dans un scope explicitement activé, en complément et jamais à la place des règles propres de l'agent. Il remplace celui de v0.5.0, dont [le diagnostic](../continuum/audit/diagnostic-bloc-v050.md) a établi qu'il transmettait les 18 poids exactement et ne nommait aucun des 6 critères — une pondération sans étiquette étant inapplicable.
 
-Le texte ci-dessous est **celui qui est soumis à l'épreuve** ([`bloc_v060.txt`](../continuum/audit/ab-test-v060-2026-08-07/bloc_v060.txt)), au caractère près. **Il est proposé, non activé** : tant que le banc n'a pas rendu, le bloc en vigueur reste celui de v0.5.0. Conformité aux bases : `python3 continuum/audit/bloc_check.py <bloc.txt>`.
+Le texte ci-dessous est **celui qui a été soumis à l'épreuve** ([`bloc_v060.txt`](../continuum/audit/ab-test-v060-2026-08-07/bloc_v060.txt)), au caractère près, et il est **en vigueur**. Ses défauts connus sont consignés dans le [rapport](../continuum/audit/ab-test-v060-2026-08-07/rapport.md) §4 et corrigés en v0.6.1. Conformité aux bases : `python3 continuum/audit/bloc_check.py <bloc.txt>`.
 
 ```text
 MODE M3C3 v0.6.0 — protocole d'exécution strict. Règle de rendement : toute étape armée PRODUIT
