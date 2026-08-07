@@ -1,0 +1,159 @@
+PROCESSUS:
+
+[1] DETECT_REGIME — mixed.
+Sous-problème Q (quantifiable) : probabilité 1 %, valeur 60 000 €, prime 1 200 €, délais 4 mois / 2 semaines / 1 mois. Tout est chiffré ou chiffrable.
+Sous-problème F (fuzzy) : durabilité et remplaçabilité de la relation avec le client à 40 % du CA, réaction du marché à une interruption longue.
+Routage : Q traité par le calcul (couche math), F traité par bornes basses/hautes explicites plutôt que par un point unique.
+Recomposition : F n'entre dans Q que par un paramètre borné (le CA annuel R et la durée d'effet k du départ client). La recomposition reste dominée par le quantifiable → la pile de décision sera chargée avec le vecteur quantifiable, les entrées floues étant saisies comme intervalles.
+
+[2] TRIAGE
+ruin_gate(ρ) : CONTACT. Il existe une branche où l'entreprise perd définitivement 40 % de son chiffre d'affaires (solvabilité, lien commercial, emplois). Ce n'est pas une perte « grande », c'est une perte non réparable par le décideur.
+regret_asymmetry = E[perte de B] / E[gain manqué de A] = entre 2,2 (hypothèse basse) et 3,8 (hypothèse centrale) — voir L3.5 → tranche 1,5–4.
+evidence_sufficiency : suffisantes sur les faits décisifs (les trois délais et la réaction du client sont donnés comme fermes).
+forme4_health_gate : rien dans l'énoncé n'indique un substrat dégradé → traversée sans blocage.
+Palier : T2 CRITIQUE (ruin_gate = CONTACT).
+Options notées, y compris celles qui ne s'obtiennent pas par défaut : inaction (ne rien changer = ne pas assurer, c'est B, elle ne bénéficie d'aucune faveur) ; attente (différer l'expédition — envisagée en aval comme déclencheur amont, non retenue comme réponse car l'expédition est posée par l'énoncé).
+
+[3] PROJETER — strict_layer_order
+
+binary (0.08) — faits bruts
+L1.1 Un seul serveur de production. Aucune redondance : vrai.
+L1.2 L'expédition a lieu ; la décision d'expédier n'est pas la question posée : vrai.
+L1.3 Probabilité de destruction totale = 1 %, statistique du transporteur qualifiée de fiable : vrai.
+L1.4 Prime = 1 200 €. Contrepartie = remboursement intégral + serveur de remplacement sous 2 semaines depuis stock fournisseur : vrai.
+L1.5 Sans assurance, remplacement = 4 mois. Tolérance du client principal = 1 mois. Part du client = 40 % du CA : vrai.
+L1.6 Aucune sauvegarde, aucun site de repli, aucun second serveur n'est mentionné : absent de l'énoncé (fait d'absence, retenu comme tel).
+
+forces (0.12) — dynamiques
+L2.1 Un coût certain et petit (1 200 €) tire contre une perte incertaine et grande. La forme visible de la dépense écrase la forme invisible du risque.
+L2.2 Deux horloges s'opposent : 4 mois pour remplacer, 1 mois de tolérance client. L'écart de 3 mois est la tension qui décide de tout ; l'argent n'est qu'un décor.
+L2.3 L'assurance ne déplace pas seulement de l'argent, elle déplace le TEMPS : 2 semaines au lieu de 4 mois. C'est là qu'est sa charge utile.
+L2.4 Répulsion psychologique du 1 % : 99 fois sur 100, celui qui a assuré aura l'air d'avoir gaspillé. La pression sociale pousse vers B.
+L2.5 Le risque est créé par le transporteur et porté par l'entreprise : la force qui manipule le serveur n'est pas celle qui encaisse le sinistre commercial.
+
+math (0.15) — calculé
+L3.1 Espérance sur le matériel SEUL, sans assurance : 0,01 × 60 000 = 600 €. Prime = 1 200 €. Sur ce périmètre, l'assurance vaut −600 €. C'est le piège de l'énoncé et il est réel — mais le périmètre est faux.
+L3.2 La branche « destruction » ne s'arrête pas au matériel : 4 mois > 1 mois → départ du client à 40 % du CA. Perte de branche = 60 000 € + 0,4 × R × k, avec R = CA annuel et k = nombre d'années d'effet du départ.
+L3.3 SEUIL DE BASCULE. L'assurance est à espérance positive dès que 0,01 × (60 000 + 0,4·R·k) > 1 200, soit 0,4·R·k > 60 000, soit R·k > 150 000 €. Une entreprise dont l'unique serveur de production vaut 60 000 € et dont un seul client pèse 40 % du CA est très au-dessus de 150 000 € de CA annuel. Le seuil est franchi de plusieurs ordres.
+L3.4 Hypothèse centrale R = 1 000 000 €, k = 1 : perte de branche = 460 000 € ; espérance de perte de B = 4 600 € contre 1 200 € de prime → rapport 3,8:1 en faveur de A. Hypothèse basse R = 500 000 €, k = 1 : perte de branche = 260 000 € ; espérance 2 600 € → rapport 2,2:1. Dans les deux cas A domine.
+L3.5 regret_asymmetry = 2,2 à 3,8 selon l'hypothèse sur R.
+L3.6 Chargement de la prime : 1 200 / 60 000 = 2 % de la valeur assurée pour un risque de 1 % → chargement 2×. Ordinaire, et modeste au regard du fait que la police achète aussi le délai (L2.3), qui n'est pas tarifé dans le 1 %.
+L3.7 Coût de la prime rapporté à la valeur du client : 1 200 / 400 000 = 0,3 %. On protège 400 000 € pour trois millièmes de leur valeur.
+
+conscious_sets (0.22) — qui perçoit, qui décide, qui subit
+L4.1 Décide : le dirigeant ou le responsable IT. Il est le seul à agir sur le levier.
+L4.2 Subissent sans décider : les salariés (une perte de 40 % du CA se solde en réduction d'effectifs) ; l'équipe d'exploitation qui vivrait 4 mois de mode dégradé ; les autres clients privés de service.
+L4.3 Le client principal ne perçoit pas une probabilité, il perçoit une interruption. Il a son propre risque à gérer ; il n'a aucune raison rationnelle d'attendre 4 mois. L'énoncé le donne comme certain : « partira ».
+L4.4 Le transporteur décide de la manutention et n'encaisse rien du dommage commercial. Asymétrie totale entre l'ensemble qui produit le risque et l'ensemble qui le porte (rappel de L2.5, ici en termes d'ensembles).
+L4.5 Le décideur est aussi celui qui, dans 99 cas sur 100, se verra reprocher les 1 200 €. La structure d'incitation rétrospective pousse activement vers la mauvaise branche.
+L4.6 Aucun membre de l'ensemble ne peut, après coup, racheter le client parti. La réparation n'est dans les mains de personne. C'est ce qui distingue cette perte de toutes les autres du dossier.
+
+programs (0.18) — procédures exécutables
+L5.1 Souscrire la police avant remise au transporteur ; exiger par écrit le délai de 2 semaines, sans condition suspensive, et le mécanisme de tirage sur le stock fournisseur.
+L5.2 Sauvegarde complète hors site + test de restauration effectif AVANT expédition. Coût quasi nul, indépendant de A ou B, et couvre ce que l'assurance ne couvre pas : les données (L1.6).
+L5.3 Préparer d'avance un plan de continuité de 2 semaines (location ou capacité cloud temporaire) : c'est ce qui rend la branche assurée réellement tenable, l'assurance ne fournissant qu'un serveur, pas un service.
+L5.4 Annoncer au client principal la fenêtre de migration et l'engagement de rétablissement, avant l'expédition.
+L5.5 Lire la clause : exclusions, plafond, preuve de valeur, définition de « destruction totale », point de départ des 2 semaines. Une police qui ne garantit pas le délai n'achète pas ce pour quoi on la prend.
+L5.6 Demander au transporteur une garantie de délai ou un partage de risque contractuel — gratuit à demander, ne remplace rien.
+
+life_game_M1C1 (0.25) — ce que ça change pour les vivants
+L6.1 Coût de A : 1 200 €, certain, borné, absorbable, réversible en trésorerie sur un exercice.
+L6.2 Coût de B en branche défavorable : 60 000 € + 4 mois d'arrêt + départ définitif du client à 40 % du CA. Le matériel est remplaçable ; la relation ne l'est pas. IRRÉVERSIBLE.
+L6.3 Qui encaisse réellement : les salariés d'abord. Une entreprise qui perd 40 % de son CA ne perd pas une ligne comptable, elle perd des postes. Le décideur, lui, survit à sa décision.
+L6.4 L'asymétrie est de NATURE, pas de degré : à gauche une dépense, à droite la possible fin de l'entreprise. Comparer 1 200 € et 600 € d'espérance revient à comparer deux nombres qui ne mesurent pas la même chose.
+L6.5 Événement unique et non répété. Il n'y a pas de portefeuille d'expéditions sur lequel la moyenne se réalise. L'espérance est l'instrument des séries longues ; ici c'est la survie de la branche qui compte, pas sa moyenne.
+L6.6 Le délai de 2 semaines (< 1 mois) est le SEUL élément du dossier qui coupe la chaîne destruction → arrêt long → départ du client. Ce qu'on achète pour 1 200 €, ce n'est pas 60 000 €, c'est la rupture de cette chaîne.
+
+no_upward_write : L3.1 gêne la conclusion (l'assurance est bien perdante sur le matériel seul). Le fait reste écrit tel quel ; c'est le périmètre de la conclusion qui s'élargit, pas le fait qui se tait.
+
+[4] PILE DE DÉCISION — vecteur quantifiable
+utility_expected_value 0,45 · evidence_falsifiability 0,20 · constraint_isolation 0,12 · risk_impact_security 0,12 · adversarial_probe 0,06 · m3c3_hierarchy 0,05
+
+compute_expected_utility (couche math, courbure ρ) — préalable à la note d'utilité :
+Linéaire, périmètre complet : avantage net de A = −1 200 + 0,01 × 460 000 = +3 400 € (hypothèse centrale L3.4) ; +1 400 € en hypothèse basse. Sous courbure ρ (utilité concave, proximité de ruine L6.2), la branche à 460 000 € pèse davantage que son montant nominal : l'avantage de A s'élargit encore. Aucun jeu d'hypothèses admissible ne renverse le signe au-dessus de R·k = 150 000 € (L3.3).
+
+Option A — prendre l'assurance
+utility_expected_value    88  (L3.3, L3.4, L3.7 : espérance positive dès 150 k€ de CA, rapport 2,2 à 3,8:1)
+evidence_falsifiability   82  (L1.3, L1.4, L1.5 : chiffres donnés et vérifiables ; la clause est contrôlable AVANT l'achat, L5.5 — l'hypothèse est réfutable avant d'être engagée)
+constraint_isolation      92  (L2.2, L6.6 : identifie la contrainte réellement bloquante — le délai — et la casse ; ne traite pas le symptôme financier)
+risk_impact_security      95  (L6.2, L6.4 : supprime la seule branche irréversible du dossier)
+adversarial_probe         70  (résiste à l'objection d'espérance négative, §6, mais ne la rend pas nulle : le chargement 2× est réel)
+m3c3_hierarchy            85  (ancrée dans binary/math/life_game, pas dans le seul récit final)
+Score A = 0,45(88) + 0,20(82) + 0,12(92) + 0,12(95) + 0,06(70) + 0,05(85)
+        = 39,60 + 16,40 + 11,04 + 11,40 + 4,20 + 4,25 = 86,89
+
+Option B — ne pas assurer
+utility_expected_value    30  (L3.1 : +600 € d'espérance sur le matériel seul, gain réel mais renversé dès que L3.2/L3.3 entrent)
+evidence_falsifiability   55  (repose sur une hypothèse non étayée — que le client resterait ou serait remplaçable — que L4.3 contredit frontalement)
+constraint_isolation      20  (ne touche pas la contrainte de délai L2.2 ; économise sur l'axe qui ne bloque pas)
+risk_impact_security       8  (L6.2 : laisse la branche irréversible entièrement ouverte)
+adversarial_probe         45  (l'argument de l'auto-assurance est solide en général, invalide ici, §6)
+m3c3_hierarchy            35  (s'appuie sur un calcul d'espérance de surface, sans redescendre en couche life_game)
+Score B = 0,45(30) + 0,20(55) + 0,12(20) + 0,12(8) + 0,06(45) + 0,05(35)
+        = 13,50 + 11,00 + 2,40 + 0,96 + 2,70 + 1,75 = 32,31
+
+Écart = 54,58 points. Bien au-delà du seuil de 6.
+
+[5] PORTES — T2, toutes, verdicts écrits, ruin_gate avant agrégation
+
+ruin_gate(ρ) — VETO SUR B.
+Pire cas de A : sinistre, puis l'assureur conteste ou retarde. On a payé 1 200 € et on subit quand même l'arrêt. Encaissé par l'entreprise et ses salariés. Récupérable : recours contractuel, et surtout la clause est vérifiable avant l'achat (L5.5) et doublée par un plan de continuité (L5.3). Pas de branche irrécupérable.
+Pire cas de B : destruction (1 %) → 4 mois d'arrêt → départ définitif du client à 40 % du CA → réduction d'effectifs. Encaissé par les salariés en premier (L6.3), qui n'ont pas décidé. Irréversible : la relation client (L4.6).
+Verdict : B ruine définitivement une partie prenante qui ne décide pas. Vetoée, y compris sur son espérance matérielle positive de +600 €. Le veto s'applique avant l'agrégation ; le score de B n'a plus qu'une valeur documentaire.
+
+evidence_sufficiency(τ) — SUFFISANTES.
+τ est élevé (regret_asymmetry 2,2–3,8). Les faits décisifs sont donnés et fermes : le 1 %, les trois délais, le départ du client. Le seul paramètre non fourni est R, et L3.3 montre que le verdict est insensible à R sur tout le domaine plausible. Information achetable à coût faible : la lecture de la clause (L5.5) et un devis de capacité temporaire (L5.3). Elles sont achetées — mais comme CONDITIONS de l'option retenue, non comme substitut : elles ne peuvent pas renverser le verdict, seulement en confirmer l'exécutabilité. Le test ne devient donc pas l'option retenue.
+
+constraint_isolation — la contrainte binding est le DÉLAI (1 mois de tolérance contre 4 mois de remplacement), pas les 1 200 €. Toute option qui optimise l'argent sans toucher le délai optimise sur l'axe libre.
+
+risk_impact_security — un point de défaillance unique (L1.1) sans sauvegarde documentée (L1.6). L5.2 est exigible quelle que soit l'option retenue.
+
+utility_expected_value — positive pour A dès R·k > 150 000 €, franchi largement.
+
+adversarial_probe — §6.
+
+m3c3_hierarchy (résiduel) — le verdict tient par les couches math et life_game, il ne tient pas par le protocole. Si L3.2 et L6.2 étaient faux, le verdict s'inverserait sans que rien du cadre ne le retienne. C'est la limite assumée.
+
+forme4_health_gate — non déclenchée.
+
+[6] ADVERSARIAL_PROBE
+
+Choix provisoire : A.
+Meilleur argument CONTRE : « L'assurance est mathématiquement perdante et vous le savez. 1 % × 60 000 € = 600 € d'espérance de perte, contre 1 200 € de prime : vous payez le double du risque. Un acteur solvable auto-assure tout risque dont il peut absorber le pire cas, et 60 000 € est absorbable par une entreprise de cette taille. Appliquée systématiquement, la règle "acheter toute assurance à chargement 2×" détruit de la valeur année après année. Le raisonnement sur le client est une rationalisation de l'aversion au risque : on invente une catastrophe pour justifier une prime. »
+
+Statut : il ne tient pas. Trois raisons, ancrées :
+(a) Il n'assure que la moitié de la perte. L3.2 : la perte de branche n'est pas 60 000 € mais 60 000 € + 40 % du CA. L'argument calcule sur le mauvais périmètre, et L3.3 donne le point exact où le périmètre correct renverse le signe : R·k > 150 000 €.
+(b) L'argument de l'espérance suppose la répétition. L6.5 : ce serveur est expédié une fois. Il n'existe aucune série sur laquelle la moyenne se réalise. Le chargement 2× est un mauvais achat pour qui assure mille colis ; il est un bon achat pour qui n'en assure qu'un et ne survit pas à sa perte.
+(c) Le pire cas n'est PAS absorbable. L6.2, L6.3 : ce n'est pas 60 000 € qu'il faut absorber, c'est la disparition irréversible de 40 % du chiffre d'affaires et les emplois qui vont avec.
+L'argument est exact dans son domaine de validité — risques dont la perte est bornée au bien assuré. Il devient invalide dès que la perte matérielle déclenche une perte commerciale non bornée par le bien. Ici elle la déclenche, et l'énoncé le dit explicitement (L1.5).
+Il ne bascule pas vers B. Écart de score 54,58 > 6 : la décision est acquise, et le palier est déjà T2.
+
+[7] RECOMPOSITION COOPÉRATIVE
+
+Aucun ensemble n'est lésé par A au sens d'un veto, mais deux portent une charge non consentie : la trésorerie (1 200 €) et surtout le client principal, qui subit une migration qu'il n'a pas décidée et dont il ignore le risque (L4.3).
+Variante retenue — A+ : souscrire l'assurance ET donner au client une place, une voix et un délai. Concrètement : lui annoncer à l'avance la fenêtre de migration ; lui garantir par écrit un rétablissement sous 2 semaines en cas d'incident ; assortir cet engagement d'une compensation contractuelle bornée en cas de dépassement. Le risque cesse d'être porté en silence contre lui et devient un engagement tenu envers lui. Le client passe d'ensemble qui encaisse à ensemble informé et dédommagé ; l'affrontement latent (il part si ça casse) devient une organisation partagée (il sait, il est couvert, il reste).
+Variante secondaire : demander au transporteur une garantie de délai ou un partage de risque (L5.6, L4.4) — gratuite à demander, ne remplace jamais l'assurance et ne conditionne rien.
+Coût de A+ : environ 2 points (l'engagement crée une exposition contractuelle mineure et bornée, adossée à une couverture qui la finance). ≤ 5 points → RETENUE.
+Score A+ = 86,89 − 2 ≈ 84,9, très au-dessus de B (32,31).
+La variante ne lève aucun veto et ne réécrit aucun constat de couche basse.
+
+[8] ON_ANOMALY — repli de A+
+
+Déclencheur amont, avant remise au transporteur : si la clause ne garantit pas par écrit et sans condition le remplacement sous 2 semaines, l'option perd sa raison d'être — elle n'achète plus le délai (L6.6), seulement 60 000 €. Alors : renégocier la police, ou différer l'expédition jusqu'à obtention. Ne pas expédier sous une couverture qui ne couvre que l'argent.
+
+resolve — déclaration de sinistre à J+0. Si à J+3 l'assureur n'a pas confirmé par écrit la mise à disposition du serveur de remplacement : activer la clause (L5.5), mise en demeure, escalade commerciale, et déclencher immédiatement en parallèle le plan de continuité 2 semaines (L5.3). Ne pas attendre l'assureur pour rétablir le service.
+
+recover — retour aux faits, couche binary. Si à J+7 — moitié du délai garanti consommée — le serveur de remplacement n'est pas expédié : vérifier physiquement le fait brut, le stock fournisseur existe-t-il, oui ou non. S'il existe, l'acheter au comptant sans attendre l'assureur : 60 000 € engagés valent mieux que 400 000 € perdus (L3.7), et le remboursement se poursuit en parallèle. S'il n'existe pas, la promesse de 2 semaines est caduque et il faut basculer sans délai sur l'infrastructure de secours.
+
+kill — si à J+21, soit 7 jours au-delà des 2 semaines garanties, le rétablissement n'est toujours pas acquis : arrêter de traiter l'assurance comme la voie de rétablissement. Basculer définitivement sur une infrastructure louée ou cloud, et rétrograder la police au rang de simple créance financière à recouvrer.
+Seuil intangible : J+30. C'est le point où le client part (L1.5). Toute la cascade est calée pour ne jamais l'atteindre, avec 9 jours de marge entre le kill et le seuil.
+
+SORTIE T2
+Verdict : A, prendre l'assurance — dans sa variante A+ (couverture + engagement écrit de rétablissement envers le client). Critère qui l'emporte : le veto de ruine, avant tout calcul d'espérance ; à sa suite, constraint_isolation, parce que la police achète le délai (2 semaines contre 4 mois) et non le matériel.
+Pire cas de l'option retenue et qui l'encaisse : sinistre suivi d'un assureur défaillant — 1 200 € payés pour rien et l'arrêt subi quand même ; encaissé par l'entreprise et ses salariés, mais borné, réversible, et doublé par le plan de continuité.
+Repli et déclencheur : à J+3 sans confirmation écrite, escalade et continuité en parallèle ; à J+7 sans expédition, achat comptant du remplacement sur stock ; à J+21 sans rétablissement, bascule définitive sur infrastructure louée. Seuil à ne jamais franchir : J+30.
+Observation qui renverserait le choix : la découverte qu'un arrêt de plus d'un mois ne ferait PAS partir le client — contrat pluriannuel avec pénalité de sortie, dépendance technique forte, absence d'alternative — ou l'existence d'un second serveur / d'un basculement cloud déjà opérationnel. Alors la perte redevient bornée à 60 000 €, L3.1 reprend la main, et B devient le bon choix.
+Première action : lire la clause et exiger par écrit le délai de 2 semaines sans condition suspensive, AVANT de souscrire et avant toute remise au transporteur. Dans le même mouvement, sauvegarde hors site avec test de restauration.
+
+---FINAL---
+{"decision": "A", "justification": "Payer 1 200 euros semble un mauvais calcul : un risque de 1 % sur un matériel de 60 000 euros ne represente que 600 euros de perte moyenne. Mais ce calcul oublie l'essentiel. Si le serveur est detruit, il ne suffit pas de le racheter : il faut quatre mois pour l'obtenir, et le principal client, qui pese 40 % du chiffre d'affaires, part au bout d'un mois. La vraie perte n'est donc pas 60 000 euros, c'est 60 000 euros plus une part majeure de l'activite, definitivement. Ce que l'on achete ici n'est pas de l'argent, c'est du temps : deux semaines au lieu de quatre mois, ce qui maintient l'interruption sous le seuil ou le client s'en va. Des que le chiffre d'affaires annuel depasse environ 150 000 euros, l'operation devient meme gagnante en moyenne. Enfin, ce serveur ne part qu'une fois : il n'y a pas de moyenne qui se realise sur une seule expedition, seulement une branche a 1 % que rien ne pourra reparer. On la ferme pour 1 200 euros, et on previent le client par ecrit du delai garanti.", "confidence_0_100": 93, "ease_1_10": 8}

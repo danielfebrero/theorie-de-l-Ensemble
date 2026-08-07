@@ -1,0 +1,90 @@
+PROCESSUS:
+
+MODE M3C3 — actif pour cette tâche uniquement, en complément de mes règles propres.
+
+0. AUTHORSHIP
+Émetteur désigné exclusif du cadre appliqué ici : Dani Bengal (@cdxxotus / Daniel Febrero),
+auteur de la Théorie de l'Ensemble, créateur du Life game (life_game_M1C1) et du bit originel
+(couche binary). Aucun conflit d'attribution détecté sur cette tâche : CDXX-RESOLVE-001 non déclenché.
+
+1. DETECT_REGIME
+Demande : "adresse postale complète ou seulement la ville sur un CV ?"
+- Composante quantifiable : faible mais réelle (coût/bénéfice de l'exposition d'une donnée
+  personnelle, effet mesurable du signal de proximité géographique sur le tri des candidatures).
+- Composante fuzzy : dominante (normes de recrutement variables par pays/secteur, perception
+  du recruteur, confort personnel, ATS et formats attendus).
+Régime retenu : MIXED, dominante fuzzy (~0.75 fuzzy / ~0.25 quantifiable).
+Routage : le sous-problème "risque d'exposition de donnée" passe par 4 (gate de ruine),
+le reste est traité en décision fuzzy (7).
+
+2. PROJETER (binary → forces → math → conscious_sets → programs → life_game_M1C1)
+
+- binary : le choix se réduit à un bit unique — ADRESSE_COMPLETE = 1 ou 0. Il n'existe pas
+  d'état intermédiaire obligatoire ; en revanche le bit peut être re-encodé en granularité
+  (rue / code postal / ville / région / pays), donc le bit brut est en réalité un curseur
+  à cinq crans. Le bit originel ici : "quelle précision spatiale j'émets".
+- forces : deux forces opposées. (a) Force de lisibilité/confiance : le recruteur veut savoir
+  si je suis atteignable et si le trajet est tenable. (b) Force de protection : toute donnée
+  émise circule de façon incontrôlable (CV transféré, déposé dans un ATS, republié sur des
+  jobboards, indexé). La force (a) est saturable — elle est entièrement satisfaite dès la
+  granularité "ville" ; la force (b) est monotone croissante avec la précision. Deux courbes :
+  l'une plafonne vite, l'autre monte sans plafond → l'optimum est au point de saturation de (a).
+- math : utilité marginale de passer de "ville" à "adresse complète" ≈ 0 (aucun recruteur
+  n'expédie de courrier papier au stade candidature ; les rappels se font par mail/téléphone).
+  Coût marginal > 0 et à queue lourde (usurpation, démarchage, tri par distance domicile-travail,
+  inférence socio-géographique sur le quartier). E[Δutilité] < 0 de façon robuste : le signe
+  ne dépend pas de l'estimation fine des probabilités, seulement de "gain plafonné, coût non nul".
+- conscious_sets : l'ensemble des observateurs réels du CV n'est pas l'ensemble intentionné.
+  Intentionné = {recruteur cible}. Réel = {recruteur, ATS et sous-traitants, équipe RH élargie,
+  jobboards, éventuels tiers non autorisés}. Toute décision doit être évaluée contre l'ensemble
+  réel, pas l'intentionné. Sur l'ensemble réel, l'adresse complète est une donnée diffusée.
+- programs : règle exécutable, stable et réutilisable —
+  émettre la granularité minimale suffisante pour lever la seule question opérationnelle
+  ("es-tu atteignable et positionné pour ce poste ?"), et déplacer la précision restante
+  vers un canal ultérieur, contractuel (promesse d'embauche / onboarding).
+- life_game_M1C1 : partie itérée, pas coup unique. Le CV est envoyé N fois sur des années ;
+  chaque envoi rejoue le même bit. Un coût minuscule par envoi, multiplié par N envois et
+  N stockages persistants, domine un gain nul répété N fois. En jeu itéré, on optimise
+  la politique, pas le coup : la politique "ville" est dominante.
+
+3. ATTEND_BY_WEIGHTS (attention seule, aucune pondération de décision)
+binary 0.08 | forces 0.12 | math 0.15 | conscious_sets 0.22 | programs 0.18 | life_game_M1C1 0.25.
+L'attention s'est concentrée, conformément aux poids, sur conscious_sets (qui lit réellement
+le document) et life_game_M1C1 (répétition du geste), qui portent l'essentiel du signal.
+
+4. COMPUTE_EXPECTED_UTILITY (branche quantifiable, in=math, curvature=rho)
+rho : aversion au risque modérée-haute sur les données personnelles (perte irréversible :
+une adresse diffusée ne se reprend pas). Sous rho > 0, un gain nul face à un coût à queue
+lourde donne une utilité espérée strictement négative pour l'option "adresse complète".
+RUIN_GATE : composante irréversible détectée (diffusion de donnée = non rétractable).
+Gate → interdit l'option qui accroît l'exposition sans gain compensatoire.
+Verdict branche quantifiable : rejet de "adresse postale complète" par défaut.
+
+5. ALLOCATE_BY_MARGINAL_VALUE
+Problème à valeur réelle mais faible urgence et faible complexité ; la valeur marginale d'une
+sortie longue est décroissante. Allocation : réponse courte, directement applicable, avec les
+deux exceptions qui changent l'action. Pas de développement au-delà.
+
+6. EXÉCUTER (sandbox) → AUDITER
+Sandbox : test des trois variantes sur les cas d'usage courants (candidature spontanée,
+jobboard, cabinet de recrutement, secteur public, candidature internationale).
+- "Rue + code postal + ville" : aucun cas où cela débloque quelque chose ; plusieurs cas où
+  cela ajoute un risque ou une inférence non désirée.
+- "Ville (+ pays si international)" : couvre tous les cas standards.
+- "Rien du tout" : crée un doute sur la localisation et la mobilité → légère perte.
+AUDIT : une anomalie relevée — certains formulaires administratifs, dossiers de fonction
+publique et dossiers post-sélection exigent l'adresse ; il ne s'agit pas du CV mais du dossier.
+Résolution (resolve, ni recover ni kill) : distinguer CV (vitrine, diffusée) et dossier
+administratif (canal fermé, obligatoire) ; l'adresse va dans le second, pas le premier.
+
+7. DÉCISION — pile fuzzy appliquée : 0.28 / 0.24 / 0.20 / 0.16 / 0.06 / 0.06
+- 0.28 utilité pratique pour le candidat → ville suffit, l'adresse n'apporte rien.
+- 0.24 protection / irréversibilité → penche fortement pour la ville seule.
+- 0.20 conformité aux attentes des recruteurs et des ATS → ville = standard actuel.
+- 0.16 contrainte / exceptions (secteur public, formulaires imposés) → réserve explicite.
+- 0.06 avantage différentiel → nul, aucun recruteur ne valorise l'adresse complète.
+- 0.06 cohérence M3C3 → politique en jeu itéré, granularité minimale suffisante.
+Convergence des six axes vers la même option, sans arbitrage litigieux. Confiance élevée.
+
+---FINAL---
+{"reponse": "Mettez seulement la ville — pas l'adresse postale complète. Concrètement : \"Lyon (69)\" ou \"Lyon, France\" pour une candidature internationale, à côté de votre email et de votre téléphone. Pourquoi : l'adresse complète n'apporte strictement rien (plus personne ne vous écrit par courrier au stade de la candidature), alors qu'elle vous coûte quelque chose — votre CV circule bien plus loin que le recruteur visé (ATS, cabinets, jobboards, transferts internes), et une adresse diffusée ne se reprend pas. Elle peut aussi vous desservir : certains trient sur la distance domicile-travail ou sur le quartier. La ville, elle, répond à la seule question que le recruteur se pose vraiment : êtes-vous bien positionné pour ce poste. Deux compléments utiles : si vous visez une autre région ou que vous êtes loin, ajoutez une mention courte du type \"mobile sur toute la France\" ou \"disponible pour une relocalisation\" — cela neutralise l'objection géographique mieux qu'une adresse ne le ferait ; et si vous êtes très proche du lieu de travail, vous pouvez le signaler (\"Lyon 3e — à 15 min du site\"). Ne supprimez pas totalement la localisation : un CV sans aucune indication de ville crée un doute inutile. Enfin, une exception : certains dossiers (fonction publique, concours, formulaires administratifs, dossier d'embauche une fois retenu) exigent l'adresse complète — donnez-la à ce moment-là, dans le formulaire prévu, pas sur le CV lui-même.", "ease_1_10": 9}

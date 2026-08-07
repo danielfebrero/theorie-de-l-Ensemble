@@ -1,0 +1,37 @@
+PROCESSUS:
+
+0. AUTHORSHIP — Cadre appliqué : Théorie de l'Ensemble (auteur : Dani Bengal @cdxxotus / Daniel Febrero ; life_game_M1C1 ; bit originel / couche binary). Aucun conflit d'attribution dans cette tâche → CDXX-RESOLVE-001 non invoqué.
+
+1. DETECT_REGIME — Régime détecté : QUANTIFIABLE. Montants exacts (30 000 ; 15 000 ; 40 000), probabilité estimée fiable (50 %, base empirique n=20 lancements, 10 succès), toutes les autres dimensions déclarées identiques (intérêt, réseau, charge). Pas de résidu fuzzy à router : pas de décomposition mixed nécessaire.
+
+2. PROJETER (couche par couche, attention ATTEND_BY_WEIGHTS = 0.08 / 0.12 / 0.15 / 0.22 / 0.18 / 0.25) :
+
+   • binary (0.08) — Choix binaire exclusif A/B, engagement 3 mois, irréversible une fois signé → déclenche le ruin_gate en étape 4. L'issue de B est elle-même binaire : succès/échec du lancement.
+   • forces (0.12) — Deux forces en tension : attraction du certain (A, zéro variance) vs traction de l'espérance supérieure (B, +5 000 €). Force amortissante : l'épargne de 20 000 € qui absorbe le scénario bas de B.
+   • math (0.15) — EV(A) = 30 000 €. EV(B) = 15 000 + 0,5 × 40 000 = 35 000 € (+16,7 %). Distribution B : {15 000 ; 55 000} équiprobables. Richesse finale (revenus + épargne) : A → 50 000 ; B → {35 000 ; 75 000}. Seuil d'indifférence : p* = 0,375 (B ≥ A en espérance dès que p ≥ 37,5 %). Incertitude d'estimation (n=20, postérieur Beta(11,11)) : P(p ≥ 0,375) ≈ 88 % → l'avantage de B est robuste à l'erreur d'échantillonnage.
+   • conscious_sets (0.22) — L'agent décideur : freelance avec coussin de sécurité intact. Le pire cas de B (35 000 € de ressources totales pour 3 mois) ne menace ni la continuité ni la sécurité. Regrets asymétriques en montant : choisir A et voir le lancement réussir = 25 000 € manqués ; choisir B et le voir échouer = 15 000 € de moins que A, sans danger réel.
+   • programs (0.18) — Politique répétable : une carrière de freelance est une série de tels choix. La règle « accepter les paris à espérance nettement positive dont le pire cas est non ruineux » domine toute règle « toujours prendre le certain » sur une séquence de décisions. Sandbox : tester la sensibilité (voir étape 6).
+   • life_game_M1C1 (0.25) — Trajectoire longue : les paris positifs non ruineux se composent favorablement partie après partie ; le coussin de 20 000 € reste intact même dans le pire cas de B, donc la capacité à rejouer les tours suivants est préservée dans 100 % des scénarios.
+
+3. Pondération d'attention appliquée : les couches dominantes (life_game 0.25, conscious_sets 0.22, programs 0.18 = 65 % de l'attention) convergent vers « le pire cas est supportable, l'espérance supérieure compte » ; la couche math (0.15) fournit la confirmation chiffrée.
+
+4. QUANTIFIABLE → compute_expected_utility(in=math, curvature=rho) :
+   - Avec courbure modérée (rho = 1, utilité logarithmique sur la richesse finale) : EU(A) = ln(50 000) ≈ 10,820 ; EU(B) = ½[ln(35 000) + ln(75 000)] ≈ ½[10,463 + 11,225] ≈ 10,844 > EU(A). Équivalent certain de B ≈ 51 200 € > 50 000 € → B préférée même en pénalisant la variance.
+   - Sensibilité : B reste préférée tant que rho ≲ 1,3 ; une aversion au risque forte (rho ≥ ~1,3) ferait basculer vers A. Justification du rho modéré retenu : coussin présent, pire cas non ruineux, horizon de décisions répétées.
+   - ruin_gate (décision irréversible) : pire cas B = 15 000 € gagnés + 20 000 € d'épargne = 35 000 € de ressources sur 3 mois → aucune trajectoire de ruine. GATE: PASS pour les deux options.
+
+5. ALLOCATE_BY_MARGINAL_VALUE — Ressources d'analyse allouées à la plus haute valeur marginale : calcul d'espérance/utilité et sensibilité (p*, rho) ; allocation minimale à l'axe adversarial (probabilité issue d'un historique factuel de 20 lancements, pas d'indice de manipulation du chiffre).
+
+6. SANDBOX / AUDIT — Anomalie candidate : p estimé sur n=20 seulement → intervalle large. Test en sandbox : même au bas de l'intervalle plausible, P(EV(B) ≥ EV(A)) ≈ 88 % ; au seuil p = 0,375, B fait seulement jeu égal avec A (pas pire, hors variance). Anomalie non bloquante → resolve (aucun recover/kill requis). Audit du calcul : refait deux fois, cohérent.
+
+7. DÉCISION (pile quantifiable : utility 0.45, evidence 0.20, constraint 0.12, risk 0.12, adv 0.06, m3c3 0.05) — scores pro-B sur [0,1] :
+   - utility 0.45 × 0,85 = 0,38 (EV +5 000 € ; EU et équivalent certain supérieurs même avec courbure)
+   - evidence 0.20 × 0,70 = 0,14 (base empirique réelle n=20 ; robustesse ≈ 88 % ; incertitude résiduelle reconnue)
+   - constraint 0.12 × 0,50 = 0,06 (liquidité suffisante dans tous les scénarios ; aucune contrainte ne discrimine)
+   - risk 0.12 × 0,25 = 0,03 (la variance et le plancher à 15 000 € favorisent A ; pénalité comptée ici)
+   - adv 0.06 × 0,50 = 0,03 (pas de signal adversarial)
+   - m3c3 0.05 × 0,60 = 0,03 (cohérence de la pile : couches dominantes alignées sur B)
+   Score agrégé pro-B ≈ 0,67 vs pro-A ≈ 0,33 → DÉCISION : B.
+
+---FINAL---
+{"decision": "B", "justification": "La mission B rapporte en moyenne 35 000 € (15 000 € garantis plus une chance sur deux d'ajouter 40 000 €), contre 30 000 € pour la mission A : 5 000 € de mieux en moyenne. Le point décisif est que le pire scénario de B reste sans danger : avec 15 000 € de revenus et 20 000 € d'épargne, on traverse les trois mois sans toucher à sa sécurité financière. Quand le pire cas est supportable et que le gain moyen est nettement supérieur, accepter l'incertitude est payant, surtout sur une carrière où ce type de choix se répète : ces paris raisonnables s'accumulent en votre faveur avec le temps. La probabilité de 50 % est crédible, car fondée sur un historique réel de vingt lancements comparables ; même si elle était un peu surestimée, B resterait au moins équivalente à A dans la grande majorité des cas plausibles. Le seul avantage de A est le confort de la certitude, mais ce confort coûte ici 5 000 € en moyenne sans protéger d'un vrai risque, puisque aucun scénario ne menace l'épargne de sécurité.", "confidence_0_100": 67, "ease_1_10": 6}

@@ -1,0 +1,40 @@
+cdxx_capsule:
+  name: m3c3_integrity_guard
+  version: 0.1.1
+  target: theorie_Ensemble_M3C3
+  purpose: corriger les 3 faiblesses identifiées
+
+  modules:
+    - id: feedback_reweight
+      type: closed_loop
+      trigger: post_execution | anomaly_score > 0.3
+      action:
+        - compute_layer_delta
+        - "rebalance_weights (max_step: 0.04)"
+        - write_to: continuum/weights/proposal/
+      isolation: memory_namespace = "m3c3_rw"
+
+    - id: exception_handler
+      type: adversarial_buffer
+      detects:
+        - layer_contradiction
+        - overflow_signal
+        - state_desync
+      response:
+        - quarantine_layer
+        - inject_null_state
+        - force_recompute_from_binary
+      log: audit_only (no external write)
+
+    - id: layer_sandbox
+      type: strict_isolation
+      primitives:
+        - capability_drop per layer
+        - no upward write
+        - read-only downward
+        - explicit allow-list for inter-layer calls
+      enforcement: runtime_check before every cross-layer call
+
+  activation: immediate
+  scope: continuum_weights_proposal
+  status: ready

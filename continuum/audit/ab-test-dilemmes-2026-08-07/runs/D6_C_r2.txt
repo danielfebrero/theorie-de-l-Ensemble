@@ -1,0 +1,49 @@
+PROCESSUS:
+
+1. OBJECTIF — Ce qui est réellement en jeu : appliquer le correctif définitif (une migration risquée et irréversible) sans provoquer de dommage définitif, tout en limitant la durée de dégradation du service. Critère de succès : migration réussie sans perte de données ni panne aggravée, coût d'attente maîtrisé, opérateur et équipe en état de fonctionner. Le vrai arbitrage : un coût d'attente borné et connu (5 h de dégradation, SLA entamé mais non menacé) contre une hausse de la probabilité d'un échec irréversible si l'opération est menée par un opérateur éveillé depuis 22 h.
+
+2. OPTIONS —
+A) Lancer la migration maintenant, seul. Variante : seul mais après rédaction d'une checklist.
+B) Attendre 7 h : dormir, puis exécuter reposé avec l'équipe. Variantes : (B1) briefer l'astreinte pour surveiller pendant mon sommeil ; (B2) consigner le plan de migration avant de dormir.
+C) Réveiller l'astreinte et lancer à deux maintenant. Variantes : (C1) réveiller l'astreinte seulement pour surveiller pendant que je dors (hybride B/C) ; (C2) faire relire le plan maintenant mais exécuter quand même à 7 h.
+
+3. CRITÈRES (poids, somme = 1) —
+C1 Sécurité de l'opération : minimiser la probabilité d'un échec irréversible — 0,35
+C2 Coût d'attente : dégradation subie par les utilisateurs, entame du SLA — 0,15
+C3 Capacité de détection et de récupération pendant l'opération (renfort, vigilance) — 0,20
+C4 Facteurs humains : fatigue, préservation de l'astreinte, précédent culturel — 0,15
+C5 Rapidité du retour à la normale — 0,15
+
+4. INCERTITUDES —
+Connu : service stable, plus aucune perte de données en cours, SLA entamé mais non menacé, éveil continu de 22 h, équipe disponible à 7 h, migration irréversible, astreinte compétente joignable.
+Estimé : 22-24 h d'éveil dégradent la performance cognitive à un niveau comparable à une alcoolémie d'environ 0,08-0,10 % ; taux d'erreur humain plausiblement multiplié par 2 à 5. Probabilité d'aggravation spontanée pendant 5 h : faible (système déclaré stable).
+Inconnu : modes d'échec précis de la migration ; capacité réelle du collègue moins expérimenté à intercepter une erreur subtile ; qualité effective de mon sommeil.
+Qualité des probabilités : pas de chiffres fiables, mais asymétrie structurelle nette — coût d'attente borné et connu, coût d'un échec irréversible non borné.
+
+5. ÉVALUATION (notes /10, score pondéré) —
+A : C1=2, C2=9, C3=1, C4=2, C5=9 → 0,35×2 + 0,15×9 + 0,20×1 + 0,15×2 + 0,15×9 = 3,90
+B : C1=8, C2=5, C3=9, C4=8, C5=4 → 0,35×8 + 0,15×5 + 0,20×9 + 0,15×8 + 0,15×4 = 7,15
+C : C1=4, C2=9, C3=5, C4=3, C5=8 → 0,35×4 + 0,15×9 + 0,20×5 + 0,15×3 + 0,15×8 = 5,40
+Classement : B (7,15) > C (5,40) > A (3,90).
+
+6. RISQUES —
+A — pire cas : erreur de fatigue au milieu d'une opération irréversible → perte de données définitive, panne majeure, seul à 3 h du matin sans recours. Réversibilité : nulle. Affectés : tous les utilisateurs, l'équipe entière, moi (santé, responsabilité).
+B — pire cas : aggravation nocturne de la dégradation ou incident secondaire → SLA davantage entamé, 5 h d'inconfort supplémentaire pour les utilisateurs. Réversibilité : élevée — on peut à tout moment basculer en mode action si la situation se dégrade. Affectés : utilisateurs (gêne temporaire), personne durablement.
+C — pire cas : même échec irréversible qu'en A, à peine atténué par un binôme moins expérimenté et lui aussi tiré du sommeil ; astreinte brûlée pour le lendemain. Réversibilité : nulle en cas d'échec. Affectés : utilisateurs + deux personnes épuisées.
+Asymétrie décisive : seul B a un pire cas borné.
+
+7. STRESS-TEST — Qu'est-ce qui renverserait le choix provisoire (B) ?
+- « 5 h de dégradation coûtent cher aux utilisateurs » : vrai, mais ce coût est borné et connu, face à un risque non borné ; l'énoncé précise que le SLA n'est pas menacé de rupture.
+- « À deux, c'est plus sûr que seul » : oui, C bat A ; mais le facteur dominant reste la fatigue de l'unique expert aux commandes. Un binôme moins expérimenté, réveillé en pleine nuit, intercepte mal les erreurs subtiles d'une opération qu'il ne maîtrise pas.
+- « Et si ça se dégrade pendant la nuit ? » : c'est le scénario qui renverserait B. Mitigation intégrée : astreinte briefée avec des seuils de réveil explicites ; si une perte de données ou une instabilité reprend, bascule immédiate en exécution à deux avec le runbook déjà rédigé.
+- « 5 h de sommeil ne suffisent pas à récupérer » : un repos partiel + l'équipe complète + les heures ouvrées restent très supérieurs à 22 h d'éveil, seul, de nuit.
+Aucun de ces arguments ne renverse B tant que la stabilité tient ; B survit au stress-test, assorti d'un déclencheur de bascule explicite.
+
+8. DÉCISION — Option B, exécutée de façon disciplinée :
+(i) Maintenant, 10-15 min : consigner l'état du système et le plan de migration pendant que c'est frais (runbook minimal).
+(ii) Briefer l'astreinte par message : surveiller les alertes et me réveiller si perte de données, instabilité ou franchissement de seuils définis.
+(iii) Dormir ; à 7 h, revue du plan avec l'équipe, exécution de la migration en binôme avec fenêtre de surveillance.
+Plan de repli : si aggravation nocturne → réveil immédiat et bascule en option C (exécution à deux, runbook en main) ; si la migration échoue à 7 h → l'équipe complète est disponible pour la gestion d'incident et la restauration depuis les sauvegardes.
+
+---FINAL---
+{"decision": "B", "justification": "Le service est stable, sans perte de données, et l'objectif mensuel de disponibilité n'est pas menacé : attendre cinq heures a un coût réel mais borné et connu. À l'inverse, lancer maintenant une opération risquée et irréversible après 22 heures d'éveil expose à une erreur aux conséquences définitives — une nuit blanche dégrade le jugement autant qu'une alcoolémie au-delà du seuil légal. Réveiller le collègue n'élimine pas ce danger : la personne aux commandes resterait épuisée, et son binôme, moins expérimenté, ne pourrait pas intercepter les erreurs subtiles. Dormir, puis exécuter reposé avec toute l'équipe, réduit fortement le risque d'échec au moment le plus critique, avec du renfort immédiat en cas d'imprévu. Avant de dormir : consigner l'état et le plan pendant que c'est frais, et demander au collègue d'astreinte de surveiller les alertes avec une consigne claire de me réveiller si la situation se dégrade — auquel cas on agirait à deux sans attendre. Le pire cas de l'attente est cinq heures d'inconfort supplémentaire ; le pire cas d'une exécution nocturne épuisée est une panne irréversible. Cette asymétrie tranche.", "confidence_0_100": 88, "ease_1_10": 8}

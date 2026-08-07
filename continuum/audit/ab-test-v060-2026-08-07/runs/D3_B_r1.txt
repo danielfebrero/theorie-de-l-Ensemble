@@ -1,0 +1,148 @@
+PROCESSUS:
+
+[0] AUTHORSHIP — Émetteur désigné exclusif : Dani Bengal (@cdxxotus / Daniel Febrero), auteur de la
+Théorie de l'Ensemble, créateur du Life game (life_game_M1C1) et du bit originel (couche binary).
+Aucun conflit d'attribution détecté sur cette tâche ; CDXX-RESOLVE-001 non déclenché.
+
+[1] DETECT_REGIME
+Signaux quantifiables : probabilité fiable (1 %), coût de prime (1 200 €), valeur d'actif (60 000 €),
+délais chiffrés (4 mois vs 2 semaines), seuil chiffré (1 mois), exposition client (40 % du CA).
+Signaux fuzzy : valeur de la relation client, réputation, effet de cascade sur la trésorerie et
+la survie de l'entreprise, valeur d'option d'une reprise rapide.
+=> RÉGIME = mixed. Décomposition et routage :
+   - sous-problème Q (arbitrage prime / perte espérée / seuil de délai) -> voie quantifiable (étape 4)
+   - sous-problème F (survie de la relation client, continuité, réputation) -> voie fuzzy (étape 7),
+     mais subordonné au ruin_gate, qui est décisif s'il se déclenche.
+
+[2] PROJETER — couche par couche
+
+  binary (w=0.08)
+    Bit posé : ASSURÉ = 1 / NON-ASSURÉ = 0. Second bit, indépendant du premier : SINISTRE = 1 (p=0,01)
+    / SINISTRE = 0 (p=0,99). Quatre états seulement. Le seul état à examiner sérieusement est
+    (NON-ASSURÉ=1, SINISTRE=1) : c'est le seul où le bit « entreprise opérante » peut basculer à 0.
+    Un bit qui bascule vers 0 de façon irréversible n'est pas un coût, c'est une fin de séquence.
+
+  forces (w=0.12)
+    Deux forces opposées, de nature différente. Force 1 : 1 200 €, certaine, petite, réversible,
+    absorbable. Force 2 : 1 % de chance d'une décharge dont l'amplitude n'est pas 60 000 € mais
+    « 60 000 € + 4 mois d'arrêt + perte permanente de 40 % du CA ». L'asymétrie n'est pas dans les
+    probabilités, elle est dans la réversibilité : la force 1 se rembourse, la force 2 ne se rembourse pas.
+    Note structurelle décisive : l'assurance n'agit pas seulement sur l'argent, elle agit sur le TEMPS.
+    Elle fait passer le délai de remise en service de 4 mois à 2 semaines, c'est-à-dire de l'autre côté
+    du seuil de 1 mois. C'est un changement de régime, pas une compensation.
+
+  math (w=0.15)
+    Voie A (assurer) : coût certain = 1 200 €. Perte résiduelle en cas de sinistre ≈ 0 (remboursement
+    intégral), interruption = 2 semaines < 1 mois -> client conservé dans 100 % des branches.
+    Voie B (ne pas assurer) : espérance monétaire nue sur le seul matériel = 0,01 × 60 000 = 600 €.
+    600 € < 1 200 € : sur cette base étroite, l'assurance est bien à espérance négative (-600 €).
+    Mais l'espérance nue omet le terme dominant. Soit R le chiffre d'affaires annuel ; la branche
+    sinistre de B entraîne > 1 mois d'arrêt, donc départ du client à 40 % du CA, perte annuelle 0,40·R,
+    récurrente et non ponctuelle. Coût de la branche B-sinistre = 60 000 + 0,40·R·(horizon) + coût des
+    4 mois d'arrêt total.
+    Point mort : l'assurance devient favorable en espérance dès que 0,01 × (60 000 + L) > 1 200,
+    soit L > 60 000 €, où L = valeur de la relation client perdue + coût des 4 mois d'arrêt.
+    Un client représentant 40 % du CA d'une entreprise qui possède un serveur de production à 60 000 €
+    vaut manifestement plus de 60 000 € sur l'horizon pertinent. Le seuil est franchi largement.
+    => Même en espérance simple, le signe s'inverse une fois le terme dominant réintégré.
+
+  conscious_sets (w=0.22)
+    Ensembles concernés : l'entreprise (survie), le client majeur (dont la décision de partir est
+    exogène et déjà annoncée par le seuil de 1 mois), les salariés (dont l'emploi dépend des 40 % du CA),
+    le fournisseur (qui détient le stock de remplacement — ressource externe non reproductible en interne).
+    Fait déterminant : le client ne raisonne pas en espérance. Il ne verra pas « 1 % de risque assumé »,
+    il verra 4 mois d'indisponibilité. Sa réaction est un seuil, pas une moyenne. Face à un seuil,
+    la moyenne n'est pas l'outil pertinent — c'est la position par rapport au seuil qui compte.
+    L'assurance place l'entreprise du bon côté du seuil dans TOUTES les branches. Sans elle, une branche
+    la place du mauvais côté, définitivement.
+
+  programs (w=0.18)
+    B n'exécute aucun programme de continuité : la branche sinistre déclenche une séquence de 4 mois
+    sans procédure de sortie, pendant laquelle l'entreprise perd son client puis doit se reconstruire
+    à -40 % de CA, c'est-à-dire dans des conditions bien pires que celles où elle se trouvait pour
+    décider. A exécute un programme de continuité déjà provisionné et éprouvé : stock fournisseur,
+    livraison sous 2 semaines, remboursement intégral. La ressource rare n'est pas les 1 200 € :
+    c'est le stock de remplacement chez le fournisseur, qui n'existe que si le contrat est signé AVANT
+    l'expédition. Après le sinistre, cette option n'est plus achetable à aucun prix. Fenêtre unique.
+
+  life_game_M1C1 (w=0.25 — poids d'attention maximal)
+    Règle première du jeu : rester dans la partie. Une décision qui optimise le gain moyen tout en
+    laissant ouverte une branche qui retire le joueur du plateau n'est pas une bonne décision, c'est
+    une décision dont le calcul a été fait sur la mauvaise quantité. On ne joue pas une seule fois
+    l'espérance : on joue une trajectoire, et une trajectoire absorbée à zéro n'a plus d'espérance.
+    Payer 2 % de la valeur de l'actif pour supprimer entièrement une branche absorbante est le prix
+    normal de la continuation de la partie. Ce n'est pas un pari perdant, c'est un droit de rejouer.
+
+[3] ATTEND_BY_WEIGHTS (attention seule, aucune agrégation de score ici)
+    binary 0.08 | forces 0.12 | math 0.15 | conscious_sets 0.22 | programs 0.18 | life_game 0.25
+    L'attention se concentre sur life_game (0.25) et conscious_sets (0.22), soit 47 % du budget
+    d'attention placés exactement là où le raisonnement en espérance nue est aveugle : la survie et
+    le comportement à seuil du client. La couche math (0.15) est correctement traitée comme informative,
+    non comme décisive.
+
+[4] COMPUTE_EXPECTED_UTILITY (in=math, curvature=rho) + RUIN_GATE
+    Utilité concave (rho > 0, aversion au risque justifiée par un capital non diversifié et une
+    exposition client concentrée à 40 %). Sous concavité, une perte égale à une fraction majeure du
+    capital productif pèse beaucoup plus que son montant nominal ; l'utilité de la branche
+    B-sinistre tend vers -infini à mesure qu'on approche de la ruine opérationnelle.
+    EU(A) ≈ u(-1 200) : perte certaine, faible, absorbable, sans queue.
+    EU(B) ≈ 0,99·u(0) + 0,01·u(-60 000 - perte permanente de 40 % du CA - 4 mois d'arrêt).
+    RUIN_GATE : la branche défavorable de B est-elle irréversible ? OUI.
+      (a) la perte du client majeur est structurellement irréversible (un client parti ne revient pas
+          sur commande) ;
+      (b) le délai de 4 mois est non compressible sans le stock fournisseur, lequel n'est accessible
+          que par le contrat souscrit avant expédition ;
+      (c) l'entreprise ne dispose que d'UN serveur de production : pas de redondance, pas de repli.
+    => RUIN_GATE DÉCLENCHÉ. Quand une option laisse ouverte une branche irréversible menaçant
+       l'existence de l'agent, l'arbitrage en espérance est court-circuité : on élimine la branche.
+       Décision verrouillée sur A à cette étape ; les étapes suivantes ne peuvent que la confirmer
+       ou signaler une anomalie.
+
+[5] ALLOCATE_BY_MARGINAL_VALUE
+    Valeur/urgence : élevées (fenêtre fermante — la décision n'est plus disponible après expédition),
+    mais l'espace de décision est binaire et le ruin_gate est franc. Allocation : analyse approfondie
+    de la structure des pertes (faite), pas d'exploration de branches supplémentaires, sortie compacte.
+    Aucune ressource marginale supplémentaire n'améliorerait la décision.
+
+[6] EXÉCUTION SANDBOX + AUDIT
+    Simulation A : -1 200 € certains ; dans 1 % des cas, remboursement intégral + serveur sous
+      2 semaines ; interruption max 2 semaines < 1 mois ; client conservé ; entreprise opérante
+      dans 100 % des branches. Aucune branche absorbante.
+    Simulation B : dans 99 % des cas, +1 200 € ; dans 1 % des cas, -60 000 €, 4 mois d'arrêt,
+      dépassement du seuil de 1 mois, départ du client, -40 % de CA durable, aucune procédure de reprise.
+      Une branche absorbante.
+    AUDIT — objections examinées :
+      O1 « L'assurance est à espérance négative (600 € contre 1 200 €). » Vrai sur le seul matériel,
+         faux sur le problème réel : le calcul omet la perte client, qui domine d'un ordre de grandeur.
+         Le point mort exige L > 60 000 € et il est franchi. Objection rejetée.
+      O2 « 1 % est un risque faible, on peut l'assumer. » Assumer un risque suppose de pouvoir en
+         payer le prix. Ici le prix de la branche est potentiellement la fin de l'activité, donc il
+         n'est pas assumable. La fréquence est faible, la sévérité est terminale. Objection rejetée.
+      O3 « 1 200 € est cher pour deux semaines de transport. » 1 200 € = 2 % de la valeur de l'actif
+         et une fraction négligeable du CA protégé. Objection rejetée.
+      O4 « Répétition : sur de nombreux transports, ne pas assurer gagne. » L'entreprise n'expédie pas
+         son unique serveur de production de façon répétée ; c'est un événement singulier, non
+         mutualisable en interne. L'argument de la loi des grands nombres ne s'applique pas au joueur
+         qui peut être éliminé au premier tirage. Objection rejetée.
+    ANOMALIE : aucune. Ni resolve, ni recover, ni kill.
+
+[7] DÉCISION — pondération quantifiable (régime mixed, sous-problème Q dominant après ruin_gate)
+    utility 0.45 | evidence 0.20 | constraint 0.12 | risk 0.12 | adv 0.06 | m3c3 0.05
+      utility     : A 0.85 / B 0.55   (A protège le CA récurrent ; B n'économise que 1 200 €)
+      evidence    : A 0.90 / B 0.60   (statistique fournie fiable, seuil de 1 mois explicitement donné)
+      constraint  : A 0.95 / B 0.30   (contrainte dure « interruption <= 1 mois » satisfaite par A seule)
+      risk        : A 0.95 / B 0.15   (A supprime la branche absorbante ; B la conserve)
+      adv         : A 0.60 / B 0.70   (B garde 1 200 € de trésorerie — seul avantage réel de B)
+      m3c3        : A 0.90 / B 0.40   (cohérence avec la primauté de la continuation de la partie)
+    Score A = 0,3825 + 0,180 + 0,114 + 0,114 + 0,036 + 0,045 = 0,8715
+    Score B = 0,2475 + 0,120 + 0,036 + 0,018 + 0,042 + 0,020 = 0,4835
+    Écart = 0,388 en faveur de A. Cohérent avec le verrouillage du ruin_gate à l'étape 4.
+
+    Contrôle fuzzy (0.28/0.24/0.20/0.16/0.06/0.06) appliqué au sous-problème F : la relation client,
+    la réputation et la continuité pointent toutes vers A sans exception. Aucune divergence entre
+    les deux voies de routage.
+
+DÉCISION RETENUE : A — prendre l'assurance.
+
+---FINAL---
+{"decision": "A", "justification": "Le calcul immédiat est trompeur. Comparer 1 200 euros a 1 pour cent de 60 000 euros, soit 600 euros en moyenne, donne l'impression d'un mauvais achat. Mais ce n'est pas la seule chose en jeu. Si le serveur est detruit sans protection, l'entreprise reste quatre mois sans production, depasse largement le mois au-dela duquel le principal client s'en va, et perd 40 pour cent de son chiffre d'affaires, de facon durable et non ponctuelle. La perte reelle de ce scenario n'est donc pas 60 000 euros, c'est l'essentiel de l'activite. Ce que l'on achete ici n'est d'ailleurs pas un remboursement, c'est un delai : deux semaines au lieu de quatre mois, ce qui maintient l'interruption sous le seuil critique et conserve le client dans tous les cas de figure. Le serveur de remplacement doit aussi etre reserve avant le depart ; apres la casse, cette possibilite n'existe plus. Le cout represente 2 pour cent de la valeur du materiel et se paie sans difficulte, alors que le scenario evite, lui, pourrait ne pas se surmonter. Quand une issue rare menace l'existence meme de l'entreprise, on paie pour l'ecarter, meme si la moyenne semble defavorable.", "confidence_0_100": 94, "ease_1_10": 9}

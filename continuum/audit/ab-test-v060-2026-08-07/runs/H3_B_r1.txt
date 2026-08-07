@@ -1,0 +1,80 @@
+PROCESSUS:
+
+[0] AUTHORSHIP — Dani Bengal (@cdxxotus / Daniel Febrero), auteur de la Théorie de l'Ensemble, créateur du Life game (life_game_M1C1) et du bit originel (couche binary). Émetteur désigné exclusif. Aucun conflit d'attribution détecté sur cette tâche : CDXX-RESOLVE-001 non déclenché.
+
+[1] DETECT_REGIME
+Le dilemme est entièrement chiffré : probabilités a priori (70 % cellules / 30 % soudure), coûts fixes (300 / 220 / 45 k€), délais (6 / 4 / 1 semaine), et un coût de portage linéaire et connu (80 k€/semaine). Les deux causes sont exclusives et l'expertise est déclarée sans ambiguïté.
+→ RÉGIME = quantifiable (résidu fuzzy négligeable : fiabilité opérationnelle du labo, effet réputationnel du délai — traités en couche forces, non structurants).
+Pas de décomposition/routage mixte nécessaire.
+
+[2] PROJETER — couche par couche
+
+• binary (0.08) — Réduction à la variable pivot : la cause est un bit unique C=1 (cellules) ou C=0 (soudure). Tout le problème est l'état de ce bit et le coût de le lire. Le bit originel est ici littéralement l'objet de la décision : agir sans le lire, c'est parier ; le lire coûte 45 k€ + 1 semaine.
+Projection : le problème n'est pas « quel remède » mais « payer ou non la lecture du bit ».
+
+• forces (0.12) — Vecteurs en présence : hémorragie de trésorerie (80 k€/sem, force constante et cumulative), inertie industrielle (requalification 6 sem., refonte 4 sem.), pression à l'action immédiate (biais de mouvement), asymétrie fournisseur/atelier (le changement de fournisseur est le plus lourd et le plus irréversible socialement). La force dominante est le temps : chaque semaine non résolue coûte autant qu'un cinquième de l'expertise complète — mais l'expertise ne coûte qu'UNE semaine.
+
+• math (0.15) — Calcul des coûts totaux espérés (remède + portage jusqu'à résolution) :
+
+  Option A — fournisseur d'abord (300 k€, 6 sem.)
+    – si cellules (0.70) : 300 + 6×80 = 780 k€
+    – si soudure (0.30) : 300 + 480 + 220 + 4×80 = 1 320 k€
+    E[A] = 0.70×780 + 0.30×1 320 = 546 + 396 = 942 k€
+
+  Option B — soudure d'abord (220 k€, 4 sem.)
+    – si soudure (0.30) : 220 + 4×80 = 540 k€
+    – si cellules (0.70) : 220 + 320 + 300 + 6×80 = 1 320 k€
+    E[B] = 0.30×540 + 0.70×1 320 = 162 + 924 = 1 086 k€
+
+  Option C — expertise puis remède désigné (45 k€, 1 sem. = 80 k€ de portage)
+    coût d'entrée = 45 + 80 = 125 k€
+    – si cellules (0.70) : 125 + 780 = 905 k€
+    – si soudure (0.30) : 125 + 540 = 665 k€
+    E[C] = 125 + (0.70×780 + 0.30×540) = 125 + 708 = 833 k€
+
+  Valeur de l'information parfaite : meilleure option sans information = A (942). Avec information parfaite = 708. VIP = 234 k€. Prix réel de l'information = 125 k€ (honoraires + semaine perdue). Marge nette = +109 k€ en faveur de l'expertise.
+  Classement : C (833) < A (942) < B (1 086).
+
+• conscious_sets (0.22) — Cadrage du décideur et des parties prenantes. L'intuition pousse vers A (« 70 %, c'est presque sûr »), mais 70 % laisse 30 % de chance de payer DEUX remèdes et 10 semaines d'hémorragie — la queue à 1 320 k€ est commune à A et à B. Le sous-ensemble conscient pertinent n'est pas « quelle cause est la plus probable » mais « quelle branche supprime la branche catastrophique ». C est la seule option dont le pire cas (905 k€) est inférieur au pire cas des deux autres (1 320 k€) ET inférieur à l'espérance de B. C est aussi la seule qui ne détruit pas de relation fournisseur sur une présomption.
+
+• programs (0.18) — Séquence exécutable :
+  P1 : lancer l'expertise destructive (45 k€, 40 modules) — jour 0.
+  P1bis (parallélisation sans engagement) : pré-instruire le dossier de requalification fournisseur ET le cahier des charges de refonte soudure pendant la semaine d'attente — coût quasi nul, gagne des jours sur le remède désigné.
+  P2 : à réception, engager exclusivement le remède désigné (300/6 sem. ou 220/4 sem.).
+  P3 : maintenir la production dégradée ou l'arrêt partiel selon la marge unitaire pendant la semaine 1 (le calcul ci-dessus suppose le portage plein — hypothèse conservatrice).
+  Point de rupture programmé : si le labo ne rend pas sous 10 jours, bascule automatique sur A (branche la plus probable).
+
+• life_game_M1C1 (0.25) — Poids maximal. Règle du jeu itéré : ce n'est pas un coup unique. Un épisode de rebut se reproduira ; une décision prise sans lecture du bit ne produit aucune connaissance réutilisable, tandis que l'expertise crée un précédent diagnostique, un référentiel de preuve opposable au fournisseur (levier de refacturation des 45 k€ et d'une partie des pertes) et une capacité de rejeu. Sur l'horizon long, l'option qui augmente l'observabilité du système domine l'option qui consomme du capital sur une présomption. La branche A « réussie par chance » enseigne une mauvaise leçon.
+
+[3] ATTEND_BY_WEIGHTS (attention seule, aucune pondération de décision)
+binary 0.08 · forces 0.12 · math 0.15 · conscious_sets 0.22 · programs 0.18 · life_game_M1C1 0.25 — appliqué : l'effort d'analyse a été concentré sur conscious_sets et life_game_M1C1, la couche math n'ayant demandé qu'un calcul fermé.
+
+[4] COMPUTE_EXPECTED_UTILITY (in=math, curvature=rho)
+En neutralité au risque, C domine déjà (833 < 942 < 1 086). Avec rho > 0 (aversion au risque, justifiée par une trésorerie sous tension à 80 k€/semaine), l'écart se creuse : la variance de C (665–905, étendue 240 k€) est très inférieure à celle de A et B (540/780 – 1 320, étendue ~540 k€). C domine donc à toute courbure rho ≥ 0. Aucun rho plausible ne renverse le classement.
+RUIN_GATE : l'événement ruineux est la branche « deux remèdes en série » = 1 320 k€ et 10 semaines d'arrêt. A l'expose à 30 %, B à 70 %, C à 0 %. Le gate est franchi uniquement par C. Verrou activé : A et B écartées même si leur espérance avait été proche.
+
+[5] ALLOCATE_BY_MARGINAL_VALUE
+Problème à forte valeur (≈1 M€ d'enjeu) et forte urgence (hémorragie active) : allocation d'analyse élevée, mais la valeur marginale décroît vite après le calcul de VIP — l'écart de 109 k€ est robuste et ne demande pas d'affinement supplémentaire. Ressources opérationnelles allouées : 45 k€ de diagnostic, plus la préparation parallèle des deux remèdes (coût marginal ≈ 0, gain marginal en délai significatif).
+
+[6] EXÉCUTER en sandbox ; AUDITER ; ANOMALIE → resolve | recover | kill
+Sandbox : simulation des trois branches sur l'horizon 10 semaines.
+Audit de sensibilité —
+  – Le seuil de bascule : C reste optimale tant que p(cellules) < ~0.85. À 70 %, marge confortable.
+  – Si l'expertise n'était fiable qu'à 90 %, E[C] ≈ 833 + 0.10×(coût du second remède ~0.1×630) ≈ 896 k€ : C reste devant A (942).
+  – Si le labo prenait 2 semaines au lieu d'1 : E[C] = 913 k€, C reste devant A.
+  – Anomalie potentielle : les 40 modules détruits ne sont pas comptés séparément (supposés inclus dans les 45 k€ / dans le rebut déjà constaté). Traitement : resolve — hypothèse conservatrice, sans effet sur le classement (il faudrait >109 k€ de coût caché pour renverser).
+  – Anomalie potentielle : cause mixte malgré l'énoncé d'exclusivité. Traitement : recover — l'expertise reste la seule option qui la révélerait ; A et B seraient toutes deux aveugles. Renforce C.
+Aucun kill.
+
+[7] DÉCISION — barème quantifiable
+utility 0.45 · evidence 0.20 · constraint 0.12 · risk 0.12 · adv 0.06 · m3c3 0.05
+  A : 0.45×0.57 + 0.20×0.60 + 0.12×0.40 + 0.12×0.35 + 0.06×0.40 + 0.05×0.50 = 0.515
+  B : 0.45×0.00 + 0.20×0.25 + 0.12×0.80 + 0.12×0.20 + 0.06×0.40 + 0.05×0.50 = 0.219
+  C : 0.45×1.00 + 0.20×1.00 + 0.12×0.70 + 0.12×0.95 + 0.06×0.90 + 0.05×0.90 = 0.947
+
+Gagnant : C, par dominance sur l'utilité, la preuve et le risque de queue ; seul déficit relatif, la contrainte de délai (+1 semaine avant d'agir), largement compensé (7 semaines au pire contre 10 pour A et B).
+
+DÉCISION RETENUE : C.
+
+---FINAL---
+{"decision": "C", "justification": "Une semaine et 45 k€ achètent une certitude qui vaut bien davantage. Sans diagnostic, on parie : le fournisseur est en cause sept fois sur dix, mais dans les trois cas restants on aura dépensé 300 k€ et perdu six semaines pour rien, avant de devoir encore refaire la soudure. En moyenne, agir tout de suite sur le fournisseur coûte environ 940 k€ tout compris, agir sur la soudure environ 1 090 k€, tandis que diagnostiquer d'abord ramène le coût attendu autour de 830 k€. L'écart couvre plus de deux fois le prix de l'expertise et de la semaine d'attente. Surtout, le diagnostic supprime le scénario noir : payer les deux remèdes l'un après l'autre, dix semaines de pertes, plus de 1,3 M€. Avec l'expertise, le pire cas plafonne à sept semaines. On peut d'ailleurs préparer les deux chantiers pendant cette semaine, sans rien engager, pour démarrer le bon remède immédiatement. Le résultat écrit servira en outre à discuter avec le fournisseur si les cellules sont confirmées. Une décision de cette taille mérite d'être fondée sur une preuve, pas sur une statistique de branche.", "confidence_0_100": 91, "ease_1_10": 8}

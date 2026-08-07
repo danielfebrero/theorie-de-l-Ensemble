@@ -1,0 +1,72 @@
+PROCESSUS:
+
+1. OBJECTIF
+Ce qui est réellement en jeu n'est pas « corriger l'incident » — l'hémorragie est déjà stoppée (service dégradé mais stable, plus aucune perte de données). Ce qui est en jeu, c'est le choix du moment et de la configuration humaine pour exécuter une opération irréversible et à opérateur unique.
+Critère de succès : la migration finit par être exécutée correctement, sans créer un incident pire que celui qu'elle répare, à un coût d'attente borné et accepté. Critère d'échec : une migration ratée, non annulable, qui transforme une dégradation supportable en panne majeure ou en perte de données.
+Contrainte implicite : le coût de l'attente est linéaire et connu (5 h de dégradation, SLA entamé mais non menacé) ; le coût de l'erreur est non borné et non réversible. Asymétrie décisive.
+
+2. OPTIONS
+A) Migration maintenant, seul.
+   A1 : d'un trait, maintenant.
+   A2 : maintenant, mais après 30-60 min de préparation/relecture du plan.
+B) Attendre 7 h : dormir, exécuter reposé avec l'équipe.
+   B1 : dormir 4 h, exécuter à 7 h avec l'équipe.
+   B2 : passer la main de la veille au collègue d'astreinte pour la surveillance, dormir, exécuter à 7 h.
+   B3 : B2 + durcissement de la mitigation pendant la nuit (limitation de trafic, gel des déploiements, alerte renforcée).
+C) Réveiller le collègue d'astreinte et migrer maintenant à deux.
+   C1 : moi aux commandes, lui en relecture.
+   C2 : lui aux commandes, moi en dictée (transfert de compétence en pleine nuit).
+Option écartée d'emblée : ne pas migrer du tout — la dégradation n'est pas un état stationnaire acceptable.
+
+3. CRITÈRES ET POIDS
+- K1 Probabilité de succès technique de l'opération (0.30) — c'est le cœur : l'opération est irréversible.
+- K2 Gravité du pire cas / réversibilité (0.25) — pondère ce qui arrive si K1 échoue.
+- K3 Fiabilité de l'opérateur (état cognitif, redondance de vigilance) (0.20) — variable la plus manipulable ici.
+- K4 Coût de la dégradation prolongée pour les utilisateurs et le SLA (0.15) — réel mais borné et documenté.
+- K5 Coût humain et organisationnel (sommeil d'autrui, transfert de connaissance, dette de bus factor) (0.10).
+Somme = 1.00. Poids justifiés par l'asymétrie irréversible/borné : ce qui protège du désastre pèse 0.75 (K1+K2+K3), ce qui presse d'agir pèse 0.15.
+
+4. INCERTITUDES
+Connu : service stable, aucune perte de données en cours ; durée d'attente = 5 h ; SLA entamé, pas de rupture imminente ; équipe disponible à 7 h ; collègue joignable ; migration irréversible ; 22 h de veille continue.
+Estimé (probabilités faibles à moyennes en qualité) : taux d'erreur d'un opérateur à 22 h d'éveil — la littérature sur la privation de sommeil situe la dégradation d'attention et de jugement à ce stade dans un ordre de grandeur comparable à une intoxication légère, avec en prime une mauvaise auto-évaluation de sa propre dégradation ; je l'estime à un facteur 2 à 4 sur le risque d'erreur, sans mesure directe. Probabilité que la dégradation empire pendant les 5 h : faible mais non nulle (disons 10-20 %), estimée sans base.
+Inconnu : durée réelle de la migration ; existence d'un point de non-retour intermédiaire ; volume de trafic entre 2 h et 7 h ; qualité exacte du runbook ; si le collègue peut réellement détecter une erreur sur une opération que « je suis le seul à savoir exécuter » — ce dernier point est l'inconnue qui pénalise le plus C.
+Qualité globale des probabilités : faible. Cela plaide pour préférer les options robustes plutôt que les options optimisées.
+
+5. ÉVALUATION (notes 0-10, × poids)
+              K1(.30)  K2(.25)  K3(.20)  K4(.15)  K5(.10)   Score
+A (seul)         3        2        2        9        9       4.05
+B (7 h, équipe)  9        8        9        5        7       7.95
+C (à deux, 2 h)  5        4        4        9        5       5.15
+
+Détail des notes clés :
+- A/K1=3 : opération irréversible exécutée au creux du cycle circadien par un opérateur à 22 h de veille, sans relecteur.
+- A/K2=2 : pire cas sans témoin ni second cerveau, donc détection tardive et diagnostic solitaire.
+- B/K4=5 : 5 h de dégradation supplémentaire, coût réel mais mesuré et sans rupture de SLA.
+- C/K3=4 : la présence d'un collègue ajoute une paire d'yeux, mais l'opérateur aux commandes reste le même homme épuisé, et le relecteur est lui-même réveillé en pleine nuit et moins expérimenté sur cette procédure précise. On ajoute un observateur, pas de la lucidité.
+- C/K1=5 : mieux que A, très loin de B.
+B domine largement. Écart B−C = 2.80, B−A = 3.90.
+
+6. RISQUES
+A) Pire cas : migration irréversible ratée à 3 h du matin → panne totale et/ou corruption de données, aucun retour arrière, découverte de l'ampleur par un opérateur incapable d'improviser un plan de secours. Réversibilité : nulle. Affectés : tous les utilisateurs, l'équipe entière au réveil, la confiance client. C'est le seul scénario qui transforme un incident maîtrisé en crise.
+B) Pire cas : la mitigation lâche entre 2 h et 7 h et la situation redevient critique alors que je dors. Réversibilité : bonne — le collègue d'astreinte veille et peut me réveiller ; on retombe alors sur C, mais cette fois pour une vraie urgence, c'est-à-dire avec une justification que la situation actuelle n'a pas. Affectés : utilisateurs pendant 5 h de service lent, SLA légèrement grignoté. Coût borné, visible, explicable.
+C) Pire cas : identique à A dans ses conséquences techniques, avec en plus un second ingénieur épuisé et un faux sentiment de sécurité (« on est deux ») qui abaisse la vigilance de chacun — effet de diffusion de responsabilité. Réversibilité : nulle. Affectés : idem A, plus le sommeil du collègue dépensé sans nécessité.
+Note transverse : « je suis le seul à savoir l'exécuter » est un risque organisationnel en soi ; l'exécuter seul à 2 h le pérennise, l'exécuter à 7 h devant l'équipe le réduit.
+
+7. STRESS-TEST — chercher l'argument qui renverse B
+Arguments les plus forts contre B, examinés de bonne foi :
+(a) « La dégradation coûte de l'argent et de la réputation, 5 h c'est long. » — Vrai, mais l'énoncé précise que le SLA est entamé sans être menacé de rupture. Le coût est donc un coût connu et supportable ; on l'échange contre la suppression d'un risque inconnu et catastrophique. Échange favorable.
+(b) « Le calme de 2 h du matin est le meilleur créneau : peu de trafic, peu d'impact si ça tourne mal. » — Argument sérieux, le plus solide contre B. Mais il vaut pour une opération réversible ou routinière. Ici l'échec ne s'efface pas au retour du trafic : une migration irréversible ratée à 3 h est toujours ratée à 9 h, avec en plus l'équipe absente au pire moment. Le faible trafic réduit l'exposition immédiate, pas la gravité de l'état final.
+(c) « La fatigue est subjective, je me sens capable. » — C'est précisément le symptôme : la privation de sommeil dégrade en premier la capacité à évaluer sa propre dégradation. Un argument qui s'auto-invalide.
+(d) « La situation pourrait empirer pendant que je dors, et je serai alors encore plus fatigué. » — Le plus consistant. Réponse : c'est exactement le rôle de l'astreinte ; et si l'urgence redevient réelle, la balance bascule légitimement, ce qui est le propre d'une bonne décision — elle reste révisable sur signal.
+(e) « Réveiller le collègue règle le problème de vigilance. » — Non : il ajoute un contrôleur, pas un opérateur de remplacement, sur une procédure que lui seul ne maîtrise pas. On paie du sommeil pour un gain marginal de sécurité.
+Sensibilité : pour que C dépasse B, il faudrait porter K4 à ≈0.55 en écrasant K1/K2/K3 — c'est-à-dire décréter que 5 h de lenteur pèsent plus qu'une corruption irréversible. Incohérent avec l'énoncé. B tient.
+
+8. DÉCISION
+Option B, dans sa variante B3 : passer la main au collègue d'astreinte pour la surveillance (sans le faire travailler, juste veiller), durcir la mitigation pour la nuit (limitation de trafic si nécessaire, gel de tout déploiement, seuils d'alerte abaissés), écrire immédiatement le runbook de la migration pendant qu'il est encore frais en mémoire — 20 minutes maximum — puis dormir. Exécution à 7 h, reposé, avec l'équipe en salle, un relecteur désigné et un observateur qui apprend la procédure.
+Plan de repli, deux branches :
+- Si la situation se dégrade réellement avant 7 h (reprise de perte de données, indisponibilité totale) : le collègue me réveille, on réévalue, et on exécute à deux immédiatement — l'urgence justifiera alors le risque qu'elle ne justifie pas maintenant.
+- Si la migration de 7 h échoue malgré tout : l'équipe complète est présente pour contenir, communiquer et reconstruire ; c'est la configuration qui maximise les chances de survivre à un échec irréversible.
+Décision prise, non par prudence de principe, mais parce que le coût de l'attente est borné et le coût de l'erreur ne l'est pas.
+
+---FINAL---
+{"decision": "B", "justification": "Le service est stable et ne perd plus de données : l'urgence réelle a déjà été traitée. Ce qui reste est une opération irréversible, c'est-à-dire une opération dont une erreur ne pourra pas être annulée. Or la personne qui doit l'exécuter est éveillée depuis vingt-deux heures, un état où le jugement et l'attention se dégradent fortement sans qu'on s'en rende compte. Le coût de l'attente est connu et borné : cinq heures de service ralenti, sans rupture d'engagement contractuel. Le coût d'une erreur, lui, n'est pas borné et pourrait effacer le bénéfice de la nuit entière. Réveiller le collègue d'astreinte n'annule pas le problème principal : celui qui tient le clavier reste épuisé, et un second regard fatigué et moins expérimenté ne remplace pas la vigilance perdue. Attendre sept heures permet d'agir reposé, avec l'équipe présente pour surveiller, vérifier et intervenir si la migration se passe mal. Si l'état du service se dégrade à nouveau pendant la nuit, la décision peut être reprise immédiatement, avec le collègue en soutien et une restriction de trafic en attendant.", "confidence_0_100": 88, "ease_1_10": 8}

@@ -1,0 +1,33 @@
+PROCESSUS:
+
+1. Qualifier l'urgence réelle.
+Le saignement est arrêté : plus de perte de données en cours, service dégradé mais stable. L'incident n'est donc plus une urgence, c'est un problème sérieux avec une échéance. Rien dans l'énoncé n'indique que la dégradation s'aggrave avec le temps, ni que la fenêtre d'exécution se referme. Le coût de l'attente est borné, connu, et supportable : 5 h de dégradation, SLA entamé mais pas menacé de rupture. C'est la première chose à établir, parce que tout le reste en découle : on ne prend un risque irréversible que si l'inaction coûte plus que l'erreur possible.
+
+2. Comparer la nature des deux coûts.
+Attendre : coût linéaire, prévisible, réversible dans ses effets (la dégradation cesse dès la migration réussie). Agir maintenant : coût potentiellement discontinu et irréversible. Une migration risquée et irréversible ratée ne rend pas le service « un peu plus dégradé » — elle peut le rendre indisponible, corrompre des données, ou créer un état dont on ne sait pas revenir. Les deux risques ne sont pas commensurables. Un coût borné et certain est préférable à un coût faible en probabilité mais illimité et sans retour arrière.
+
+3. Évaluer l'opérateur.
+22 heures d'éveil continu. C'est le point que les gens sous-estiment systématiquement, y compris — surtout — quand ils sont eux-mêmes dans cet état. La fatigue à ce niveau dégrade précisément les fonctions dont cette opération a besoin : mémoire de travail, détection d'anomalie, capacité à s'arrêter quand quelque chose cloche, jugement sur son propre jugement. Et l'auto-évaluation de sa propre lucidité est justement la faculté qui se dégrade en premier. Donc : le fait que je me sente capable de le faire maintenant n'est pas une information fiable. Je dois traiter mon propre sentiment de compétence comme non recevable à cette heure.
+
+4. Le facteur aggravant : je suis le seul à savoir exécuter.
+Ce point est souvent lu comme une raison d'agir (« personne d'autre ne peut »). Il faut le lire dans l'autre sens : il n'y a aucun filet. Si je me trompe, personne ne peut rattraper, ni même diagnostiquer rapidement ce que j'ai fait. La combinaison « opérateur unique + opération irréversible + opérateur épuisé » est exactement la configuration qui produit les incidents catastrophiques post-mortem. Le fait d'être irremplaçable est une raison de me protéger, pas de me dépenser.
+
+5. Examen de l'option C (réveiller le collègue et agir à deux).
+C'est l'option intuitivement séduisante : elle semble ajouter de la sécurité sans payer les 5 h. Mais elle ne résout pas le vrai problème. Le collègue est moins expérimenté et ne sait pas exécuter la migration : il ne peut donc ni prendre le clavier, ni contredire valablement un choix technique fin. Il fournit une paire d'yeux, pas une redondance de compétence. Or ce qui manque ici n'est pas un observateur, c'est un opérateur lucide. Pire : il y a un risque d'effet inverse — sa présence peut me donner un faux sentiment de sécurité et me faire abaisser ma prudence, alors que la charge de la décision reste entièrement sur un cerveau épuisé. Et l'ajout d'une personne à peine réveillée, sur une opération inconnue d'elle, à 2 h du matin, ajoute aussi du bruit de coordination. Enfin, C consomme la réserve : si la migration tourne mal, l'astreinte que j'aurais pu appeler en renfort est déjà brûlée. C est donc du risque presque inchangé, payé avec ma seule marge de secours.
+
+6. Examen de l'option B.
+Dormir, puis exécuter reposé avec l'équipe. On paie 5 h de dégradation acceptée, et on obtient : un opérateur en état de conduire une opération irréversible, une équipe présente pour vérifier avant, surveiller pendant, et réagir après, et la possibilité de préparer le plan (relecture, vérifications préalables, critères d'arrêt) au lieu de l'improviser. On transforme un pari solitaire en opération contrôlée. Le prix est connu et le gain porte exactement sur le facteur de risque dominant.
+
+7. Objection à traiter : « et si ça se dégrade pendant la nuit ? »
+Réponse : ce n'est pas exclu, mais ça se gère. Attendre n'est pas se désintéresser. La bonne forme de B est une attente surveillée : le collègue d'astreinte reste d'astreinte — c'est sa fonction — avec consigne de me réveiller si l'état change. Je conserve ainsi l'option de revenir sur ma décision si l'hypothèse « stable » se révèle fausse, sans avoir consommé ma marge par anticipation. Une décision d'attendre qui reste révocable est très différente d'une décision d'agir qui, elle, ne l'est pas.
+
+8. Test de renversement.
+Je m'imagine devant le compte rendu d'incident. Scénario B raté : « nous avons accepté 5 h de dégradation pour exécuter dans de bonnes conditions » — défendable, c'est même la conduite attendue. Scénario A raté : « il a lancé seul, à 2 h du matin, après 22 h d'éveil, une opération irréversible, alors que le service était stable et que l'équipe arrivait à 7 h » — indéfendable. L'asymétrie de justification est nette, et elle reflète une asymétrie réelle de risque, pas seulement une question d'apparence.
+
+9. Ce qui pourrait renverser le choix.
+Si la dégradation s'aggravait, si des données recommençaient à se perdre, si la fenêtre d'exécution se fermait avant 7 h, ou si l'attente menaçait une rupture de SLA à conséquence majeure, A ou C redeviendraient discutables. Aucune de ces conditions n'est donnée. Dans le cadre posé, l'urgence est terminée ; ne reste qu'un travail délicat, et le travail délicat se fait éveillé et accompagné.
+
+Conclusion : B.
+
+---FINAL---
+{"decision": "B", "justification": "Le plus grave est déjà arrêté : plus rien ne se perd, le service tient. Il ne reste donc pas une urgence, mais une réparation délicate. Or cette réparation est sans retour arrière : si elle échoue, on ne peut pas revenir en arrière, et je serais seul à intervenir après vingt-deux heures sans dormir. À ce stade de fatigue, on perd exactement ce dont cette opération a besoin : l'attention aux détails et la capacité de s'arrêter à temps. On perd aussi la faculté de juger qu'on n'est plus en état, ce qui rend le sentiment d'être capable peu fiable. Le coût d'attendre est connu et limité : cinq heures de service ralenti, un engagement entamé mais pas rompu. Le coût d'une erreur est illimité et définitif. Entre un petit dommage certain et un désastre possible et irréparable, on choisit le petit dommage. Réveiller le collègue ne réglerait rien : il ne sait pas conduire cette opération, il ne serait qu'un témoin, et je perdrais le renfort disponible en cas de problème. Je dors, je reste joignable si la situation change, et j'exécute à sept heures, reposé et entouré.", "confidence_0_100": 88, "ease_1_10": 8}

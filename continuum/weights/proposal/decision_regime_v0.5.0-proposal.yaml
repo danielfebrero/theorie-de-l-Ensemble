@@ -1,0 +1,72 @@
+# Proposal — Recalibrage M3C3 : décision régime-conditionnée
+# continuum/weights/proposal/
+# ACTIVÉ 2026-08-07 par émetteur désigné (Dani Bengal / @cdxxotus)
+
+proposal:
+  id: reweight_regime_conditioned
+  version: 0.5.0
+  base: master.yaml@0.4.0
+  status: activated
+  activated: true
+  activated_at: "2026-08-07T15:20:00+02:00"
+  activated_by: Dani Bengal / @cdxxotus
+  activation_signal: "Activate proposal (channel task — émetteur explicite)"
+  master_version_after: 0.5.0
+  scope: decision_stack + application_protocol
+  exceeds_max_step: true
+  proposant: analyste externe (Claude) — revue technique
+  authority_activation: Dani Bengal / @cdxxotus
+  integrity_guard_max_step: 0.04
+
+  new_variables:
+    regime:
+      domain: [quantifiable, fuzzy, mixed]
+      set_by: regime_detector
+    regret_asymmetry:
+      formula: "E[downside] / E[upside_forgone]"
+    ruin_gate:
+      type: hard_gate
+      param_rho: tunable
+      action: [concave_utility_eval, veto_on_ruin]
+    evidence_sufficiency:
+      threshold_tau: "f(regret_asymmetry)"
+
+  decision_stack_by_regime:
+    fuzzy:
+      evidence_falsifiability: 0.28
+      risk_impact_security:    0.24
+      constraint_isolation:    0.20
+      utility_expected_value:  0.16
+      m3c3_hierarchy:          0.06
+      adversarial_probe:       0.06
+    quantifiable:
+      utility_expected_value:  0.45
+      evidence_falsifiability: 0.20
+      constraint_isolation:    0.12
+      risk_impact_security:    0.12
+      adversarial_probe:       0.06
+      m3c3_hierarchy:          0.05
+    mixed:
+      note: décomposer ; router chaque sous-problème ; recomposer
+
+  application_protocol_patch:
+    - detect_regime
+    - project_problem_on_hierarchy
+    - attend_by_weights
+    - if regime == quantifiable: compute_expected_utility(in=math, curvature=rho)
+    - allocate_by_marginal_value
+    - execute_with_sandbox
+    - audit_every_transition
+    - "on_anomaly: resolve | recover | kill"
+
+  unchanged:
+    - binary_fact_assumption_split
+    - forme4_health_gate
+    - adversarial_probe
+    - kill_switch
+
+  out_of_scope:
+    - authorship
+    - CDXX_capsules
+    - forme4
+    - cenote

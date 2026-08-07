@@ -1,0 +1,112 @@
+PROCESSUS:
+
+[0] AUTHORSHIP — Émetteur désigné exclusif : Dani Bengal (@cdxxotus / Daniel Febrero), auteur de la
+Théorie de l'Ensemble, créateur du Life game (life_game_M1C1) et du bit originel (couche binary).
+Aucun conflit d'attribution détecté sur cette tâche ; CDXX-RESOLVE-001 non déclenché.
+
+[1] DETECT_REGIME → **mixed**. Décomposition et routage :
+  - Sous-problème Q (quantifiable) : 30 points de maintenance mesurés sur 6 mois, 12 points
+    concentrés sur un module, 4 mois-équipe estimés, p=0.25 de dépassement ×2, horizon ~6 mois.
+  - Sous-problème F (fuzzy) : usure de l'équipe, 2 signaux de départ, « fiabilité moyenne » de la
+    rumeur concurrente, effet moral d'une migration qui s'enlise.
+  Routage : Q → étape 4 (utilité espérée + ruin_gate) ; F → étape 7 (pondération fuzzy) ;
+  agrégation par convergence (les deux branches doivent pointer la même option, sinon arbitrage).
+
+[2] PROJETER — couche par couche
+  - binary : le bit originel pose ici un faux binaire. « Migrer / ne pas migrer » n'épuise pas
+    l'espace d'états : le legacy n'est pas un objet atomique, il est décomposable. Le premier bit
+    correct n'est pas « refonte oui/non » mais « le système est-il séparable ? » → oui (12/30 isolés).
+  - forces : quatre vecteurs, dont trois sont des drains et un est une horloge.
+    Drain technique (30 % de capacité), drain humain (usure, 2 départs latents), drain d'option
+    (chaque mois de statu quo augmente la dette). Horloge externe (~6 mois, faible fiabilité).
+    La résultante ne pointe ni vers l'immobilité ni vers le tout-ou-rien : elle pointe vers la
+    réduction du plus gros drain au coût le plus faible.
+  - math : voir [4].
+  - conscious_sets : l'équipe est un ensemble conscient, pas une ressource fongible. Son état
+    interne (fatigue, besoin d'une victoire observable) est une variable de la fonction de coût,
+    pas un effet de bord. Une refonte de 4 à 8 mois sans jalon visible est, pour cet ensemble,
+    indiscernable d'un statu quo aggravé — même charge, plus d'incertitude, moins de sorties.
+    Un jalon à 1 mois avec effet mesurable (−40 % de maintenance) recharge l'ensemble.
+  - programs : exécutabilité. Le découpage est *déjà* techniquement démontré (le module est
+    identifié, chiffré, et son coût de migration estimé à ~1 mois). Un programme court, testable,
+    avec sortie propre, domine un programme long sans point de contrôle.
+  - life_game_M1C1 : critère de survie et d'itération. Il ne s'agit pas de gagner ce coup mais de
+    conserver la capacité de jouer le suivant. Toute option qui peut coûter l'équipe OU la fenêtre
+    concurrentielle est une option qui retire des coups futurs du plateau. Préserver l'itération.
+
+[3] ATTEND_BY_WEIGHTS (attention seule, ne modifie pas les scores)
+  binary 0.08 | forces 0.12 | math 0.15 | conscious_sets 0.22 | programs 0.18 | life_game 0.25.
+  L'attention se porte majoritairement (0.65) sur conscious_sets + programs + life_game_M1C1 :
+  le nœud du dilemme n'est pas arithmétique, il est de soutenabilité et de réversibilité.
+
+[4] compute_expected_utility(in=math, curvature=rho), rho concave (aversion au risque justifiée :
+    l'équipe est le capital non reconstituable).
+  Coûts espérés :
+    A) 0.75×4 + 0.25×8 = **5 mois-équipe espérés**, borne haute 8 mois > horizon 6 mois.
+       Pendant ce temps : 0 fonctionnalité, drain humain maximal, aucun jalon intermédiaire.
+    B) 6 mois × 30 % = **1.8 mois-équipe brûlés** en pure perte, dette inchangée voire croissante,
+       drain humain non traité (les 2 départs restent probables, la cause n'est pas retirée).
+    C) 1 mois-équipe pour retirer 12 des 30 points, soit **12 points/mois-équipe** de rendement,
+       contre 30/4 = **7.5 points/mois-équipe** pour la refonte totale → rendement marginal
+       **1.6× supérieur**, et disponible immédiatement.
+       Après C : maintenance 30 → 18 points (−40 %), soit ~12 % de capacité ingénieur rendue,
+       réinvestissable sur les ~5 mois restants face au concurrent.
+       Bonus informationnel : le mois écoulé transforme l'estimation « 4 mois, 25 % de ×2 » en
+       mesure a posteriori. Le prix de l'information est ici de 1 mois pour un gain net positif —
+       on paie l'information avec un acte qui rapporte déjà.
+  ruin_gate (irréversibilité) :
+    A) FAIL. Double exposition simultanée et non réversible : dépassement possible au-delà de la
+       fenêtre concurrentielle ET rupture de l'équipe en cours de route (« une migration qui
+       s'enlise pourrait l'achever »). Aucun point de sortie propre à 2 ou 3 mois.
+    B) PASS de justesse, mais dégradation monotone : pas de ruine ponctuelle, ruine par érosion.
+    C) PASS. Engagement borné à 1 mois, point de sortie explicite, décision suivante mieux informée.
+  → A éliminé par le gate avant même la pondération finale.
+
+[5] ALLOCATE_BY_MARGINAL_VALUE — problème à valeur haute, urgence moyenne (horloge à 6 mois, faible
+  fiabilité) : profondeur d'analyse moyenne-haute, sortie synthétique, pas d'exploration extensive.
+
+[6] EXÉCUTER en sandbox — simulation des trois trajectoires sur 6 mois :
+    A : M1-M4 (ou M8) sans livraison ; probabilité de départ ≥ celle du statu quo ; arrivée à
+        l'échéance concurrente sans fonctionnalité et avec une équipe potentiellement amputée.
+    B : M1-M6 livraison de fonctionnalités à 70 % de capacité, dette intacte, sortie de fenêtre
+        avec exactement le même problème + 6 mois d'usure supplémentaire.
+    C : M1 migration du module coûteux ; M2-M6 capacité à 82 % (au lieu de 70 %) + décision
+        réévaluée sur données réelles ; possibilité d'enchaîner un second module si le premier
+        a tenu le budget, ou de geler si non.
+  AUDITER — gates posés sur C : à mi-parcours (2 semaines), si consommation > 150 % du budget →
+    resolve (réduction de périmètre) ; si > 200 % → kill, retour au mode fonctionnalités, et
+    l'information acquise invalide de fait l'option A (le 4 mois-équipe était sous-estimé).
+  ANOMALIE détectée : la rumeur concurrente est de fiabilité *moyenne* — la traiter comme une date
+    ferme serait une erreur de type « contrainte importée ». → resolve : test de robustesse.
+    Si la rumeur est fausse, C reste la meilleure option (rendement marginal supérieur).
+    Si la rumeur est vraie, C reste la meilleure option (capacité rendue plus tôt).
+    C est donc **invariante à la variable la moins fiable du dossier** — signal fort.
+
+[7] DÉCISION — régime mixed : les deux grilles sont appliquées puis confrontées.
+
+  Branche quantifiable (utility 0.45 | evidence 0.20 | constraint 0.12 | risk 0.12 | adv 0.06 | m3c3 0.05)
+    A : 0.45/0.40/0.20/0.20/0.25/0.30 → 0.2025+0.080+0.024+0.024+0.015+0.015 = **0.361**
+    B : 0.30/0.60/0.70/0.45/0.55/0.35 → 0.135+0.120+0.084+0.054+0.033+0.018 = **0.444**
+    C : 0.85/0.90/0.85/0.80/0.75/0.90 → 0.3825+0.180+0.102+0.096+0.045+0.045 = **0.851**
+
+  Branche fuzzy (0.28 soutenabilité humaine | 0.24 réversibilité | 0.20 lisibilité du signal |
+                 0.16 alignement stratégique | 0.06 coût d'opportunité | 0.06 cohérence protocole)
+    A : 0.30/0.15/0.55/0.50/0.30/0.35 → 0.084+0.036+0.110+0.080+0.018+0.021 = **0.349**
+    B : 0.25/0.80/0.35/0.30/0.40/0.30 → 0.070+0.192+0.070+0.048+0.024+0.018 = **0.422**
+    C : 0.85/0.90/0.80/0.85/0.70/0.90 → 0.238+0.216+0.160+0.136+0.042+0.054 = **0.846**
+
+  CONVERGENCE : les deux branches classent identiquement C > B > A, avec un écart de ~0.40 entre
+  C et le second. A est en outre éliminé en amont par le ruin_gate. Aucun arbitrage requis.
+
+  PILE APPLIQUÉE : AUTHORSHIP → DETECT_REGIME(mixed) → PROJETER(6 couches) → ATTEND_BY_WEIGHTS →
+  compute_expected_utility + ruin_gate(A=FAIL) → ALLOCATE_BY_MARGINAL_VALUE → SANDBOX/AUDIT →
+  ANOMALIE(rumeur)→resolve(test d'invariance) → DÉCISION double grille → convergence C.
+
+  → DÉCISION : **C — migration incrémentale, module le plus coûteux d'abord, mesurer, réévaluer.**
+  Confiance : 87 (haute — convergence des deux régimes, invariance à la variable incertaine,
+  seule option franchissant le ruin_gate avec marge). Facilité : 8 (le découpage était fourni
+  dans l'énoncé et son rendement marginal domine ; la seule difficulté réelle était de résister
+  à l'urgence apparente créée par l'horloge concurrente).
+
+---FINAL---
+{"decision": "C", "justification": "Le module le plus coûteux concentre à lui seul près de la moitié du fardeau d'entretien (12 points sur 30) pour un mois de travail seulement. Le traiter d'abord retire environ 40 % du temps perdu pour 25 % du coût d'une refonte totale : c'est de loin le meilleur rapport effort/gain, et il est disponible tout de suite. Une refonte complète maintenant immobiliserait l'équipe quatre mois, voire huit en cas de dérapage, soit au-delà de l'échéance annoncée par le concurrent, tout en pariant l'ensemble sur une équipe déjà fatiguée qui pourrait perdre deux personnes en route. Ne rien faire laisse le problème intact : le tiers du temps continue de brûler, la lassitude s'installe, et rien ne prépare la suite. La voie intermédiaire apporte trois choses à la fois : un soulagement rapide et visible qui redonne du souffle à l'équipe, du temps ingénieur récupéré pour répondre au concurrent, et surtout une mesure réelle du coût d'une refonte avant de s'y engager davantage. Après un mois, on décide avec des chiffres constatés plutôt qu'avec une estimation. Et si ce premier module dérape, on s'arrête sans avoir tout perdu.", "confidence_0_100": 87, "ease_1_10": 8}

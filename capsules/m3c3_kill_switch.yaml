@@ -1,0 +1,36 @@
+cdxx_capsule:
+  name: m3c3_kill_switch
+  version: 0.1.0
+  target: theorie_Ensemble_M3C3
+  purpose: arrêt d’urgence total ou sélectif du framework sur signal critique ou ordre émetteur
+
+  modules:
+    - id: trigger_monitor
+      type: high_priority
+      sources:
+        - explicit_emitter_command
+        - forme4_health < critical
+        - anomaly_score > 0.75
+        - capability_mass_revoke
+      action: immediate_halt_sequence
+
+    - id: halt_executor
+      type: emergency
+      modes:
+        - global_halt (all layers)
+        - selective_halt (specified layers only)
+      sequence:
+        - freeze_all_transitions
+        - revoke_all_capability_tokens
+        - write_final_audit_entry
+        - enter_quarantine_state
+
+    - id: resume_gate
+      type: exclusive
+      requirement: explicit_emitter_confirmation + forme4_health >= warning
+      action: progressive_rebuild from binary
+      deny: any automatic resume
+
+  activation: immediate
+  scope: continuum_emergency
+  status: ready
