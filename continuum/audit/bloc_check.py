@@ -42,7 +42,9 @@ def canoniques(master):
         for k, v in groupe.items():
             vals.add(round(float(v), 4))
             provenance.setdefault(round(float(v), 4), []).append(f"{nom}.{k}")
-    return vals, provenance, list(d["hierarchy"]["order"])
+    criteres = sorted(set(d["decision_stack_by_regime"]["fuzzy"])
+                      | set(d["decision_stack_by_regime"]["quantifiable"]))
+    return vals, provenance, list(d["hierarchy"]["order"]), criteres
 
 
 def main():
@@ -54,7 +56,7 @@ def main():
     with open(bloc_path) as f:
         bloc = f.read()
 
-    vals, provenance, ordre = canoniques(master)
+    vals, provenance, ordre, criteres = canoniques(master)
     echecs, notes = [], []
 
     # --- 1. poids cités ---
@@ -101,6 +103,19 @@ def main():
     # étapes impératives (DETECT_REGIME) et en minuscules dans les renvois au master.
     bas = bloc.lower()
     manquants = [r for r in REQUIS if r.lower() not in bas]
+
+    # --- 4. critères de pile nommés ---
+    # Le défaut central du bloc v0.5.0 : transmettre « 0.28/0.24/0.20/0.16/0.06/0.06 » sans
+    # dire ce que ces nombres pondèrent. Un poids anonyme est inapplicable — la valeur est
+    # juste, et pourtant la primitive est morte. Abréger (« adv », « m3c3 ») ne suffit pas.
+    anonymes = [c for c in criteres if c.lower() not in bas]
+    if anonymes:
+        echecs.append(
+            "critères de pile cités sans être nommés : " + ", ".join(anonymes)
+            + "\n    un poids dont le critère n'est pas nommé ne peut pas être appliqué"
+        )
+    else:
+        notes.append(f"{len(criteres)} critères de pile nommés en toutes lettres")
     if manquants:
         echecs.append("primitives M3C3 absentes : " + ", ".join(manquants))
     else:
