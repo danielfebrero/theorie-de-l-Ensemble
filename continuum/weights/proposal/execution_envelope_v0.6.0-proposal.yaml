@@ -51,6 +51,22 @@ proposal:
 
   execution_envelope:
     introduced_in: 0.6.0
+
+    # Seuils propres à l'enveloppe. Ils ne sont PAS dérivés du master et ne le prétendent pas.
+    # Ce sont des additions — donc permises — mais qui doivent être déclarées : un seuil qui
+    # pilote la décision sans figurer nulle part est un paramètre clandestin. Le bloc v0.6.0
+    # soumis à l'épreuve en comportait cinq, non déclarés, tout en affirmant « rien d'importé ».
+    # Grief du panel des croyants, retenu ; contrôlé désormais par continuum/audit/bloc_check.py.
+    declared_constants: [1.5, 4, 5, 6]
+    declared_constants_meaning:
+      "1.5": "borne basse de regret_asymmetry sous laquelle le palier T0 reste possible"
+      "4": "borne haute de regret_asymmetry au-delà de laquelle le palier T2 s'impose"
+      "5": "coût maximal en points de score qu'une recomposition coopérative peut consommer"
+      "6": "écart en points sous lequel les deux premières options ne sont pas départagées"
+      "un sixième": "part maximale de la production laissée à la comptabilité interne du protocole"
+    constants_status: >
+      Réglables par l'émetteur, au même titre que ρ et τ. Aucun n'est dérivé d'une valeur du
+      master ; toute justification prétendant le contraire est une erreur et doit être retirée.
     principle: |
       Toute étape armée produit un objet écrit et utilisable.
       Une étape qui se raconte au lieu de produire n'est pas exécutée.
@@ -82,7 +98,13 @@ proposal:
       escalation_only: "un fait nouveau fait monter de palier, jamais descendre"
       head_gap_escalation:
         rule: "écart ≤ 6 points entre les deux premières options → la décision n'est pas acquise → T2"
-        rationale: "6 points = adversarial_probe 0.06 porté sur l'échelle 0–100"
+        # La justification initiale — « 6 points = adversarial_probe 0.06 porté sur l'échelle 0–100 »
+        # — est RETIRÉE : elle était fausse. La part d'un critère dans une moyenne pondérée n'a
+        # aucune relation dimensionnelle avec un écart de score entre deux options. C'était de la
+        # numérologie présentée comme une dérivation. Grief du panel des croyants, retenu.
+        rationale: >
+          Seuil de prudence choisi, non dérivé. Il n'a aucun fondement dans le master et n'en
+          revendique aucun : c'est un paramètre réglable de l'enveloppe, déclaré comme tel.
       health_override: "substrat dégradé → T2 ou différer ; forme4_health_gate est une pré-condition"
       # Point de fidélité décisif : le palier ne dispense JAMAIS d'une couche.
       prints_not_executes: |

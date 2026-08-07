@@ -60,8 +60,6 @@ def main():
     echecs, notes = [], []
 
     # --- 1. poids cités ---
-    # On ne retient que les décimaux de la forme 0.xx : ce sont les poids. Les entiers et
-    # les nombres du problème (montants, délais) ne sont pas des bases.
     cites = [round(float(m), 4) for m in re.findall(r"\b0[.,]\d{1,4}\b", bloc.replace(",", "."))]
     inconnus = sorted({c for c in cites if c not in vals})
     if inconnus:
@@ -73,6 +71,47 @@ def main():
         )
     else:
         notes.append(f"{len(cites)} poids cités, tous canoniques")
+
+    # --- 1bis. seuils non canoniques ---
+    # Ne contrôler que les décimaux `0,xx` laissait passer tout le reste : un bloc pouvait
+    # introduire des bornes (« regret_asymmetry > 4 »), des marges (« 6 points ») ou des
+    # quotas (« un sixième ») en se réclamant de n'avoir « rien importé », et le contrôleur
+    # certifiait « tous canoniques » — les seuls qu'il regardait. Un seuil non déclaré est un
+    # paramètre clandestin : il pilote la décision sans figurer nulle part dans le master.
+    # Ils ne sont pas interdits — les additions le sont — mais ils doivent être DÉCLARÉS,
+    # dans `execution_envelope.declared_constants` du master.
+    env = master["master_document"].get("execution_envelope") or {}
+    declares = {round(float(x), 4) for x in (env.get("declared_constants") or [])}
+    # Un seuil se reconnaît à son contexte, pas à sa valeur : une comparaison, une marge
+    # exprimée en points, un quota. Les numéros d'étape et les bornes d'échelle n'en sont pas.
+    txt = bloc.replace(",", ".")
+    motifs = [
+        r"[<>≤≥]\s*(\d+(?:\.\d+)?)",              # regret_asymmetry > 4
+        r"(\d+(?:\.\d+)?)\s*points?\b",            # 6 points, au plus 5 points
+        r"\bau plus\s+(\d+(?:\.\d+)?)",
+        r"\bun\s+(sixième|cinquième|quart|tiers)\b",
+    ]
+    seuils, mots = set(), set()
+    for mot in motifs:
+        for m in re.finditer(mot, txt, re.I):
+            g = m.group(1)
+            if g.isalpha():
+                mots.add(g.lower())
+                continue
+            v = round(float(g), 4)
+            if v not in vals and v not in declares:
+                seuils.add(v)
+    indeclares = sorted(seuils) + sorted(mots)
+    if indeclares:
+        echecs.append(
+            "seuils non canoniques et non déclarés : "
+            + ", ".join(f"{s:g}" if isinstance(s, float) else s for s in indeclares)
+            + "\n    ni dans le master, ni dans execution_envelope.declared_constants —"
+            + "\n    un seuil qui pilote la décision sans être déclaré est un paramètre clandestin"
+        )
+    else:
+        notes.append("aucun seuil clandestin"
+                     + (f" ({len(declares)} déclarés dans l'enveloppe)" if declares else ""))
 
     # --- 2. ordre des couches ---
     # Une couche peut être nommée hors de la projection — l'authorship cite déjà
