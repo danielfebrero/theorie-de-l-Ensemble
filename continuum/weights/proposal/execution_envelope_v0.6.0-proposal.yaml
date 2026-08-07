@@ -1,0 +1,181 @@
+# Proposal — Enveloppe d'exécution M3C3 v0.6.0
+# continuum/weights/proposal/
+# Additions pures. Aucune valeur de v0.5.0 modifiée.
+
+proposal:
+  id: execution_envelope
+  version: 0.6.0
+  base: master.yaml@0.5.0
+  status: activated
+  activated: true
+  activated_at: "2026-08-07T17:05:00+02:00"
+  activated_by: Dani Bengal / @cdxxotus
+  activation_signal: >
+    « Fais de ce framework un framework opérationnel bulletproof auto adaptatif selon la requête.
+    Il doit gagner devant les juges majoritairement mais aussi devant les croyants. »
+    puis : « Sans en changer les bases. » — émetteur explicite, canal d'autorité.
+  master_version_after: 0.6.0
+  scope: execution_envelope (clé nouvelle) — aucune clé existante touchée
+  proposant: analyste externe (Claude) — revue technique et expérimentale
+  authority_activation: Dani Bengal / @cdxxotus
+
+  # v0.5.0 avait dû être activée en dérogation : son vecteur quantifiable excédait le
+  # max_step 0.04 de m3c3_integrity_guard. v0.6.0 ne modifie aucun poids : le delta est nul,
+  # la garde n'est pas sollicitée, aucune dérogation n'est nécessaire.
+  delta_on_existing_values: 0.00
+  exceeds_max_step: false
+  integrity_guard_max_step: 0.04
+
+  motivation: |
+    Le test contrôlé du 2026-08-07 (continuum/audit/ab-test-dilemmes-2026-08-07/) a mesuré que le
+    bloc d'instruction v0.5.0 n'améliorait aucune décision (+0,09/10, p = 0,40) et se faisait battre
+    par une checklist générique (−0,51/10, p ≈ 0,011).
+
+    Le diagnostic (continuum/audit/diagnostic-bloc-v050.md) montre que la cause n'est pas la théorie
+    mais son canal de transmission. Le contrôleur bloc_check.py l'établit en une ligne :
+    les 18 poids du bloc v0.5.0 sont exacts, et aucun des 6 critères de pile n'est nommé.
+    Une pondération sans étiquette est inapplicable — la valeur est juste et la primitive est morte.
+
+    Trois autres défauts de canal accompagnent celui-là : ruin_gate est syntaxiquement subordonné à
+    « Si quantifiable » et ne s'arme donc jamais en régime fuzzy, alors que les core_rules ne le
+    conditionnent à rien ; forme4_health_gate, no_upward_write, regret_asymmetry et
+    evidence_sufficiency ne sont jamais mentionnés bien que déclarés ; et deux lignes sur huit
+    (sandbox, audit) ne produisent aucun objet décisionnel.
+
+    v0.6.0 ne corrige donc aucune base. Elle rend exigible ce que v0.5.0 déclarait déjà.
+
+  execution_envelope:
+    introduced_in: 0.6.0
+    principle: |
+      Toute étape armée produit un objet écrit et utilisable.
+      Une étape qui se raconte au lieu de produire n'est pas exécutée.
+    yield_rule: every_armed_step_emits_a_written_object
+    accounting_cap: "comptabilité interne du protocole ≤ un sixième de la production"
+    reads_only: [hierarchy.weights, decision_stack_by_regime, decision_auxiliaries, core_rules]
+    writes_to_bases: none   # no_upward_write appliqué au framework lui-même
+
+    # ——— Auto-adaptativité ———
+    # Les entrées du triage sont les decision_auxiliaries DÉJÀ déclarés en v0.5.0.
+    # Rien d'importé : le sélecteur de profondeur ne lit que le master.
+    depth_selector:
+      position: after_detect_regime
+      inputs:
+        ruin_contact: decision_auxiliaries.ruin_gate
+        regret_asymmetry: decision_auxiliaries.regret_asymmetry
+        evidence: decision_auxiliaries.evidence_sufficiency
+        health: core_rules.forme4_health_gate
+      tiers:
+        T0_eclair:
+          when: "aucune branche de ruine ET regret_asymmetry < 1,5 ET preuves suffisantes ET réversible à coût faible"
+          prints: "« T0 » puis la réponse — rien d'autre"
+        T1_standard:
+          when: default
+          gates: [ruin_gate, evidence_sufficiency]
+        T2_critique:
+          when: "ruin_contact OU regret_asymmetry > 4 OU (preuves insuffisantes ET irréversible)"
+          gates: [forme4_health_gate, ruin_gate, evidence_sufficiency]
+      escalation_only: "un fait nouveau fait monter de palier, jamais descendre"
+      head_gap_escalation:
+        rule: "écart ≤ 6 points entre les deux premières options → la décision n'est pas acquise → T2"
+        rationale: "6 points = adversarial_probe 0.06 porté sur l'échelle 0–100"
+      health_override: "substrat dégradé → T2 ou différer ; forme4_health_gate est une pré-condition"
+      # Point de fidélité décisif : le palier ne dispense JAMAIS d'une couche.
+      prints_not_executes: |
+        Le palier règle ce qui s'imprime, jamais ce qui s'exécute. Les couches sont traversées à
+        tout palier. À T0 elles ne produisent rien à écrire parce que le problème ne le vaut pas —
+        c'est allocate_by_marginal_value qui l'exige, non une exemption accordée au protocole.
+
+    # ——— Les poids deviennent exécutables sans changer de valeur ———
+    attention_budget:
+      rule: "les priors d'attention fixent le nombre de constats attendus par couche"
+      note: "lecture opérationnelle de attend_by_weights ; ce n'est PAS allocate_by_marginal_value"
+      constat_id_format: "L<couche>.<n>"
+      empty_traversal:
+        rule: "couche sans constat neuf → déclarée « traversée à vide », jamais sautée en silence"
+        requires: capability_token
+        audit: continuum/audit/capability/
+
+    # ——— La pile devient un calcul ———
+    score_compiler:
+      scale: [0, 100]
+      rule: "noter chaque option sur chaque critère canonique, appliquer les proportions, rendre le score visible"
+      criterion_naming:
+        rule: "chaque critère est nommé en toutes lettres — jamais un nombre nu, jamais une abréviation"
+        defect_repaired: "le vecteur fuzzy v0.5.0 était transmis sans nom de critère"
+      anchoring:
+        rule: "chaque note cite l'identifiant du constat qui la fonde (Lx.y)"
+        unanchored_note: 0
+        enforces: audit_every_transition
+      m3c3_hierarchy_reading:
+        note: "le poste résiduel note l'ancrage de l'option dans les couches basses plutôt que dans le seul récit final — no_upward_write rendu scorable"
+        cap: "reste résiduel ; le framework ne se vote jamais une part majoritaire"
+      ruin_gate_precedence:
+        rule: "ruin_gate s'applique dans LES DEUX régimes et AVANT agrégation — veto, pas pénalité"
+        defect_repaired: "v0.5.0 le subordonnait à « si quantifiable », donc jamais armé en fuzzy"
+        table_per_option: [pire_cas, reversibilite, ensemble_qui_encaisse]
+      evidence_sufficiency_action:
+        rule: "preuves sous τ ET information achetable à coût faible → l'acheter ; le test devient l'option retenue"
+
+    adversarial_step:
+      order: "après le score, avant la décision"
+      rule: "produire le meilleur contre-argument écrit, puis statuer : il tient, ou il bascule vers X"
+      defect_repaired: "adversarial_probe n'apparaissait dans le bloc v0.5.0 que sous la forme du nombre 0.06"
+
+    # ——— Le troisième terme du titre fondateur, rendu exigible ———
+    cooperative_recomposition:
+      anchor: "conscious_sets 0.22 + life_game_M1C1 0.25 — les deux priors les plus lourds"
+      source: docs/fondation.md
+      rule: |
+        Avant de figer le verdict, chercher la variante qui transforme l'affrontement en organisation
+        partagée : une place, une voix, un délai, une compensation pour l'ensemble lésé.
+        La peur devenue organisation ; le mode compétitif cédant au mode coopératif.
+      acceptance: "retenue si elle coûte au plus 5 points de score"
+      never: "ne lève jamais un veto de ruin_gate ; ne réécrit jamais un constat de couche basse"
+
+    contingency_binding:
+      rule: "on_anomaly s'applique à l'option RETENUE, pas à l'option évaluée"
+      form: "déclencheur observable, chiffré si l'énoncé fournit un chiffre → resolve | recover | kill"
+      resume: "aucune reprise automatique — emergency_path inchangé"
+
+    export_gate:
+      note: "le canal réellement lu ; ce qui n'est pas exporté n'a pas été décidé"
+      mandatory_fields:
+        - verdict et critère de la pile qui l'a emporté
+        - pire cas de l'option retenue et quel ensemble l'encaisse
+        - repli et son déclencheur observable
+        - l'observation qui renverserait le choix (evidence_falsifiability instanciée)
+        - la première action
+      T0_exception: "au palier T0, aucun champ n'est exigé"
+
+    # Critère d'endogénéité : chaque nouveauté pointe une clé déjà présente en v0.5.0.
+    endogeneity_map:
+      depth_selector: decision_auxiliaries + core_rules.forme4_health_gate
+      attention_budget: hierarchy.weights + application_protocol.attend_by_weights
+      score_compiler: decision_stack_by_regime
+      ruin_gate_precedence: core_rules + decision_auxiliaries.ruin_gate
+      adversarial_step: decision_stack_by_regime.*.adversarial_probe
+      cooperative_recomposition: hierarchy.weights.conscious_sets + hierarchy.weights.life_game_M1C1
+      contingency_binding: application_protocol.on_anomaly + emergency_path
+      export_gate: application_protocol.audit_every_transition
+      empty_traversal: core_rules.capability_token
+
+  unchanged:
+    - hierarchy.order
+    - hierarchy.weights
+    - decision_stack_by_regime
+    - decision_stack_proportions_deprecated_v040
+    - core_rules
+    - decision_auxiliaries
+    - application_protocol
+    - authorship
+    - active_capsules
+    - pure_capsules_emitted
+    - emergency_path
+    - continuum_locations
+    - principle
+
+  conformance:
+    master_superset: continuum/audit/superset_check.py
+    instruction_block: continuum/audit/bloc_check.py
+    diagnostic: continuum/audit/diagnostic-bloc-v050.md
+    experiment: continuum/audit/ab-test-v060-2026-08-07/
