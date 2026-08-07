@@ -104,7 +104,14 @@ def main():
     # Ils ne sont pas interdits — les additions le sont — mais ils doivent être DÉCLARÉS,
     # dans `execution_envelope.declared_constants` du master.
     env = master["master_document"].get("execution_envelope") or {}
-    declares = {round(float(x), 4) for x in (env.get("declared_constants") or [])}
+    # Un seuil peut se dire en mots (« un sixième ») autant qu'en chiffres : la déclaration
+    # accepte les deux, sinon un quota littéral resterait clandestin par simple typographie.
+    declares, declares_mots = set(), set()
+    for x in (env.get("declared_constants") or []):
+        try:
+            declares.add(round(float(x), 4))
+        except (TypeError, ValueError):
+            declares_mots.add(str(x).strip().lower())
     # Un seuil se reconnaît à son contexte, pas à sa valeur : une comparaison, une marge
     # exprimée en points, un quota. Les numéros d'étape et les bornes d'échelle n'en sont pas.
     txt = bloc.replace(",", ".")
@@ -119,7 +126,8 @@ def main():
         for m in re.finditer(mot, txt, re.I):
             g = m.group(1)
             if g.isalpha():
-                mots.add(g.lower())
+                if g.lower() not in declares_mots:
+                    mots.add(g.lower())
                 continue
             v = round(float(g), 4)
             if v not in vals and v not in declares:
