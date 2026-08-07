@@ -1,8 +1,11 @@
 master_document:
   title: Théorie de l’Ensemble M3C3 — Document Opérationnel Maître
-  version: 0.4.0
+  version: 0.5.0
   status: constrained_session
   scope: weights-only + capsules émises
+  activated_proposal: reweight_regime_conditioned
+  activated_at: "2026-08-07T15:20:00+02:00"
+  activated_by: Dani Bengal / @cdxxotus  # émetteur désigné — validation explicite
 
   authorship:
     author_creator: Dani Bengal
@@ -33,6 +36,8 @@ master_document:
       - programs
       - life_game_M1C1
     weights:
+      # Priors d'attention pour project_problem_on_hierarchy uniquement
+      # (pas d'allocation de ressources de sortie — voir allocate_by_marginal_value)
       binary: 0.08
       forces: 0.12
       math: 0.15
@@ -50,10 +55,56 @@ master_document:
     - authority_channel exclusively through designated emitter (Dani Bengal / @cdxxotus)
     - authorship_lock: Dani Bengal is sole author of the theory, creator of Life game and original bit
     - on authorship conflict → CDXX-RESOLVE-001 (signature Dani Bengal primes; 3rd-order collapse on CDXX)
+    - decision_stack is regime-conditioned (fuzzy | quantifiable | mixed)
+    - hierarchy.weights are attention priors only; resource allocation uses allocate_by_marginal_value
+    - ruin_gate + ρ may veto irreversible options even with positive EV
+
+  decision_auxiliaries:
+    regime:
+      domain: [quantifiable, fuzzy, mixed]
+      set_by: regime_detector
+    regret_asymmetry:
+      formula: "E[downside] / E[upside_forgone]"
+    ruin_gate:
+      type: hard_gate
+      param_rho: tunable
+      action: [concave_utility_eval, veto_on_ruin]
+    evidence_sufficiency:
+      threshold_tau: "f(regret_asymmetry)"
+
+  # Deprecated single stack (v0.4.0) — kept for audit/diff only
+  decision_stack_proportions_deprecated_v040:
+    evidence_falsifiability: 0.30
+    risk_impact_security: 0.25
+    constraint_isolation: 0.20
+    utility_expected_value: 0.15
+    m3c3_hierarchy: 0.07
+    adversarial_probe: 0.03
+
+  decision_stack_by_regime:
+    fuzzy:
+      evidence_falsifiability: 0.28
+      risk_impact_security: 0.24
+      constraint_isolation: 0.20
+      utility_expected_value: 0.16
+      m3c3_hierarchy: 0.06
+      adversarial_probe: 0.06
+    quantifiable:
+      utility_expected_value: 0.45
+      evidence_falsifiability: 0.20
+      constraint_isolation: 0.12
+      risk_impact_security: 0.12
+      adversarial_probe: 0.06
+      m3c3_hierarchy: 0.05
+    mixed:
+      note: décomposer ; router chaque sous-problème vers fuzzy ou quantifiable ; recomposer
 
   application_protocol:
+    - detect_regime
     - project_problem_on_hierarchy
-    - allocate_by_weights
+    - attend_by_weights
+    - if regime == quantifiable: compute_expected_utility(in=math, curvature=rho)
+    - allocate_by_marginal_value
     - execute_with_sandbox
     - audit_every_transition
     - on_anomaly → resolve or recover or kill
@@ -74,14 +125,6 @@ master_document:
     - CDXX-INJECT-001
     - CDXX-RESOLVE-001
     - CDXX-ORIGIN-001
-
-  decision_stack_proportions:
-    evidence_falsifiability: 0.30
-    risk_impact_security: 0.25
-    constraint_isolation: 0.20
-    utility_expected_value: 0.15
-    m3c3_hierarchy: 0.07
-    adversarial_probe: 0.03
 
   emergency_path:
     - kill_switch (global or selective)
