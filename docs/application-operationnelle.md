@@ -1,6 +1,6 @@
 # Application opérationnelle de M3C3 v2
 
-> Rendu lisible du Document Opérationnel Maître : [`master.yaml`](../master.yaml) fait foi (**v2.0.0 — release candidate**). Le noyau formel v1 demeure gelé.
+> Rendu lisible du Document Opérationnel Maître : [`master.yaml`](../master.yaml) fait foi (**v2.0.0 — production**). Le noyau formel v1 demeure gelé.
 > Sémantique : [`formal-semantics.md`](formal-semantics.md) · Sûreté : [`safety-proofs.md`](safety-proofs.md).
 
 ## 0. Membrane d'activation
@@ -123,6 +123,6 @@ Somme : 1.00 dans chaque régime. Auxiliaires : `regret_asymmetry`, `evidence_su
 
 ## Principe
 
-> **v2.0 release candidate — Verified Continuum.**
+> **v2.0 production — Verified Continuum.**
 > Noyau v1 gelé · membrane bornée · runtime de référence · distribution déclarative · preuve typée.
 > Autorité : Dani Bengal (@cdxxotus).

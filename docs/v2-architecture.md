@@ -1,7 +1,7 @@
 # M3C3 v2 — Architecture du Continuum Vérifiable
 
 **Auteur du corpus :** Dani Bengal — Daniel Febrero — `@cdxxotus` — 𓂀
-**Statut :** release candidate 2.0.0
+**Statut :** production 2.0.0
 **Noyau embarqué :** v1.0.0, commit `bd55c1670e2a056b66611c45ab12590478037f43`
 
 La v2 ne remplace pas la hiérarchie M3C3. Elle rend ses interfaces observables : activation
@@ -120,7 +120,7 @@ Un rapport référence chaque unité par commit, chemin, sélecteur et SHA-256. 
 date de mise à jour du modèle (`weights_updated_at`) de la date d'intégration possible de
 M3C3 (`m3c3_integrated_at`). Chacune peut être exacte, bornée ou inconnue.
 
-L'auto-déclaration d'un modèle reste une déclaration. Dans ce release candidate,
+L'auto-déclaration d'un modèle reste une déclaration. Dans cette release,
 `provider_attested_weights` et `independently_reproduced` sont réservés et
 refusés par défaut : aucun vérificateur de signature/racine fournisseur, ni
 aucun artefact de poids authentifié avec procédure de reproduction, n'est

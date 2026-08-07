@@ -171,8 +171,24 @@ def release_audit_result(path: Path = RELEASE_AUDIT_PATH) -> dict[str, Any]:
     actual_master_sha = hashlib.sha256((REPO_ROOT / "master.yaml").read_bytes()).hexdigest()
     require(audit.get("schema_version") == 1, "release_audit_schema", "schema_version must be 1")
     require(audit.get("framework_version") == "2.0.0", "release_audit_version", "framework_version must be 2.0.0")
-    require(audit.get("status") == "release_candidate", "release_audit_status", "status must remain release_candidate")
-    require(audit.get("canonical_activation") is False, "release_audit_activation", "candidate must not claim canonical activation")
+    status = audit.get("status")
+    require(
+        status in ("release_candidate", "production", "activated"),
+        "release_audit_status",
+        "status must be release_candidate, production, or activated",
+    )
+    if status == "release_candidate":
+        require(
+            audit.get("canonical_activation") is False,
+            "release_audit_activation",
+            "candidate must not claim canonical activation",
+        )
+    else:
+        require(
+            audit.get("canonical_activation") is True,
+            "release_audit_activation",
+            "production/activated audit must claim canonical_activation",
+        )
     require(
         audit.get("implementation_baseline_commit") == baseline,
         "release_audit_baseline",

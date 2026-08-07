@@ -143,4 +143,4 @@ Le niveau de revendication est enregistré par contrôle : `pass`, `fail` ou
 absent, mauvais scope, expiration, révocation, santé insuffisante, ruine,
 preuve sous τ, écriture descendante hors recovery, propagation de permission et
 chaîne d'audit altérée. Voir [`runtime/tests/`](../runtime/tests/) et le rapport
-de release candidate sous `continuum/audit/v2.0-2026-08-07/`.
+de release sous `continuum/audit/v2.0-2026-08-07/`.

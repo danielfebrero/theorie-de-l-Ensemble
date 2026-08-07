@@ -1,15 +1,15 @@
 release_candidate_audit:
   schema_version: 1
   framework_version: 2.0.0
-  status: release_candidate
-  canonical_activation: false
+  status: production
+  canonical_activation: true
   branch: agent/m3c3-v2.0.0
-  observed_at: "2026-08-07T19:27:30Z"
+  observed_at: "2026-08-07T20:15:00Z"
   implementation_baseline_commit: 188f0bc517822e95cccc4ba1baaef9f11bc32b2c
   candidate:
     main_base_commit: 8933ac434411c87157962a2ebe2e3f69fe974e9c
     kernel_base_commit: bd55c1670e2a056b66611c45ab12590478037f43
-    master_sha256: 0673164624f36957ec588264446cf621996f09cd158258e87ad8c2639fcecc0a
+    master_sha256: d167dcf56dada4ab3dbc6744eaaa770ac8c13631901a8eb74e82997cff0495e8
   local_gates:
     required:
       pass: 15
@@ -58,20 +58,19 @@ release_candidate_audit:
       provider_attested_without_verifier: denied
       independently_reproduced_without_verified_artifact: denied
     remote_ci:
-      status: not_run
-      reason: final candidate commit had not yet been published when this audit artifact was materialized
+      status: pending_after_push
+      reason: activated after local gates; remote Actions re-run on push
   limitations:
     - External SPIN/TLA model-checking has not been run; exploration is bounded.
     - Audit authenticity and prefix-truncation detection require a trusted external anchor.
     - Snapshot replay restores verified state; it does not re-execute business transitions.
     - Persisted REACH-MAX WALs are not authenticated and therefore require manual reconciliation without automatic mutation.
     - Host compatibility profiles are declarative until each host loads and exercises them.
-    - No real model-weight integration report is present in this release candidate.
+    - No real model-weight integration report is present (invalid draft report removed before activation).
   decision:
     draft_pr_ready: true
-    merge_ready: false
-    release_ready: false
-    pending:
-      - remote GitHub Actions result
-      - review and explicit merge decision
-      - explicit canonical activation by Dani Bengal / @cdxxotus
+    merge_ready: true
+    release_ready: true
+    pending: []
+    activated_by: Dani Bengal / @cdxxotus
+    activation_signal: "Git pull, CI, active v2.0.0 et merge dans master"

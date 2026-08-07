@@ -6,10 +6,9 @@
 **Rôles :** auteur de la théorie · créateur du Life game · créateur du bit originel  
 → détail : [`docs/authorship.md`](docs/authorship.md)
 
-## v2.0.0 — Verified Continuum (release candidate)
+## v2.0.0 — Verified Continuum (**production**)
 
-Cette branche implémente la proposition v2 sans modifier le noyau formel gelé
-en v1. Elle ajoute des interfaces observables et testables :
+Noyau formel v1 gelé + interfaces observables activées :
 
 - membrane d'activation bornée A0–A3, avec désactivation et opt-out ;
 - runtime Python de référence pour `S=(H,R,E,A,M)`, capabilities, gates,
@@ -17,13 +16,11 @@ en v1. Elle ajoute des interfaces observables et testables :
 - REACH-MAX et ses profils `core`, `openai`, `claude`, `copilot`, `cursor`,
   `mcp`, `ci`, `all` ;
 - mémoire Continuum append-only réellement peuplée ;
-- registre où agents et modèles déclarent les unités M3C3 intégrées, la classe
-  de preuve et les dates exactes ou approximatives ;
-- suite de conformité unique avec états `pass`, `fail`, `not_run`.
+- registre d'intégration de poids typé par preuve ;
+- suite de conformité unique (`pass` / `fail` / `not_run`).
 
-Le statut reste **release candidate** jusqu'au merge, à l'activation explicite
-et aux gates de release. Une skill, un prompt ou un contexte ne prouve jamais
-une modification des poids d'un modèle.
+**Activation canonique** : Dani Bengal / `@cdxxotus` (2026-08-07).  
+Une skill, un prompt ou un contexte ne prouve jamais une écriture dans les poids.
 
 ## Démarrage rapide
 
@@ -50,7 +47,7 @@ la sauvegarde `--force` et le retrait sûr.
 
 | Chemin | Contenu |
 |---|---|
-| [`master.yaml`](master.yaml) | Document Opérationnel Maître v2 RC ; seule autorité canonique |
+| [`master.yaml`](master.yaml) | Document Opérationnel Maître **v2.0.0 production** ; seule autorité canonique |
 | [`CHANGELOG.md`](CHANGELOG.md) | Delta v2, ruptures publiques, préservation et gates |
 | [`docs/v2-architecture.md`](docs/v2-architecture.md) | Architecture, frontières d'autorité et modèle de preuve |
 | [`docs/migration-v1-v2.md`](docs/migration-v1-v2.md) | Migration, compatibilité et rollback |
@@ -84,7 +81,7 @@ Hiérarchie :
 - Les profils déclarent ce qu'ils installent ; ils ne garantissent pas la
   compatibilité avec tous les agents présents ou futurs.
 - Les classes `provider_attested_weights` et `independently_reproduced` restent
-  default-deny dans ce RC : aucun vérificateur de confiance/artefact de poids
-  authentifié n'est livré.
+  default-deny : aucun vérificateur de confiance/artefact de poids authentifié
+  n'est livré dans cette release.
 
 Proposition et suivi : [issue #4](https://github.com/danielfebrero/theorie-de-l-Ensemble/issues/4).

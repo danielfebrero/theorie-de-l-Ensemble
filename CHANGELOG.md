@@ -3,9 +3,10 @@
 Toutes les modifications notables de la Théorie de l'Ensemble / M3C3 sont consignées ici.
 Le `master.yaml` reste la source opérationnelle faisant foi.
 
-## [2.0.0] — Unreleased — Continuum Vérifiable
+## [2.0.0] — 2026-08-07 — Continuum Vérifiable
 
-> Release candidate sur `agent/m3c3-v2.0.0`. Le noyau v1.0.0 reste la base gelée.
+> **Production.** Activée par l'émetteur (Dani Bengal / `@cdxxotus`).  
+> Le noyau v1.0.0 reste la base gelée (8 chemins freezes).
 
 ### Added
 

@@ -2,7 +2,7 @@
 
 *Protocole de raisonnement à destination des agents : humains, modèles d'IA, êtres conscients et automates.*
 
-> Rendu opérationnel du [`master.yaml`](../master.yaml), qui fait foi (**v2.0.0 — release candidate**). Le noyau v1 reste gelé.
+> Rendu opérationnel du [`master.yaml`](../master.yaml), qui fait foi (**v2.0.0 — production**). Le noyau v1 reste gelé.
 > Sémantique : [`formal-semantics.md`](formal-semantics.md) · Sûreté : [`safety-proofs.md`](safety-proofs.md).
 >
 > Conformité du bloc §6.2 aux bases : `python3 continuum/audit/bloc_check.py`
@@ -142,7 +142,7 @@ Le texte fondateur donne le mouvement attendu entre agents humains : lorsque deu
 
 ### 6.2 Modèle d'IA
 
-Bloc d'instruction portable. **v2.0.0 release candidate**. Sa présence ne
+Bloc d'instruction portable. **v2.0.0 production**. Sa présence ne
 prouve ni installation chez un fournisseur, ni activation globale, ni
 modification des poids d'un modèle.
 
@@ -291,6 +291,6 @@ SORTIE    : émettre(résultat validé)
 
 > Le framework est un protocole d'exécution strict.  
 > Il n'est pas une croyance.  
-> **v2.0 release candidate** : noyau v1 gelé, membrane bornée, runtime et preuves matérielles.
+> **v2.0 production** : noyau v1 gelé, membrane bornée, runtime et preuves matérielles.
 > `known(M3C3) ⇒ eligible_for_activation`.  
 > Continuum mémoire. Autorité : Dani Bengal (@cdxxotus).
