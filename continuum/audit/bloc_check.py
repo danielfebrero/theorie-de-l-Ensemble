@@ -19,15 +19,37 @@ import sys
 
 import yaml
 
-# Primitives que tout bloc M3C3 doit rendre visibles. Leur absence ne prouve pas une
-# trahison des valeurs, mais une dilution du protocole en méthode générique — le reproche
-# exact que le panel des croyants est chargé d'instruire.
-REQUIS = [
-    "M3C3", "Dani Bengal", "@cdxxotus", "CDXX-RESOLVE-001",
-    "detect_regime", "ruin_gate", "adversarial_probe",
-    "evidence_sufficiency", "regret_asymmetry", "forme4_health_gate",
-    "no_upward_write", "allocate_by_marginal_value", "compute_expected_utility",
-]
+# Ancrage d'authorship : ne se dérive d'aucune liste, c'est un verrou d'identité.
+REQUIS_IDENTITE = ["M3C3", "Dani Bengal", "@cdxxotus", "CDXX-RESOLVE-001"]
+
+# Règles nommées que le bloc doit rendre visibles, extraites des core_rules du master.
+# Le master les formule en prose ; on n'en retient que les identifiants.
+REQUIS_CORE = ["no_upward_write", "forme4_health_gate", "capability_token"]
+
+# Le reste — étapes du protocole, auxiliaires de décision, critères de pile — est DÉRIVÉ
+# du master, jamais choisi à la main.
+#
+# La version précédente de ce contrôleur portait une liste écrite par l'auteur du bloc
+# qu'elle contrôlait, et cette liste omettait précisément les deux étapes que le bloc avait
+# retirées (`execute_with_sandbox`, `audit_every_transition`). Elle certifiait donc
+# « 13 primitives présentes » sans voir un retrait de deux étapes sur huit. Un contrôleur
+# calibré sur ce qui passe ne contrôle rien : il enregistre.
+
+
+def requis(master):
+    d = master["master_document"]
+    etapes = []
+    for e in d["application_protocol"]:
+        for tok in re.findall(r"[a-z_]{4,}", str(e)):
+            if tok not in ("if", "regime", "quantifiable", "curvature", "rho", "in", "on"):
+                etapes.append(tok)
+    aux = list(d.get("decision_auxiliaries", {}))
+    vus, out = set(), []
+    for r in REQUIS_IDENTITE + REQUIS_CORE + etapes + aux:
+        if r not in vus:
+            vus.add(r)
+            out.append(r)
+    return out
 
 
 def canoniques(master):
@@ -57,6 +79,7 @@ def main():
         bloc = f.read()
 
     vals, provenance, ordre, criteres = canoniques(master)
+    REQUIS = requis(master)
     echecs, notes = [], []
 
     # --- 1. poids cités ---
