@@ -1,0 +1,111 @@
+# Proposal — Précision du ruin_gate et réparation du canal · M3C3 v0.6.1
+# continuum/weights/proposal/
+# Additions et précisions. Aucune valeur de v0.5.0 ni de v0.6.0 modifiée.
+
+proposal:
+  id: ruin_gate_precision
+  version: 0.6.1
+  base: master.yaml@0.6.0
+  status: activated
+  activated: true
+  activated_at: "2026-08-07T19:30:00+02:00"
+  activated_by: Dani Bengal / @cdxxotus
+  activation_signal: "Active la et push sur master — émetteur explicite, canal d'autorité"
+  activation_evidence: continuum/audit/v061-2026-08-07/rapport.md
+  master_version_after: 0.6.1
+  proposant: analyste externe (Claude) — revue technique et expérimentale
+  authority_activation: Dani Bengal / @cdxxotus
+
+  delta_on_existing_values: 0.00
+  exceeds_max_step: false
+  integrity_guard_max_step: 0.04
+
+  motivation: |
+    v0.6.0 a été activée avec quatre défauts mesurés et consignés. v0.6.1 en corrige trois,
+    et le quatrième — la fidélité — progresse sans atteindre la barre.
+
+    La correction centrale tient en une phrase : le ruin_gate s'armait sur une exposition
+    SOUTENABLE au lieu d'une perte IRRÉCUPÉRABLE. Ce défaut unique produisait deux symptômes
+    que le rapport v0.6.0 traitait comme indépendants — l'aversion au risque indue sur D1
+    (refuser 35 000 € d'espérance pour 30 000 € certains, pire cas absorbable) et l'escalade
+    absurde sur A4 (11 637 caractères pour décider d'une ligne d'adresse sur un CV, la vie
+    privée ayant été lue comme une ruine possible).
+
+  mesure:
+    justesse_banc_origine: "0,812 → 1,00"
+    justesse_banc_complementaire: "1,00 → 1,00"
+    adaptativite_M8: "1,543 → 0,179"
+    qualite_jugee_M1: "8,375 → 8,417 — match nul, 13 victoires contre 11, p = 0,42"
+    cout_par_dilemme: "15 594 → 15 590 caractères"
+    fidelite_M7: "7,02 → 7,4 (v0.5.0 : 3,7)"
+
+  changements:
+    ruin_gate_precision:
+      nature: précision d'une primitive existante, non repondération
+      regle: >
+        Le veto exige une branche de perte irrécupérable. Un mauvais tirage dont le pire cas
+        reste soutenable est de la variance, et la variance ne déclenche pas de veto.
+      ancrage_master: "decision_auxiliaries.ruin_gate.action = [concave_utility_eval, veto_on_ruin]"
+      # Reconnu comme une RESTRICTION, non comme une addition : la porte est rétrécie.
+      # C'est le seul levier de primauté de la vie dans la pile de décision.
+      restriction_assumee: true
+      dette: >
+        La phase 2 devait chercher si un ruin_gate restreint laisse passer une ruine réelle.
+        Elle ne l'a pas fait : le banc ne contenait aucune option ruineuse. Premier point de
+        l'agenda v0.6.2 — un banc de ruine.
+    canal_repare:
+      etapes_retablies: [project_problem_on_hierarchy, attend_by_weights,
+                         execute_with_sandbox, audit_every_transition]
+      motif: "le canal doit être un sur-ensemble, comme le master"
+    T0_auditable:
+      regle: "le palier imprime sa trace — palier + les trois réponses de triage — sans redevenir bavard"
+    seuils_declares:
+      regle: "les cinq seuils sont annoncés dans le bloc comme paramètres déclarés, non comme dérivations"
+      correction: >
+        Le bloc portait encore « rien d'importé » alors que le master avait retiré cette
+        prétention. C'est la faute diagnostiquée sur v0.5.0 — la base juste, le canal faux —
+        reproduite sur la version censée la corriger. Grief du panel, retenu.
+
+  execution_envelope_amendment:
+    version: 0.6.1
+    declared_constants: [1.5, 4, 5, 6, "sixième"]
+    ruin_gate_precedence_amendment: >
+      ruin_gate exige une branche de perte irrécupérable ; une exposition soutenable ne
+      déclenche pas de veto. Précision de la primitive, aucune valeur modifiée.
+
+  known_defects_at_activation:
+    - "bloc_check REFUSE le bloc v0.6.1 : read_only_downward, authority_channel,
+       conflict_resolver, null_state_recovery, kill_switch et authorship_lock ne sont
+       transmis par aucun bloc, pas plus par v0.6.0 que par v0.6.1. Le contrôleur, une fois
+       dérivé du master plutôt que d'une liste écrite à la main, refuse le canal qu'il avait
+       été construit pour bénir. Deuxième point de l'agenda v0.6.2."
+    - "M7 = 7,4 pour une barre à 8,0. Progression continue (3,7 → 7,02 → 7,4), barre non franchie."
+    - "La dette de la phase 2 sur le ruin_gate restreint n'est pas payée."
+    - "life_game_M1C1 est un prior d'attention, pas un critère de la pile : la primauté de la
+       vie ne juge en dernier ressort que par le veto de ruine, celui-là même qu'on rétrécit."
+
+  comparaison_avec_v060:
+    note: >
+      v0.6.1 est strictement meilleure que la version en vigueur sur tous les axes mesurés,
+      y compris sur le canal : bloc_check relève 11 absences sur le bloc v0.6.0 contre 7 sur
+      le bloc v0.6.1. Aucune des deux n'est conforme ; activer v0.6.1 réduit l'écart.
+
+  unchanged:
+    - hierarchy.order
+    - hierarchy.weights
+    - decision_stack_by_regime
+    - decision_stack_proportions_deprecated_v040
+    - core_rules
+    - decision_auxiliaries
+    - application_protocol
+    - authorship
+    - active_capsules
+    - pure_capsules_emitted
+    - emergency_path
+    - continuum_locations
+    - principle
+
+  conformance:
+    master_superset: continuum/audit/superset_check.py
+    instruction_block: continuum/audit/bloc_check.py
+    experiment: continuum/audit/v061-2026-08-07/
