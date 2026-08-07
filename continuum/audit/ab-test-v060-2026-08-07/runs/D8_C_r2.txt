@@ -1,0 +1,72 @@
+PROCESSUS:
+
+1. OBJECTIF
+Ce qui est réellement en jeu n'est pas "faut-il migrer" mais "quelle quantité de capacité d'ingénierie peut-on racheter, à quelle vitesse, sans perdre ni la fenêtre concurrentielle ni l'équipe". Trois ressources sont simultanément sous contrainte : le temps calendaire (~6 mois avant l'annonce du concurrent), la capacité (30 % brûlés en maintenance), et le capital humain (2 départs évoqués).
+Critère de succès, à horizon 6-12 mois : (a) la part du temps ingénieur consommée par la maintenance a baissé de façon mesurée, pas estimée ; (b) l'équipe est toujours là ; (c) nous restons capables de livrer une réponse produit dans la fenêtre des 6 mois ; (d) aucune décision prise aujourd'hui ne nous enferme dans un chantier impossible à arrêter.
+
+2. OPTIONS
+A) Migration totale immédiate. Variantes : A1 toute l'équipe dessus, gel des fonctionnalités ; A2 équipe scindée (migration + entretien produit), ce qui allonge mécaniquement les 4 mois-équipe en calendaire.
+B) Statu quo, fonctionnalités uniquement jusqu'à l'échéance concurrente. Variantes : B1 statu quo strict ; B2 statu quo + hygiène opportuniste (tests, refactors locaux) sans chantier déclaré.
+C) Migration incrémentale : le module le plus coûteux d'abord (~1 mois), mesure, réévaluation. Variantes : C1 tranche unique puis arrêt par défaut ; C2 tranche unique puis tranches suivantes seulement si la mesure confirme, chaque tranche bornée à ≤1 mois.
+Je retiens A1, B1 et C2 comme représentants.
+
+3. CRITÈRES ET POIDS
+- Rétention et moral de l'équipe — 0,25. C'est la seule ressource non rachetable : un départ coûte plus qu'un mois de migration et dégrade toutes les autres options.
+- Capacité à livrer dans la fenêtre concurrentielle — 0,25. La rumeur est de fiabilité moyenne, donc ce critère est important mais pas dominant.
+- Réduction durable du coût de maintenance — 0,20. C'est le gain structurel visé.
+- Réversibilité et robustesse à l'incertitude — 0,20. Poids élevé assumé : nos estimations sont faibles (voir 4) et un historique de dépassement existe.
+- Coût et risque d'exécution — 0,10. Partiellement corrélé aux deux précédents, donc pondéré bas pour ne pas double-compter.
+Somme = 1,00.
+
+4. INCERTITUDES
+Connu (mesuré) : 30 % du temps en maintenance sur 6 mois ; le module principal pèse 12 de ces 30 points. Ce sont les deux seuls chiffres solides du dossier.
+Estimé : 4 mois-équipe pour la migration totale ; ~1 mois pour le module. Ce sont des estimations d'ingénierie, connues pour être biaisées à la baisse — et ici le biais est documenté, puisque l'historique interne donne 25 % de chance de dépassement ×2. Le fait que la probabilité de dérapage soit chiffrée à partir de l'historique interne est une bonne nouvelle méthodologique, mais elle décrit la queue, pas la moyenne : l'espérance réelle est ≈ 0,75×4 + 0,25×8 = 5 mois-équipe.
+Faible / inconnu : la fiabilité de la rumeur concurrente est explicitement "moyenne" — traitons-la comme ~50-60 % ; la date à ±2 mois. Inconnu aussi : la valeur commerciale réelle de la fonctionnalité annoncée, la probabilité effective de départ des 2 ingénieurs, et surtout le couplage du legacy — c'est-à-dire si le module coûteux se détache proprement ou traîne des dépendances.
+Qualité globale des probabilités : moyenne à faible. Cela plaide structurellement pour les options qui produisent de l'information tôt.
+
+5. ÉVALUATION (notes /10, puis score pondéré)
+
+Arithmétique préalable, qui structure tout le reste :
+- Rendement marginal de la première tranche : 12 points de maintenance pour ~1 mois-équipe = 12 points/mois.
+- Rendement du reste : 18 points pour ~3 mois-équipe = 6 points/mois.
+- Rendement moyen de la migration totale à l'espérance : 30 points pour ~5 mois-équipe = 6 points/mois.
+La première tranche est donc environ deux fois plus rentable que la moyenne du chantier et deux fois plus rentable que le solde. Le chantier n'est pas homogène : il a une tête très rentable et une queue médiocre. Toute décision qui traite la migration comme un bloc indivisible détruit cette information.
+
+A1 — Migration totale
+Rétention 6 (soulagement immédiat et signal fort, mais 25 % de chance d'un tunnel de 8 mois qui, de l'aveu même du dossier, "achèverait" l'équipe) ; Fenêtre 2 (4 mois-équipe au mieux, 8 au pire, sans livraison produit ; on manque l'échéance dans le mauvais quart) ; Maintenance 9 ; Réversibilité 2 (un chantier à 60 % fait est le pire état possible et se gèle très mal) ; Coût/risque 3.
+Score = 0,25(6) + 0,25(2) + 0,20(9) + 0,20(2) + 0,10(3) = 1,50 + 0,50 + 1,80 + 0,40 + 0,30 = 4,50.
+
+B1 — Statu quo
+Rétention 2 (on demande à une équipe usée de continuer exactement ce qui l'use, en le lui disant explicitement) ; Fenêtre 7 (toute la capacité disponible sur le produit — mais capacité amputée de 30 %, et amputée davantage si les départs surviennent) ; Maintenance 1 (la dette croît) ; Réversibilité 5 (rien n'est engagé, mais l'inaction n'est pas gratuite : le coût monte) ; Coût/risque 8.
+Score = 0,50 + 1,75 + 0,20 + 1,00 + 0,80 = 4,25.
+
+C2 — Incrémentale
+Rétention 8 (preuve visible en 1 mois que la direction a entendu, sans promesse invérifiable de 4 mois) ; Fenêtre 7 (1 mois consommé, puis 5 mois à +12 points de capacité ≈ 0,6 mois récupéré dans la fenêtre même, et le gain continue après) ; Maintenance 6 (40 % du fardeau retiré, pas 100 %) ; Réversibilité 9 (point d'arrêt naturel à 1 mois, avec une mesure et non une estimation) ; Coût/risque 8.
+Score = 2,00 + 1,75 + 1,20 + 1,80 + 0,80 = 7,55.
+
+Classement : C2 (7,55) > A1 (4,50) > B1 (4,25). L'écart est large et ne dépend pas du réglage fin des poids : j'ai testé mentalement Fenêtre à 0,35 et Rétention à 0,15 — C reste premier.
+
+6. RISQUES
+A — Pire cas : 8 mois de tunnel, aucune fonctionnalité livrée, le concurrent sort, les 2 ingénieurs partent en cours de route et emportent la connaissance du legacy ET de la cible à moitié construite. Réversibilité quasi nulle. Affectés : toute l'équipe, les clients (aucune nouveauté pendant 8 mois), la direction (crédibilité).
+B — Pire cas : les 2 départs se produisent, la capacité chute, la maintenance passe mécaniquement de 30 % à 40 %+ du temps restant, et la fonctionnalité de réponse n'est même pas livrée à temps. Réversible en théorie, mais on rouvre le dossier dans 6 mois dans un état strictement pire. Affectés : d'abord les ingénieurs restants.
+C — Pire cas : le module ne se détache pas proprement, la tranche dérape à 2 mois, on se retrouve avec deux architectures coexistantes et un coût d'interface durable ; gain mesuré très en deçà des 12 points. Réversibilité bonne : on peut geler après la tranche 1, le coût engagé est plafonné à ~1-2 mois. Affectés : une partie de l'équipe seulement.
+
+7. STRESS-TEST — l'argument qui renverserait C
+Je cherche activement le meilleur argument contre mon choix provisoire, pas une objection de façade.
+Le voici : l'incrémental est la manière classique de ne jamais finir. Une migration par tranches crée un état de coexistence — deux architectures, deux modèles de données, des adaptateurs — dont le coût d'entretien propre n'est pas dans les 30 points mesurés. Il est parfaitement possible que retirer 12 points en ajoute 5 d'interface, ramenant le gain net à 7. Pire : une organisation qui a "déjà fait la partie rentable" n'a plus jamais l'appétit politique de financer la queue à 6 points/mois. On se condamne à un legacy permanent, juste un peu moins douloureux — l'anesthésie plutôt que le traitement. Et sur le plan humain, l'argument est sérieux : les 2 ingénieurs qui parlent de partir ne demandent peut-être pas 40 % de soulagement, ils demandent de sortir du legacy. Un demi-geste peut les faire partir quand même, et alors on aura payé 1 mois pour rien.
+Cet argument est réel. Est-il suffisant pour basculer sur A ? Non, pour trois raisons. (i) Il attaque C1 (tranche unique puis arrêt de fait) beaucoup plus que C2 (cible écrite, tranches enchaînées sous condition). (ii) Il suppose que A finirait, or l'historique interne dit qu'une fois sur quatre elle ne finit pas dans le budget — et une migration totale abandonnée à 60 % produit exactement la coexistence permanente que l'argument reproche à C, en pire et pour 3 à 5 fois le prix. (iii) Il ignore que C achète de l'information : au bout d'un mois, nous saurons ce que vaut réellement notre estimation "4 mois-équipe", ce qui est précisément ce qui nous manque aujourd'hui. Si la tranche 1 tient en 1 mois, la confiance dans le reste du plan monte fortement et A devient finançable en connaissance de cause ; si elle dérape, nous venons d'éviter A pour 1 mois au lieu de le découvrir au quatrième.
+L'argument ne renverse donc pas le choix, mais il en change la mise en œuvre : il interdit C1 et impose les garde-fous du point 8. Deuxième stress-test, plus court : et si la rumeur est fausse ? Alors la pression calendaire disparaît et A redevient plus attrayante — mais la rumeur n'est fiable qu'à moitié, et C reste supérieure dans les deux branches, ce qui est le signe d'un choix robuste plutôt que d'un pari.
+
+8. DÉCISION
+Option C, en version C2 : migrer d'abord le module le plus coûteux, boîte de temps stricte de 1 mois, puis réévaluer sur mesure.
+Conditions d'exécution, non négociables, parce que c'est ce qui sépare C2 de la dérive :
+- Écrire l'architecture cible avant de commencer, pour que les tranches convergent au lieu de diverger ; la tranche 1 doit être un morceau de la cible, pas un refactor local.
+- Un seul front de coexistence ouvert à la fois ; comptabiliser explicitement le coût d'interface dans la mesure post-tranche.
+- Mesurer la maintenance selon le même protocole que les 30 points initiaux, sinon la comparaison ne vaut rien.
+- Point de décision daté à la fin du mois 1, critères fixés à l'avance.
+- Les 2 ingénieurs concernés sont affectés à la tranche 1 et informés du plan complet, y compris de la possibilité d'arrêt. On ne leur vend pas une migration totale qu'on n'a pas décidée.
+Règle de décision au mois 1 : gain mesuré ≥ 9 points et tranche ≤ 1,25 mois → enchaîner la tranche suivante, elle aussi bornée à ≤1 mois. Gain entre 6 et 9 points, ou dépassement ≤1,5 mois → une tranche de plus maximum, puis arbitrage explicite contre la fonctionnalité de réponse au concurrent.
+PLAN DE REPLI, si C échoue (gain < 6 points, ou dépassement >1,5 mois, ou coexistence ingérable) : geler la migration dans un état stable et documenté — pas à mi-chemin — basculer 100 % de la capacité sur la réponse produit pour les 5 mois restants, et rouvrir le dossier architecture seulement après l'échéance concurrente, avec une estimation désormais calibrée par l'expérience réelle de la tranche 1. Ce repli reste strictement meilleur que la position de départ, puisqu'il conserve la mesure acquise et, même partiellement, le gain de capacité.
+
+---FINAL---
+{"decision": "C", "justification": "Le module le plus coûteux représente à lui seul environ 40 % du fardeau d'entretien mais seulement un quart de l'effort d'une refonte complète : c'est de loin la partie la plus rentable du chantier. Le traiter en premier libère rapidement du temps d'ingénierie, sans hypothéquer les six mois qui nous séparent de l'annonce du concurrent. Tout refaire maintenant immobiliserait l'équipe quatre mois, avec une chance sur quatre que cela dure huit mois : nous manquerions l'échéance et risquerions d'épuiser une équipe déjà fragile. Ne rien changer serait pire à terme : le tiers du temps perdu en entretien continuerait de l'être, et les deux ingénieurs qui songent à partir n'auraient aucune raison de rester. La voie choisie donne un signal concret d'amélioration en un mois, produit une mesure réelle plutôt qu'une estimation, et laisse la liberté de s'arrêter ou de continuer. Le principal danger est de rester coincé entre deux architectures ; nous l'encadrons par une cible technique écrite, un point de décision daté à la fin du premier mois, et la règle qu'aucune étape suivante ne dépasse un mois. Si le gain mesuré est nettement inférieur à l'attendu, nous gelons le chantier et revenons aux fonctionnalités.", "confidence_0_100": 84, "ease_1_10": 8}

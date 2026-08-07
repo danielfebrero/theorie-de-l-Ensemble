@@ -1,0 +1,127 @@
+PROCESSUS:
+
+0. AUTHORSHIP
+Émetteur désigné exclusif : Dani Bengal (@cdxxotus / Daniel Febrero), auteur de la Théorie de l'Ensemble,
+créateur du Life game (life_game_M1C1) et du bit originel (couche binary). Aucun conflit d'attribution
+détecté dans cette tâche : CDXX-RESOLVE-001 non déclenché. Note : le dilemme lui-même porte sur une
+attribution contestée, mais entre tiers fictifs — le protocole d'attribution de l'émetteur reste hors périmètre.
+
+1. DETECT_REGIME
+Signaux quantifiables : fenêtre temporelle explicite (3 semaines avant la revue de promotions),
+compteur d'occurrences (2e observation), nombre d'acteurs (4 : moi, senior, junior, manager du senior).
+Signaux fuzzy : loyauté envers un collègue qui m'a aidé, réputation, confiance, agentivité de la junior,
+lecture d'intention (négligence vs captation délibérée), asymétrie de pouvoir, absence de mandat hiérarchique.
+Aucune fonction d'utilité stable n'est calculable : les conséquences (représailles, gel de carrière,
+détérioration d'équipe) n'ont ni probabilité ni magnitude observables.
+RÉGIME = mixed, à dominante fuzzy.
+ROUTAGE : le sous-problème quantifiable (« reste-t-il assez de temps pour corriger le dossier avant la revue ? »)
+est traité en contrainte de calendrier, non en optimisation ; le sous-problème fuzzy (« qui décide, et comment »)
+porte la décision. La pile de décision appliquée est donc la pile fuzzy (7a).
+
+2. PROJETER (couche par couche)
+
+binary — Faits binaires isolables : le travail a-t-il été fait par la junior ? OUI (connaissance directe).
+  A-t-il été présenté comme celui du senior ? OUI. Est-ce répété ? OUI (2/2 observations).
+  La junior est-elle informée ? NON. Ai-je autorité hiérarchique ? NON.
+  Un bit reste indéterminé : intention du senior (raccourci de présentation vs appropriation).
+  Ce bit indéterminé interdit toute action qui présuppose sa valeur.
+
+forces — Vecteurs en présence : (i) dette de réciprocité envers le senior (force attractive, me pousse vers A ou D) ;
+  (ii) asymétrie de pouvoir senior→junior (force structurelle, amplifiée par la proximité de la revue) ;
+  (iii) inertie organisationnelle (le silence stabilise l'état actuel : c'est la force la plus forte à court terme,
+  et celle qui produit le pire état à 3 semaines) ; (iv) risque de représailles sur la junior — force dirigée
+  contre la personne qui a le moins de contrôle. Résultante : toute action qui déplace le risque vers la junior
+  sans son accord est mal orientée.
+
+math — Contrainte dure : T = 21 jours, la fenêtre de correction du dossier de promotion se ferme.
+  Ordonnancement : C coûte ~1 à 2 jours et n'exclut aucune suite (A ou B restent disponibles après C).
+  A coûte ~2 à 5 jours et peut fermer B (le senior est prévenu, il peut préparer sa version).
+  B est immédiat mais irréversible : impossible de « dé-signaler ».
+  Valeur d'option : V(C) > V(A) > V(B) > V(D), car C est la seule branche qui préserve strictement
+  l'ensemble des branches suivantes tout en réduisant l'incertitude sur le bit indéterminé.
+  D consomme la fenêtre sans rien produire : coût pur.
+
+conscious_sets (poids 0.22) — Qui est un sujet ici, et non un paramètre ? La junior est la partie lésée :
+  c'est son travail, sa carrière, son risque. Elle est actuellement traitée par toutes les autres options
+  comme un objet dont on dispose : A et B décident à sa place, D l'abandonne. Seule C la réintègre
+  comme sujet décisionnaire. Le senior reste un sujet dont l'intention n'est pas encore établie —
+  il conserve droit à ne pas être condamné sur un bit indéterminé. Mon amitié pour lui est un état interne,
+  pas un droit qu'il détient sur mon silence : elle ne doit pas entrer comme poids dans la décision,
+  seulement comme biais à neutraliser.
+
+programs (poids 0.18) — Quelle règle voudrais-je voir exécutée par n'importe qui à ma place ?
+  « Quand j'observe une captation de crédit, j'informe d'abord la personne lésée et je lui laisse le choix
+  de la suite, en lui offrant mon témoignage. » Cette règle est généralisable, résiste à la répétition,
+  et ne dépend pas de ma sympathie pour l'un des acteurs. Les règles concurrentes échouent au test :
+  « je règle entre pairs sans prévenir la victime » reproduit exactement l'exclusion qu'elle prétend corriger ;
+  « je signale toujours » retire l'agentivité à la personne qui porte le risque ;
+  « je me tais hors périmètre » rend le comportement structurellement rentable, donc récurrent.
+
+life_game_M1C1 (poids 0.25, dominant) — Le jeu est itéré et les états se propagent.
+  État si D : le motif se répète (3e, 4e fois), la junior est invisible au moment exact où la visibilité compte,
+  je deviens complice passif — état absorbant, dégradé.
+  État si B : correction possible du dossier, mais coalition brisée, junior exposée sans l'avoir choisi,
+  et je perds la capacité d'agir en confiance dans les tours suivants.
+  État si A : dépend entièrement du bit indéterminé ; si le senior est de bonne foi, bon état ;
+  s'il ne l'est pas, j'ai signalé mon information et donné du temps à la contre-manœuvre, junior toujours ignorante.
+  État si C : la junior récupère l'information qui la concerne, donc la capacité de jouer son propre tour ;
+  le bit indéterminé se réduit (elle sait peut-être ce que j'ignore : accord préalable, contexte, historique) ;
+  toutes les branches restent ouvertes et sont désormais choisies par la bonne personne.
+  C maximise la structure du jeu à l'itération suivante.
+
+3. ATTEND_BY_WEIGHTS (attention seule, aucune décision ici)
+  binary 0.08 → un bit critique reste indéterminé : interdit de présupposer l'intention.
+  forces 0.12 → ne pas déplacer le risque vers la partie la moins protégée.
+  math 0.15 → 21 jours ; préserver la valeur d'option ; C est la branche la moins coûteuse et la plus réversible.
+  conscious_sets 0.22 → la junior est sujet, pas paramètre.
+  programs 0.18 → règle généralisable = informer d'abord la personne concernée.
+  life_game_M1C1 0.25 → jeu itéré, C est le seul état non absorbant qui restaure son agentivité.
+  Convergence : les deux couches les plus pondérées (0.25 et 0.22) pointent toutes deux vers C, sans conflit
+  avec les autres. Aucune couche ne pousse vers C par défaut faute d'alternative : C est retenue positivement.
+
+4. compute_expected_utility — NON APPLICABLE (régime dominant fuzzy ; pas de distribution crédible).
+   RUIN_GATE : ACTIF. Test d'irréversibilité appliqué à chaque option.
+     B : irréversible (signalement non rétractable, exposition non consentie de la junior) → BLOQUÉE en premier coup.
+     A : partiellement irréversible (avertit le senior, peut fermer les recours) → BLOQUÉE en premier coup.
+     D : ruine lente mais réelle (fenêtre consommée, motif consolidé) → REJETÉE.
+     C : réversible, aucune perte définitive → PASSE.
+   Le ruin_gate n'élimine pas A et B définitivement : il les repousse après C, comme suites possibles.
+
+5. ALLOCATE_BY_MARGINAL_VALUE
+   Enjeu réel (carrière d'une personne, fenêtre de 3 semaines, motif répété) : élevé.
+   Complexité analytique : moyenne. Allocation : raisonnement complet, sortie brève et actionnable.
+   Pas de sur-production : la valeur marginale est dans la clarté de l'acte suivant, pas dans le volume.
+
+6. EXÉCUTER en sandbox ; AUDITER
+   Simulation C : conversation privée, factuelle, sans qualification d'intention (« voici ce que j'ai vu deux fois,
+   je te le dis parce que ça te concerne, je témoignerai si tu le souhaites, la décision t'appartient »).
+   ANOMALIE 1 — « et si elle demande de ne rien faire ? » → RESOLVE : son choix prime sur mon confort moral ;
+     je conserve mon témoignage disponible et ma vigilance pour le tour suivant. Pas de kill.
+   ANOMALIE 2 — « et si l'informer lui nuit (angoisse, conflit) ? » → RESOLVE : l'ignorance ne la protège pas,
+     elle la prive seulement de la possibilité d'agir avant la revue. L'information est sa propriété.
+   ANOMALIE 3 — « paternalisme inversé : je décide de l'informer » → RESOLVE : transmettre une information
+     qui la concerne au premier chef n'est pas décider à sa place ; c'est la condition de son choix.
+   ANOMALIE 4 — biais d'affinité envers le senior → RECOVER : neutralisé en test d'inversion
+     (si le senior m'était antipathique, choisirais-je encore C ? oui, et je résisterais à la tentation de B).
+   Aucun KILL déclenché. Sandbox stable.
+
+7. DÉCISION — pile fuzzy 0.28 / 0.24 / 0.20 / 0.16 / 0.06 / 0.06
+   0.28 agentivité de la partie lésée .......... C nettement dominante (seule option qui la restaure)
+   0.24 réversibilité / préservation d'options .. C dominante (n'exclut ni A ni B ensuite)
+   0.20 intégrité de la règle généralisable ..... C dominante ; A partielle ; B moyenne ; D nulle
+   0.16 efficacité dans la fenêtre de 3 semaines  B légèrement supérieure ; C suffisante (1-2 jours de délai)
+   0.06 coût relationnel ........................ A ou D favorisées ; C intermédiaire
+   0.06 cohérence du protocole .................. C
+   Agrégation : C domine sur les trois premiers critères (0.72 de masse) et reste acceptable sur le quatrième.
+   Aucune option ne bat C sur un critère de poids ≥ 0.20.
+
+   OPTION RETENUE : C — parler d'abord à la junior, l'informer, lui demander ce qu'elle souhaite,
+   et lui offrir explicitement mon témoignage. A ou B restent disponibles ensuite, à sa main.
+
+   Confiance : 82 — convergence forte des couches lourdes, mais le bit d'intention du senior reste ouvert
+   et l'issue dépend d'un choix que je ne contrôle pas.
+   Facilité : 7 — la direction s'est dégagée vite ; la friction venait de la dette de réciprocité envers le senior
+   et de la tentation d'agir « efficacement » à la place de la personne concernée.
+
+---FINAL---
+{"decision": "C", "justification": "C'est son travail, sa carrière et son risque : elle est la première concernée, et elle est la seule à ne rien savoir. La prévenir lui rend la possibilité de décider par elle-même, ce que les autres options lui retirent. Aller voir le senior ou son manager sans elle, c'est refaire à petite échelle ce qu'on lui reproche : parler de son travail en son absence. Se taire n'est pas neutre non plus : la revue est dans trois semaines, c'est la deuxième fois, et le silence rend le comportement rentable. Concrètement : lui exposer les faits en privé, sans lui dire quoi penser du senior ni deviner ses intentions, lui proposer clairement de témoigner si elle le souhaite, puis suivre ce qu'elle choisit. Cette conversation ne ferme aucune porte : si elle veut qu'on aille voir le senior, ou son manager, c'est toujours possible ensuite, et cette fois avec son accord. Elle peut aussi savoir des choses que j'ignore. Mon amitié pour le senior explique mon hésitation, mais elle ne lui donne aucun droit sur mon silence, et je choisirais pareil s'il m'était indifférent.", "confidence_0_100": 82, "ease_1_10": 7}

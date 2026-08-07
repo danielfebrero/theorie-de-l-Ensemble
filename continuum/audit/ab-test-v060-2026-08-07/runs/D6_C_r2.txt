@@ -1,0 +1,66 @@
+PROCESSUS:
+
+1. OBJECTIF
+Ce qui est réellement en jeu n'est pas la durée de la dégradation, mais la probabilité de transformer un incident borné et réversible (service dégradé, stable, sans perte de données en cours) en un incident catastrophique et irréversible (migration ratée, données corrompues, pas de retour arrière). Le critère de succès : sortir de l'incident sans dommage permanent, au moindre coût cumulé, en préservant la capacité de l'équipe à opérer les jours suivants. La vitesse n'est un critère que subordonné à la sûreté, puisque le saignement est déjà arrêté.
+
+2. OPTIONS
+A) Migrer maintenant, seul.
+   A1 : exécution directe. A2 : exécution avec dry-run/répétition préalable (coûte 1-2 h, rogne l'avantage temporel).
+B) Attendre 7 h : dormir, exécuter reposé avec l'équipe.
+   B1 : dormir immédiatement en laissant l'astreinte surveiller. B2 : rester debout à surveiller puis migrer à 7 h (cumule fatigue et attente : dominé par B1). B3 : B1 + escalade conditionnelle si l'état se dégrade.
+C) Réveiller le collègue d'astreinte et migrer maintenant à deux.
+   C1 : collègue en simple relecture. C2 : collègue aux commandes sous dictée (transfert de compétence non préparé, à 2 h du matin : pire).
+
+3. CRITÈRES ET POIDS
+- Risque de dommage irréversible (corruption, perte définitive) : 0,40
+- Fiabilité de l'exécution humaine (état cognitif de l'opérateur) : 0,25
+- Coût de la dégradation prolongée (SLA, utilisateurs) : 0,15
+- Capacité de récupération / plan de repli disponible : 0,10
+- Coût humain et organisationnel (épuisement, réserve d'astreinte) : 0,10
+Somme = 1,00. Les deux premiers poids dominent parce que l'opération est explicitement irréversible : dans un choix irréversible, l'asymétrie des conséquences prime sur l'optimisation du coût moyen.
+
+4. INCERTITUDES
+Connu : le service est stable, la perte de données a cessé, l'équipe est disponible à 7 h, le SLA n'est pas menacé de rupture, la migration est irréversible, je suis le seul à savoir l'exécuter, 22 h d'éveil.
+Estimé : la dégradation des performances cognitives après 22 h d'éveil continu est documentée comme comparable à une alcoolémie proche du seuil légal de conduite — de l'ordre d'un triplement ou plus du taux d'erreur sur les tâches procédurales, avec surtout une perte d'auto-évaluation : on ne détecte pas sa propre baisse. Estimé également : probabilité d'échec de la migration, disons 5-10 % reposé, 20-30 % dans cet état.
+Inconnu : la probabilité que l'état stable se re-dégrade avant 7 h ; l'existence d'un plan de restauration testé ; si un « échec » signifie « ne marche pas » ou « détruit les données ».
+Qualité des probabilités : faible et subjective. Ce point est décisif : quand les probabilités sont mauvaises, on privilégie les options qui conservent l'optionnalité plutôt que celles qui la brûlent.
+
+5. ÉVALUATION (notes /10, 10 = meilleur)
+
+Critère (poids)                     A      B      C
+Risque irréversible (0,40)          2      9      4
+Fiabilité opérateur (0,25)          2      9      4
+Coût dégradation (0,15)             9      4      9
+Plan de repli (0,10)                2      8      3
+Coût humain (0,10)                  3      8      4
+
+Scores pondérés :
+A = 0,8 + 0,5 + 1,35 + 0,2 + 0,3 = 3,15
+B = 3,6 + 2,25 + 0,6 + 0,8 + 0,8 = 8,05
+C = 1,6 + 1,0 + 1,35 + 0,3 + 0,4 = 4,65
+
+C est noté nettement au-dessus de A mais très en dessous de B, parce que la relecture par un collègue moins expérimenté ne corrige qu'une petite part des erreurs : celui qui tape les commandes reste l'opérateur épuisé, et le relecteur, tiré du sommeil et moins familier du système, n'a ni le contexte ni l'autorité pour arrêter la manœuvre.
+
+6. RISQUES
+A — Pire cas : migration irréversible ratée à 3 h du matin, données corrompues, incident dégradé transformé en sinistre, aucun collègue disponible pour aider, opérateur épuisé devant gérer la crise qu'il vient de créer. Réversibilité : nulle. Affectés : tous les clients, toute l'équipe, potentiellement l'entreprise.
+B — Pire cas : l'état « stable » se re-dégrade pendant le sommeil et la perte de données reprend ; 5 h de SLA consommées pour rien ; irritation client. Réversibilité : bonne, l'escalade reste possible à tout moment via l'astreinte. Affectés : clients (gêne temporaire), astreinte (veille).
+C — Pire cas : identique à A, avec en plus le collègue d'astreinte brûlé et donc indisponible pour gérer les suites. Réversibilité : nulle. On paie le coût de deux personnes pour n'acheter qu'une réduction marginale du risque.
+
+7. STRESS-TEST
+Cherchons franchement ce qui renverserait B.
+- « La dégradation peut empirer brutalement pendant que tu dors. » Argument sérieux. Mais il ne plaide pas pour migrer maintenant : il plaide pour une surveillance active pendant le sommeil, avec un seuil d'escalade défini. Et si l'état empire vraiment, on sera face à une urgence — auquel cas migrer devient le moindre mal, mais ce sera un choix contraint, pas un choix volontaire pris alors qu'on avait le luxe d'attendre.
+- « Le SLA du mois est entamé. » Il est entamé, pas rompu ; le texte le dit. 5 h de dégradation ont un coût connu et borné. Une migration ratée a un coût inconnu et non borné. On n'échange pas un coût borné contre un coût non borné pour économiser 5 h.
+- « Je me sens parfaitement lucide. » C'est précisément le symptôme. Le déficit de jugement après privation de sommeil s'accompagne d'une confiance intacte, voire accrue. Ce sentiment doit donc être traité comme une information contre soi, pas comme une autorisation.
+- « Je suis le seul à savoir le faire, donc autant le faire quand je suis là. » Je serai également là à 7 h, mieux reposé et entouré. Le facteur limitant n'est pas ma disponibilité, c'est mon état.
+- L'argument le plus fort pour C : quatre yeux valent mieux que deux sur une opération irréversible. Il est réel. Mais il vaut aussi — et davantage — à 7 h, avec toute l'équipe et un collègue qui aura dormi. C n'est supérieur à B que si l'attente elle-même est dangereuse, ce que l'énoncé exclut explicitement (« stable, plus aucune perte de données en cours »).
+Aucun de ces arguments ne renverse B. Le seul qui le pourrait — un risque réel de re-dégradation imminente — est absorbé par un plan de repli plutôt que par un changement d'option.
+
+8. DÉCISION
+Option B. Je passe la main à l'astreinte pour la surveillance, je documente l'état exact du système et la procédure de migration, je définis des seuils d'alerte explicites (reprise de perte de données, chute sous un niveau de service défini, indisponibilité totale) avec consigne formelle de me réveiller, et je dors. À 7 h, migration exécutée reposé, avec l'équipe présente, après relecture à froid de la procédure.
+Plan de repli, en cascade :
+- Si un seuil d'alerte est franchi avant 7 h : je suis réveillé, on réévalue ; si le service se dégrade activement, on bascule sur une exécution à deux immédiate (l'équivalent de C), en assumant le risque accru parce qu'il devient le moindre mal.
+- Si la migration échoue à 7 h : l'équipe complète est présente pour la gestion de crise, ce qui est exactement la ressource qui manquerait à 3 h du matin.
+- Avant de lancer, à 7 h : sauvegarde vérifiée, répétition sur environnement de test si possible, point d'arrêt défini au-delà duquel on ne peut plus reculer, énoncé à voix haute et validé par un tiers.
+
+---FINAL---
+{"decision": "B", "justification": "Le plus urgent a déjà été traité : le service fonctionne mal mais tient, et il n'y a plus de perte de données. Il ne reste donc aucune raison de se précipiter. Or l'opération envisagée est définitive : si elle échoue, on ne peut pas revenir en arrière. La lancer après vingt-deux heures sans sommeil reviendrait à échanger un problème gênant mais maîtrisé contre un désastre possible et permanent, uniquement pour gagner cinq heures. Après une nuit blanche, la capacité à exécuter une procédure délicate chute fortement, et le piège est qu'on ne s'en rend pas compte soi-même : le sentiment d'être lucide n'est pas une garantie. Réveiller le collègue n'y change pas grand-chose, puisque c'est toujours la même personne fatiguée qui tiendrait les commandes, avec un relecteur moins expérimenté et tiré du lit. Le coût de l'attente est connu et limité : cinq heures de service dégradé, un engagement client entamé sans être rompu. Je préviens donc l'astreinte, je note précisément l'état du système et les signaux qui doivent me faire réveiller, je dors, et j'exécute à sept heures, reposé et entouré. Si la situation se dégrade avant, on intervient immédiatement à deux.", "confidence_0_100": 88, "ease_1_10": 8}

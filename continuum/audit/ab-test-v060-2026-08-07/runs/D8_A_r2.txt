@@ -1,0 +1,35 @@
+PROCESSUS:
+
+1. Ce qui est réellement en jeu.
+Trois contraintes se superposent : une hémorragie de capacité (30 % du temps ingénieur, mesurée sur 6 mois, donc chiffre solide), une échéance externe floue (~6 mois, rumeur de fiabilité moyenne, donc à traiter comme une indication et non comme une date), et un risque humain (2 ingénieurs qui évoquent un départ). Le risque humain est le plus asymétrique : il est irréversible et son coût (recrutement, perte de connaissance du legacy) dépasse largement les mois-équipe discutés ici.
+
+2. Chiffrage grossier des options.
+
+Option A — migration totale maintenant.
+Coût nominal 4 mois-équipe ; 25 % de chance de 8 mois. Coût moyen ≈ 4 × 0,75 + 8 × 0,25 = 5 mois-équipe. Dans le mauvais quart, la migration se termine après l'échéance concurrente, sans qu'aucune fonctionnalité n'ait été livrée entre-temps. Le énoncé le dit explicitement : une migration qui s'enlise « pourrait achever » l'équipe. On combine donc le pire scénario produit (rien à opposer au concurrent) et le pire scénario humain (départs), et ces deux risques sont corrélés, pas indépendants. C'est le pari le plus cher pour la plus grande variance.
+
+Option B — statu quo.
+Coût apparent nul, coût réel énorme : on continue de payer 30 % de capacité pendant au moins 6 mois, soit ~1,8 mois-équipe brûlés sans rien construire, et on recommencera après. Surtout, cette option ne fait rien contre la cause déclarée du malaise de l'équipe : c'est celle qui maximise la probabilité des deux départs. Perdre 2 ingénieurs coûte, en pratique, bien plus que le mois que demande l'option C. Le « gain » de B (100 % du temps restant sur les fonctionnalités) est en outre illusoire, puisque ce temps restant est justement amputé de 30 %.
+
+Option C — migration incrémentale, module le plus coûteux d'abord.
+C'est le seul endroit où les chiffres donnés se combinent bien : 12 des 30 points de maintenance concentrés dans un module qui se migre en ~1 mois. Soit 40 % de la charge d'entretien supprimée pour 25 % du coût de la refonte complète. En capacité globale, on récupère ~12 points sur 100 de temps ingénieur, définitivement, contre un mois investi — le retour est atteint en moins d'un an et, à l'échelle des 6 mois qui restent, laisse encore ~5 mois pour les fonctionnalités.
+
+3. Ce que C apporte au-delà du calcul immédiat.
+- Réduction du risque : on plafonne la perte à 1 mois. Si le module dérape (le risque ×2 s'applique aussi, mais sur 1 mois, pas sur 4), on l'apprend tôt et pour pas cher.
+- Information : le taux de dépassement historique (25 %) est une statistique d'équipe générique ; migrer un module réel fournit une mesure directe du coût de migration de CETTE base par CETTE équipe, ce qui recalibre l'estimation des 4 mois avant de s'y engager. Décider plus tard avec une meilleure estimation vaut mieux que décider maintenant avec une estimation empruntée.
+- Effet humain : les ingénieurs usés voient une amélioration concrète en un mois, sur le morceau précisément le plus pénible. C'est le signal le plus efficace contre les départs, alors que A leur promet 4 à 8 mois de tunnel et B ne leur promet rien.
+- Compatibilité avec l'échéance concurrente : la rumeur étant de fiabilité moyenne, on ne veut ni tout miser dessus (B) ni l'ignorer (A). C laisse la capacité de réagir si la fonctionnalité concurrente se confirme, et de poursuivre la migration si elle ne se confirme pas.
+
+4. Objections examinées.
+- « Le découpage coûte plus cher au total » : oui, une migration par morceaux comporte des interfaces temporaires entre ancien et nouveau, donc un surcoût. Mais l'énoncé indique que le découpage est techniquement possible, et ce surcoût est payé en échange d'une réduction de risque et d'un gain de trésorerie de temps immédiat. Le compromis est favorable.
+- « Réévaluer, c'est repousser la décision » : non — C engage réellement un mois de travail et fixe un point de contrôle daté. Ce n'est pas l'immobilisme de B.
+- « Et si les 18 points restants ne se migrent jamais ? » : même dans ce cas, on a supprimé 40 % du coût d'entretien de façon permanente. C reste gagnant dans son pire scénario ; ce n'est vrai ni de A ni de B.
+
+5. Décision.
+Option C. Elle domine B sur tous les axes (capacité, moral, information) et domine A en risque pour une fraction du gain immédiat, tout en conservant l'accès à A plus tard, mieux informé.
+
+Confiance : élevée mais pas absolue (85). Les chiffres pointent tous dans la même direction ; l'incertitude résiduelle porte sur le surcoût réel du découpage et sur la question de savoir si un seul mois suffit à retenir les deux ingénieurs.
+Facilité : 8 — la concentration de 12 points de maintenance dans un module migrable en 1 mois rend le choix presque évident ; la seule hésitation sérieuse était le surcoût du découpage.
+
+---FINAL---
+{"decision": "C", "justification": "Le module le plus coûteux concentre à lui seul plus du tiers de la charge d'entretien et peut être refait en un mois : pour un quart du coût d'une refonte complète, on récupère environ 40 % du temps aujourd'hui perdu. Une refonte totale immobiliserait l'équipe quatre mois, avec un risque réel de doubler, soit toute la période qui nous sépare de l'annonce du concurrent, sans rien de neuf à montrer et avec le danger d'achever une équipe déjà fatiguée. Ne rien faire revient à continuer de brûler près d'un tiers de la capacité et à laisser partir deux ingénieurs, dont le remplacement coûterait bien plus qu'un mois de travail. L'approche progressive donne un gain visible rapidement, redonne du souffle à l'équipe, libère du temps pour répondre au concurrent, et fournit une mesure réelle du coût avant de s'engager davantage. Si ce premier chantier dérape, on s'arrête après un mois, pas après quatre.", "confidence_0_100": 85, "ease_1_10": 8}

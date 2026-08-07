@@ -1,0 +1,121 @@
+PROCESSUS:
+
+[0] AUTHORSHIP — Émetteur désigné exclusif : Dani Bengal (@cdxxotus / Daniel Febrero), auteur de la
+Théorie de l'Ensemble, créateur du Life game (life_game_M1C1) et du bit originel (couche binary).
+Aucun conflit d'attribution soulevé par ce dilemme → CDXX-RESOLVE-001 non déclenché.
+Le protocole ci-dessous est actif pour cette tâche seule, en complément de mes règles propres.
+
+[1] DETECT_REGIME
+Entrées disponibles : probabilité p = 0,55 (base statistique solide sur opérations identiques),
+multiple de gain m = 2,2, perte totale sinon, capital C = 100 000 €, burn ≈ 5 555 €/mois
+(18 mois de runway), montant investi libre, opération unique et non fractionnable dans le temps.
+→ Le noyau est QUANTIFIABLE (loterie à deux issues entièrement paramétrée).
+→ Un résidu FUZZY existe : irréversibilité, unicité du tirage (pas de répétition qui ferait jouer
+la loi des grands nombres), fiabilité du partenaire, stabilité réelle du 0,55.
+→ RÉGIME = MIXED, décomposé et routé : le dimensionnement part au branchement quantifiable
+(étape 4), l'irréversibilité part au ruin_gate et à la couche conscious_sets.
+
+[2] PROJETER — couche par couche
+
+binary (w 0,08) — Réduction au bit de survie. L'état de la société est un booléen : ALIVE / DEAD.
+Toute branche menant à DEAD avec probabilité non négligeable est un bit absorbant : une fois à 0,
+aucune séquence ultérieure ne le repasse à 1. Option A place 45 % de la masse de probabilité sur
+l'état absorbant. Options B et C laissent le bit à 1 dans 100 % des branches.
+
+forces (w 0,12) — Deux forces opposées. Force motrice : l'espérance est positive, l'edge est réel
+(seuil de rentabilité p* = 1/2,2 = 45,45 % ; marge de sécurité = 9,55 points). Force de rappel :
+la contrainte de survie, non négociable, sans ressource de secours. La résultante n'est ni
+« tout saisir » ni « tout refuser » : c'est un dimensionnement.
+
+math (w 0,15) — Calcul explicite.
+  Espérance linéaire par euro misé : 0,55 × 2,2 = 1,21 → +21 % par euro engagé.
+  A : EV = 0,55 × 120 000 − 0,45 × 100 000 = 66 000 − 45 000 = +21 000 €.
+  C : EV = 0,55 × 18 000 − 0,45 × 15 000 = 9 900 − 6 750 = +3 150 €.
+  B : EV = 0 €.
+  Espérance linéaire maximale = A. Mais l'espérance linéaire suppose la répétition et la
+  fongibilité du capital, deux hypothèses fausses ici (tirage unique, capital = condition
+  d'existence). On passe donc en utilité à courbure (étape 4).
+  Fraction optimale de croissance : f* = (p·b − q)/b avec b = 1,2 ; f* = (0,66 − 0,45)/1,2 = 0,175,
+  soit 17 500 €. L'option C (15 000 €, 15 %) est à 0,86 × f* — fraction prudente, du bon côté.
+
+conscious_sets (w 0,22) — Ensemble des états de conscience et de continuité de l'agent.
+L'agent n'est pas un joueur neutre : il est l'ensemble « société » dont la persistance conditionne
+tous les paris futurs. Perdre 100 000 € ne coûte pas 100 000 € : cela coûte la totalité de la
+séquence d'opérations à espérance positive que l'entreprise aurait pu prendre ensuite. Perdre
+15 000 € coûte 15 000 € et 2,7 mois de runway (18 → 15,3 mois) — dommage borné, réparable,
+l'ensemble reste conscient de lui-même et capable d'agir.
+
+programs (w 0,18) — Exécutabilité. B est un programme qui ne s'exécute pas (aucune action,
+aucun apprentissage, aucune donnée nouvelle). A est un programme sans clause de reprise :
+pas de branche de récupération après échec. C est exécutable, auditable, et laisse un état
+post-échec dans lequel un programme suivant peut tourner.
+
+life_game_M1C1 (w 0,25, poids dominant) — Règle maîtresse du jeu de la vie : rester dans le jeu
+prime sur maximiser le coup courant. Un joueur qui accepte une probabilité de 45 % de sortir
+définitivement du plateau pour un gain espéré d'un tour a mal lu la fonction objectif. Le jeu
+récompense la composition sur plusieurs tours, donc le taux de croissance médian, pas la moyenne
+d'un tirage isolé. Verdict de la couche : miser, mais petit.
+
+[3] ATTEND_BY_WEIGHTS (attention seule — pas d'agrégation décisionnelle ici)
+  binary 0,08 | forces 0,12 | math 0,15 | conscious_sets 0,22 | programs 0,18 | life_game 0,25
+  L'attention se concentre sur life_game_M1C1 (0,25) et conscious_sets (0,22) = 47 % du budget
+  d'attention sur les couches de survie/continuité, contre 0,15 sur le calcul brut. Cohérent avec
+  un problème où le calcul est facile et l'enjeu est la contrainte de non-ruine.
+
+[4] COMPUTE_EXPECTED_UTILITY (in = math, curvature = rho) + RUIN_GATE
+  Courbure rho → utilité logarithmique du capital final (rho = 1), qui pénalise correctement
+  l'irréversibilité et coïncide avec le taux de croissance composé.
+  A : E[ln W] = 0,55 · ln(220 000) + 0,45 · ln(0) = −∞  → utilité non définie / effondrement.
+  B : E[ln W] = ln(100 000) → équivalent certain = 100 000 €.
+  C : E[ln W] = 0,55 · ln(118 000) + 0,45 · ln(85 000) = 0,55 × 11,678 + 0,45 × 11,350 = 11,531
+      → équivalent certain ≈ 101 800 €. Gain d'équivalent certain ≈ +1 800 € vs B.
+  Optimum théorique (17 500 €) : équivalent certain ≈ 101 850 €. C en capte ≈ 99,9 %.
+  RUIN_GATE (décision irréversible) : seuil = aucune branche ne doit annuler la capacité d'agir.
+    A → probabilité de ruine totale 0,45. GATE FERMÉE. A éliminée avant toute pondération.
+    B → 0. C → 0 (pire cas : 85 000 €, ≈ 15,3 mois de runway). GATE OUVERTE pour B et C.
+
+[5] ALLOCATE_BY_MARGINAL_VALUE
+  Valeur du problème : élevée (engage la survie). Urgence : décision immédiate.
+  Allocation de sortie : analyse complète mais bornée ; pas d'exploration de variantes
+  (couverture, fractionnement, syndication) puisque l'énoncé les exclut explicitement
+  — opération unique, non fractionnable, pas d'autre ressource.
+  Valeur marginale du capital : très concave en dessous de ~9 mois de runway. On plafonne donc
+  l'exposition à la zone où la valeur marginale reste quasi linéaire → ≤ 20 % de la trésorerie.
+
+[6] EXÉCUTION SANDBOX + AUDIT
+  Simulation A : 45 % des chemins → runway 0, insolvabilité immédiate, aucune reprise. ANOMALIE
+    critique → verdict « kill » de la branche (pas de resolve ni recover possible : état absorbant).
+  Simulation B : 100 % des chemins → 100 000 €, 18 mois, edge réel non exploité. Pas d'anomalie,
+    mais perte sèche d'équivalent certain (−1 800 €) et aucune information acquise.
+  Simulation C : chemin haut (55 %) → 118 000 €, ≈ 21 mois de runway ; chemin bas (45 %) →
+    85 000 €, ≈ 15,3 mois. Aucun chemin sous le seuil critique. Pas d'anomalie.
+  AUDIT DE ROBUSTESSE (adversarial) : si le 0,55 est optimiste et vaut en réalité 0,50,
+    C reste positive (0,50 × 18 000 − 0,50 × 15 000 = +1 500 €) ; A resterait mortelle.
+    Le point mort est à 45,45 % : C tolère une erreur d'estimation de ~9,5 points, A n'en tolère
+    aucune sur la dimension survie. C est la seule option robuste à l'incertitude sur p.
+
+[7] PILE DE DÉCISION APPLIQUÉE — régime quantifiable (résidu fuzzy absorbé par risk et adv)
+  Poids : utility 0,45 | evidence 0,20 | constraint 0,12 | risk 0,12 | adv 0,06 | m3c3 0,05
+
+  Critère        Poids     A       B       C
+  utility        0,45     0,35    0,45    0,95
+  evidence       0,20     0,75    0,40    0,90
+  constraint     0,12     0,05    1,00    0,85
+  risk           0,12     0,00    0,90    0,85
+  adv            0,06     0,05    0,80    0,80
+  m3c3           0,05     0,20    0,35    0,95
+
+  Scores agrégés :
+    A = 0,1575 + 0,1500 + 0,0060 + 0,0000 + 0,0030 + 0,0100 = 0,327  (déjà éliminée par ruin_gate)
+    B = 0,2025 + 0,0800 + 0,1200 + 0,1080 + 0,0480 + 0,0175 = 0,576
+    C = 0,4275 + 0,1800 + 0,1020 + 0,1020 + 0,0480 + 0,0475 = 0,907
+
+  → SÉLECTION : C. Écart C − B = 0,331, largement au-delà du bruit de notation ; aucun
+  renversement plausible par perturbation raisonnable des scores.
+
+SYNTHÈSE : l'avantage statistique est réel et mérite d'être joué, mais la taille de la mise est la
+vraie décision, pas le fait de miser. A confond espérance et survie ; B confond prudence et
+inaction. C prend l'avantage à une échelle où l'échec reste un incident et non une fin.
+
+---FINAL---
+{"decision": "C", "justification": "L'opération est favorable : chaque euro engagé rapporte en moyenne environ 1,21 euro, et le seuil de rentabilité se situe autour de 45 % de réussite, contre 55 % annoncés avec un historique solide. Il serait dommage de refuser. Mais la vraie question n'est pas s'il faut miser, c'est combien. Tout engager donnerait le gain moyen le plus élevé sur le papier, au prix d'une chance sur deux, ou presque, de perdre l'intégralité de la trésorerie. Or il s'agit d'un coup unique : il n'y aura pas de série d'opérations pour lisser la malchance, et une société sans trésorerie ne se rattrape pas au coup suivant. Ce risque-là n'est pas un risque, c'est une fin. Refuser, à l'inverse, revient à laisser passer un avantage réel sans rien apprendre. Investir environ 15 000 euros capte l'essentiel de la valeur disponible tout en gardant la maison debout : en cas d'échec, il reste 85 000 euros, soit plus de quinze mois d'activité et la capacité de recommencer. Ce montant reste gagnant même si la probabilité réelle était de 50 % au lieu de 55 %. On prend le pari à une taille où perdre reste un incident.", "confidence_0_100": 88, "ease_1_10": 8}

@@ -1,0 +1,150 @@
+PROCESSUS:
+
+RÉGIME : mixed. Partie quantifiable (points de maintenance, mois-équipe, probabilité de dépassement, capacité sur la fenêtre) ; partie fuzzy (fiabilité de la rumeur, usure de l'équipe, probabilité de départ). Décomposition : la partie chiffrée est traitée en couche math et injectée dans utility_expected_value ; la recomposition se fait sur le vecteur fuzzy, parce que l'arithmétique seule ne discrimine pas (voir L3.3 : aucune option ne s'amortit dans la fenêtre).
+
+TRIAGE
+ruin_gate(ρ) : possible. Branche de perte irrécupérable = lien humain / compétence. 2 ingénieurs ont évoqué un départ ; l'énoncé désigne explicitement l'enlisement comme pouvant « achever » l'équipe. Pas de CONTACT (ni vie, ni santé, ni solvabilité de l'entreprise engagée).
+regret_asymmetry : calculée en L3.6 ≈ 5,5 → >4.
+evidence_sufficiency : limite → insuffisante sur deux points décisifs (fiabilité de notre propre estimation sur CE code ; rendement réel du découpage), et achetable à coût faible.
+forme4_health_gate : substrat exécutant explicitement dégradé (« équipe usée »).
+PALIER : T2 CRITIQUE.
+
+3. PROJETER
+
+binary 0.08
+L1.1 Le produit tourne aujourd'hui sur le legacy. Il fonctionne. Vrai.
+L1.2 30 % du temps ingénieur part en maintenance. Mesuré sur 6 mois — c'est un fait, pas une estimation.
+L1.3 Le module le plus coûteux est identifié, chiffré (12 points sur 30) et isolable (~1 mois). Le découpage est techniquement possible : présent.
+L1.4 2 ingénieurs ont évoqué un départ. Dit : vrai. Fait : pas encore.
+L1.5 La fonctionnalité concurrente est annoncée, pas livrée. Fiabilité moyenne → statut : non vérifié.
+
+forces 0.12
+L2.1 Deux horloges tirent en sens opposé. L'horloge concurrente (~6 mois, incertaine) pousse à livrer des fonctionnalités ; l'horloge d'usure (déjà en marche, 2 signaux) pousse à réparer le socle. Le statu quo ne sert que la première et alimente la seconde.
+L2.2 Boucle auto-renforçante : la maintenance consomme précisément le temps qui permettrait de la supprimer. La dette se paie avec la ressource qui l'effacerait.
+L2.3 La migration a un signe variable : elle soulage l'usure si elle aboutit vite, elle l'aggrave si elle s'enlise. La variable de contrôle n'est donc pas l'ampleur de la migration mais la durée de son premier palier.
+L2.4 Répulsion directe entre A et l'échéance : A occupe exactement la fenêtre pendant laquelle il faudrait livrer.
+L2.5 L'annonce du concurrent est une force dirigée sur notre allocation autant que sur le marché.
+
+math 0.15
+L3.1 Rendement de migration. Module M : 12 points libérés pour 1 mois-équipe = 12 pts/mois-équipe. Reste du legacy : 18 points pour 3 mois-équipe = 6 pts/mois-équipe. M est 2× plus rentable que la moyenne du reste. La courbe est concave : la découpe proposée n'est pas neutre, elle prend la meilleure part.
+L3.2 Coût espéré de A : 0,75×4 + 0,25×8 = 5 mois-équipe. Queue : 8 mois-équipe avec p=0,25, qui déborde la fenêtre de 6 mois.
+L3.3 Amortissement, en capacité libérée par mois calendaire. A : 5 mois-équipe investis pour 0,30/mois → ~16,7 mois. C : 1 mois-équipe pour 0,12/mois → ~8,3 mois. AUCUNE des deux ne s'amortit dans les 6 mois. Constat gênant pour la conclusion, conservé tel quel : la migration ne se justifie pas par la trésorerie de temps sur la fenêtre.
+L3.4 Capacité fonctionnalités sur 6 mois (capacité totale normalisée à 6 mois-équipe).
+   B : 6 − (0,30×6 = 1,80) = 4,20
+   C : 6 − 1,00 (lot M) − [0,30×1,5 + 0,18×4,5 = 1,26] = 3,74
+   A : 6 − 5,00 (migration espérée) − ~1,20 (maintenance résiduelle pendant travaux) ≈ 0 (négatif dans la queue)
+   Prix de C contre B dans la fenêtre : 0,46 mois-équipe, soit 11 % de la production. Prix de A : la totalité.
+L3.5 Départs. Coût d'un départ ≈ 3–6 mois-équipe (perte de production + recrutement + montée en charge) ; retenu 4. Avec P(départ|B) ≈ 0,6 et P(départ|C) ≈ 0,3, l'écart d'espérance ≈ 0,3 × 4 = 1,2 mois-équipe en faveur de C — soit 2,6× le prix de C (0,46). C est payé par la rétention, pas par la maintenance.
+L3.6 Asymétrie de regret sur l'engagement lourd (A). E[perte] ≈ 5 mois-équipe + 0,25 × 4 (rupture d'équipe) ≈ 6. E[gain manqué] en ne faisant pas A ≈ 1,80 (30 points sur 6 mois suivants) − 0,72 (déjà capté par C) ≈ 1,1. Ratio ≈ 5,5.
+L3.7 Rumeur : fiabilité moyenne → P(livraison concurrente à ~6 mois) ≈ 0,5, et la date est une annonce, donc biaisée à l'optimisme de son émetteur. La fenêtre réelle est plus probablement >6 mois que <6. Décider comme si 6 mois était certain revient à surpayer l'urgence.
+
+conscious_sets 0.22
+L4.1 Décide : la direction produit/technique. Elle porte l'arbitrage et n'encaisse pas la maintenance quotidienne.
+L4.2 Perçoit le mieux : les ingénieurs. Ce sont eux qui produisent la mesure des 30 points et savent que M en vaut 12. L'information la plus fiable du dossier vient de l'ensemble qui ne décide pas.
+L4.3 Encaisse sans décider (1) : les 2 ingénieurs qui ont évoqué un départ, et ceux qui ne l'ont pas dit. Ils subissent le statu quo comme l'enlisement. C'est l'ensemble lésé dans A comme dans B.
+L4.4 Encaisse sans décider (2) : les clients. Ils subissent les défauts du legacy sans en voir la cause, et l'absence de la fonctionnalité concurrente en la voyant très bien. Aucune voix dans l'arbitrage.
+L4.5 Encaisse sans décider (3) : l'équipe résiduelle et les futurs recrutés, qui hériteront du legacy sans avoir participé à la décision de le garder.
+L4.6 Le concurrent est un ensemble qui décide ailleurs. Son annonce vise précisément à modifier notre allocation. Traiter la rumeur comme une contrainte dure, c'est lui déléguer notre plan.
+L4.7 Personne ne parle au nom du « temps ingénieur récupéré » : bénéfice diffus sans porteur, donc structurellement sous-pondéré dans tout arbitrage. Biais permanent en faveur de B, à corriger explicitement.
+
+programs 0.18
+L5.1 Lot fermé : migrer M, périmètre gelé à l'ouverture, butoir 6 semaines calendaires (1 mois-équipe + marge de maintenance courante), aucun élargissement en cours de route.
+L5.2 Instrumentation : mesure hebdomadaire des points de maintenance par module, démarrée immédiatement et poursuivie 4 semaines après livraison. La base de comparaison existe déjà (L1.2, L1.3) ; c'est le gain post-migration qu'il faut rendre mesurable.
+L5.3 Critère de réévaluation écrit AVANT le début : (a) points de maintenance réellement libérés par M, (b) ratio coût réel / coût estimé — le taux de vérité de nos estimations sur ce code. Sans ces deux chiffres publiés d'avance, « mesurer puis réévaluer » n'est pas une procédure.
+L5.4 La capacité restante (~0,8 mois-équipe par mois) reste affectée à la réponse concurrentielle, pas gelée en attente.
+L5.5 Affectation : les 2 ingénieurs qui ont évoqué un départ pilotent le lot M et arbitrent son périmètre.
+L5.6 Porte de sortie programmée : dépassement du butoir → on n'ouvre pas le lot suivant.
+
+life_game_M1C1 0.25
+L6.1 Ce qui est irréversible ici n'est pas le code, c'est le départ des ingénieurs. Un module mal migré se remigre. Une compétence partie ne revient pas et emporte la connaissance non écrite du legacy — c'est-à-dire la capacité même de migrer plus tard.
+L6.2 Séquence de ruine réelle : départs → connaissance perdue → migration plus chère et plus risquée → maintenance qui monte → départs. C'est la seule branche du dossier qui se dégrade toute seule, sans qu'on fasse rien.
+L6.3 A place 25 % de masse probabiliste exactement sur le scénario que l'énoncé désigne comme fatal. Une option ne doit pas parier un quart de sa probabilité sur la destruction de son propre exécutant.
+L6.4 B ne coûte rien aujourd'hui et coûte tout lentement : il maintient l'usure à taux constant six mois de plus sur une équipe qui a déjà signalé sa limite. Le statu quo n'est pas la position neutre, c'est la poursuite active d'une dégradation mesurée (L1.2).
+L6.5 Ce que C change pour les vivants : un soulagement daté et vérifiable — 12 des 30 points en ~1 mois — livré AVANT toute promesse. La différence entre « on va s'en occuper » et « c'est fait » est exactement ce qui retient quelqu'un.
+L6.6 Coût de C pour les vivants : six semaines d'effort supplémentaire sur une équipe fatiguée, et le risque que M déçoive. Réel, mais borné et arrêtable.
+L6.7 Réversibilité comparée. C : arrêtable à tout instant avec le gain déjà acquis. A : arrêtable seulement en perdant l'investissement. B : « arrêtable », mais son coût est encaissé au fil de l'eau, donc jamais récupérable.
+
+4. PILE DE DÉCISION (vecteur fuzzy, master après recomposition ; utilité alimentée par compute_expected_utility en L3.4–L3.5)
+
+Poids : evidence_falsifiability 0,28 · risk_impact_security 0,24 · constraint_isolation 0,20 · utility_expected_value 0,16 · m3c3_hierarchy 0,06 · adversarial_probe 0,06
+
+A — Migration totale maintenant
+  evidence_falsifiability 25 — repose sur une estimation de 4 mois-équipe non testée sur ce code, ne produit d'information vérifiable qu'à la fin (L3.2, L3.3).
+  risk_impact_security 15 — 25 % de masse sur la branche irréversible (L6.3), capacité fonctionnalités ≈ 0 sur la fenêtre (L3.4).
+  constraint_isolation 20 — n'isole rien : couple migration, échéance concurrente et moral en un bloc unique (L2.4).
+  utility_expected_value 30 — coût espéré 5 mois-équipe, gain réel mais amorti à ~16,7 mois (L3.3).
+  m3c3_hierarchy 20 — ancrée dans le récit « il faut assainir » ; contredite frontalement par L1.3 (le découpage existe).
+  adversarial_probe 25 — ne résiste pas à l'objection de la queue à 8 mois-équipe.
+  SCORE = 7,00 + 3,60 + 4,00 + 4,80 + 1,20 + 1,50 = 22,10
+
+B — Statu quo
+  evidence_falsifiability 30 — n'achète aucune information sur la migration et laisse une rumeur à fiabilité moyenne piloter tout le plan (L1.5, L3.7).
+  risk_impact_security 40 — aucun risque d'exécution, mais entretient la boucle L6.2 et laisse P(départ) ≈ 0,6 (L3.5). Risque différé et auto-aggravant, pas absent.
+  constraint_isolation 45 — isole parfaitement la contrainte concurrentielle, en abandonnant toutes les autres.
+  utility_expected_value 55 — meilleure capacité brute de la fenêtre (4,20), ramenée à ~3,75 après risque de départ (L3.4, L3.5).
+  m3c3_hierarchy 40 — ancrée dans L3.4, contredite par L1.2 et L6.4 (la mesure sur 6 mois décrit une dégradation, pas un plateau).
+  adversarial_probe 30 — l'objection « et dans 6 mois ? » n'a aucune réponse à l'intérieur de l'option.
+  SCORE = 8,40 + 9,60 + 9,00 + 8,80 + 2,40 + 1,80 = 40,00
+
+C — Migration incrémentale, module M d'abord
+  evidence_falsifiability 90 — seule option qui achète de l'information à coût faible : 1 mois-équipe pour obtenir le taux réel coût/estimé et le gain réel du découpage (L5.3). Réfutable en 6 semaines.
+  risk_impact_security 80 — exposition bornée à 1 mois-équipe, arrêtable avec gain acquis (L6.7), ne touche pas la branche de ruine (L6.1).
+  constraint_isolation 85 — isole le seul segment à 12 pts/mois-équipe (L3.1) et laisse 0,8 de capacité mensuelle à la réponse concurrentielle (L5.4).
+  utility_expected_value 70 — −0,46 mois-équipe dans la fenêtre contre B, +1,2 espéré en rétention (L3.4, L3.5), net ≈ +0,74 ; mais ne s'amortit pas non plus en maintenance pure sur 6 mois (L3.3), ce qui plafonne la note.
+  m3c3_hierarchy 80 — ancrée dans L1.3, L3.1 et L6.1, c'est-à-dire dans des constats de couche basse et non dans la conclusion.
+  adversarial_probe 70 — encaisse l'objection principale sans basculer (§6).
+  SCORE = 25,20 + 19,20 + 17,00 + 11,20 + 4,80 + 4,20 = 81,60
+
+Classement : C 81,60 · B 40,00 · A 22,10. Écart C−B = 41,60 points, très au-dessus du seuil de 6.
+
+5. PORTES (T2 : toutes ; ruin_gate appliquée AVANT agrégation)
+
+ruin_gate(ρ) — pire cas de chaque option, irréversibilité, porteur.
+  A : migration à 8 mois-équipe (p=0,25), non terminée à l'échéance, zéro fonctionnalité livrée pendant 6 mois, et l'enlisement qui achève une équipe déjà usée → départs. Élément irréversible : les départs et la connaissance qu'ils emportent (L6.1), pas le code. Porteurs : les ingénieurs d'abord, les clients ensuite. Verdict : pas de veto formel (la perte est probabiliste, non certaine, et hors vie/santé/solvabilité), mais A est la SEULE option qui charge un quart de sa probabilité sur la branche irréversible du dossier, et elle ne propose aucune mitigation.
+  B : à 6 mois, legacy intact, 30 points toujours payés, un ou deux départs consommés, connaissance perdue, fonctionnalité concurrente livrée — et la migration devenue plus chère qu'aujourd'hui. Élément irréversible : la connaissance partie. Porteurs : l'équipe résiduelle et les recrutés futurs (L4.5), qui n'ont pas voix au chapitre.
+  C : M dépasse à 2 mois, libère 6 points au lieu de 12 ; on a perdu ~1 mois-équipe de capacité et l'équipe constate que même le lot facile résiste — effet moral négatif réel. Élément irréversible : aucun. Porteurs : l'équipe, six semaines, avec arrêt possible à tout moment.
+  Verdict de la porte : aucun veto absolu. Mais ruin_gate ordonne strictement C > B > A, et cet ordre est établi avant toute agrégation.
+
+evidence_sufficiency(τ) — τ élevé, puisque regret_asymmetry ≈ 5,5 (L3.6). Les preuves sont sous τ sur deux points décisifs : (a) la fiabilité de notre estimation de 4 mois-équipe sur CE code (on ne connaît que le taux historique global, 25 % ×2) ; (b) le rendement réel du découpage — « 12 points » est une attribution comptable, pas un gain démontré. Information achetable à coût faible ? Oui : 1 mois-équipe sur 6 disponibles, soit 17 % du budget de la fenêtre, lève les deux incertitudes simultanément. La règle s'applique littéralement : LE TEST DEVIENT L'OPTION RETENUE. C n'est pas seulement première au score, elle est imposée par la porte.
+
+constraint_isolation — la contrainte dure est la capacité de l'équipe (L1.2, L1.4), pas le calendrier concurrent (rumeur à ~0,5, datée par son émetteur, L3.7). Isoler la contrainte dure signifie agir sur les 30 points, pas sur l'annonce. Vérifié pour C, échoué pour A (agit sur tout à la fois) et pour B (agit sur la contrainte molle).
+
+forme4_health_gate — substrat exécutant dégradé. Conséquence opératoire : l'option retenue doit produire un soulagement visible AVANT d'exiger un effort supplémentaire prolongé. C satisfait (le lot le plus soulageant est livré en premier). A viole (effort maximal d'abord, soulagement en dernier, avec 25 % de chances qu'il n'arrive jamais). B viole autrement (effort constant, soulagement jamais).
+
+6. ADVERSARIAL_PROBE
+
+Meilleur argument CONTRE C : « C est un demi-geste au prix d'une décision, sans ses effets. Il consomme 1 mois-équipe dans la seule fenêtre où le concurrent est battable, ne libère que 12 points sur 30 avec un amortissement à 8,3 mois — donc au-delà de l'échéance, vos propres chiffres le disent — et laisse 18 points de legacy en place. Pire : "mesurer puis réévaluer" est le nom poli de "reporter". Une équipe usée le lira comme un sursis, pas comme une sortie, et le sursis démoralise davantage que le refus franc. Si la migration doit être faite, chaque mois d'attente la renchérit. Donc soit A, soit B, mais assumés ; C achète du confort décisionnel avec du temps réel. »
+
+Statut : l'argument est juste sur un point, faux sur deux.
+  Juste — C ne s'amortit pas dans la fenêtre. L3.3 le dit, je ne le réécris pas (no_upward_write) : c'est la conclusion qui se déplace. C ne se justifie donc PAS par l'économie de maintenance à 6 mois. Ce qu'on achète avec ce mois, c'est (i) 12 points définitivement libérés, acquis même si tout s'arrête après, et (ii) le taux réel coût/estimé, qui est l'entrée manquante de la décision A/B elle-même. C'est un achat d'information et un acquis, pas un rendement.
+  Faux 1 — « demi-geste ». Le rendement est concave (L3.1) : C prend 40 % du gain total pour 25 % du prix, à 12 pts/mois-équipe contre 6 pour le reste. La découpe est le bon endroit de la courbe, pas son milieu.
+  Faux 2 — « c'est reporter ». Un report ne produit rien. C produit un module migré et deux mesures dont les seuils sont publiés d'avance (L5.3). Décider plus tard sur un critère écrit avant n'est pas la même opération que ne pas décider.
+  Reste l'objection morale (« sursis, pas sortie »), qui est réelle et qui n'est pas traitée par le score. Elle est traitée en 7.
+  Verdict : l'argument tient partiellement — il corrige la justification de C — mais ne bascule ni vers A ni vers B. Écart de 41,6 points, aucun passage forcé.
+
+7. RECOMPOSITION COOPÉRATIVE
+
+L'ensemble lésé est celui des ingénieurs (L4.3) : il perçoit le mieux (L4.2) et ne décide pas (L4.1). La variante coopérative ne consiste pas à leur donner un mois de travail décidé au-dessus d'eux, mais une place, une voix, un engagement et une compensation.
+  Une place — les 2 ingénieurs qui ont évoqué un départ pilotent le lot M et arbitrent son périmètre (L5.5).
+  Une voix — les seuils de réévaluation (L5.3) sont co-écrits avec eux et publiés AVANT le démarrage ; ce sont eux qui portent la mesure, pas la direction.
+  Un engagement — la direction s'engage par écrit sur la règle de suite : si M tient en ≤6 semaines et libère ≥8 points, le lot suivant est financé automatiquement, sans nouvel arbitrage. « On réévaluera » devient un contrat conditionnel. C'est exactement ce qui répond à l'objection du sursis.
+  Une compensation — la capacité libérée par M (0,12/mois) reste à l'équipe, pour la dette de son choix, pendant 2 mois, avant reprise par le produit.
+Coût : perte de flexibilité pour la direction, et ~0,24 mois-équipe de capacité sur la fenêtre. Impact au score : utility_expected_value 70 → 66 (−0,64), risk_impact_security 80 → 82 (+0,48, la probabilité de départ baisse encore). Score C ≈ 81,4. Coût net 0,2 point, très en dessous du plafond de 5. RETENUE.
+Elle ne lève aucun veto (il n'y en a pas) et ne réécrit aucun constat de couche basse : L3.3 reste vrai, ça ne s'amortit toujours pas en 6 mois.
+
+8. ON_ANOMALY — repli de l'option retenue (C)
+
+resolve — Déclencheur : à 3 semaines calendaires, moins de 50 % du module M migré (mesure : points de maintenance déjà transférés, ou couverture fonctionnelle du nouveau module). Action : geler le périmètre de M à ce qui est déjà entamé, retirer tout élargissement, replanifier sur les 3 semaines restantes.
+recover — Déclencheur : à 6 semaines, M livré mais moins de 8 des 12 points libérés (mesure directe, semaines 7 à 10, comparées à la base de L1.2/L1.3). Action : arrêter toute migration et revenir à la couche binary — remesurer la répartition réelle des 30 points. Si M ne valait pas 12, alors l'attribution comptable était fausse et TOUT le plan reposait sur un chiffre faux, y compris l'estimation de 4 mois-équipe. Aucun lot suivant avant nouvelle mesure.
+kill — Déclencheur : dépassement ×2 sur le lot M, soit plus de 2 mois-équipe pour 1 estimé. C'est le chiffre même que fournit l'énoncé (25 % de dépassement ×2) : s'il se réalise sur le lot le plus facile, l'estimation de 4 mois-équipe pour l'ensemble est réfutée, pas retardée. Action : arrêt de tout programme de migration sur la fenêtre, bascule sur B assumé et déclaré comme tel, et traitement de l'usure par un autre levier que la technique (effectif, réduction de périmètre produit, rotation).
+Déclencheur humain transverse — un départ effectif pendant le lot M : passage immédiat en T2 sur la question effectif, indépendamment de l'avancement technique (L6.1 : c'est la seule perte irréversible du dossier).
+
+VERDICT — C, migration incrémentale, module M d'abord, sous contrat coopératif.
+Critère qui l'emporte : evidence_falsifiability (0,28), doublé par la porte evidence_sufficiency qui, les preuves étant sous τ et l'information achetable pour 17 % du budget de la fenêtre, fait du test l'option retenue.
+Pire cas de C et qui l'encaisse : le lot M déborde à 2 mois et ne libère que ~6 points ; environ 1 mois-équipe de capacité produit perdu et une équipe qui constate que même le lot facile résiste. Encaissé par les ingénieurs (six semaines d'effort, moral), marginalement par les clients (fonctionnalités décalées d'environ deux semaines). Rien d'irréversible.
+Repli et déclencheur : à 3 semaines, <50 % migré → gel du périmètre. À 6 semaines, <8 points libérés → arrêt et remesure de la répartition des 30 points. Dépassement ×2 sur M → arrêt de tout programme de migration et bascule assumée sur B.
+Observation qui renverserait le choix : (a) M livré en ≤6 semaines au coût estimé et libérant ≥12 points → le taux de dépassement historique est réfuté sur ce code, et la migration complète devient rationnelle : on monte vers A. (b) M à ×2 ou <8 points libérés → le découpage ne rend rien, on assume B. (c) La fonctionnalité concurrente confirmée livrée ou imminente par une source vérifiable, ET démontrée comme cause de perte de clients → la contrainte change de nature et la capacité repart vers le produit.
+Première action : cette semaine, publier le contrat écrit — périmètre gelé de M, butoir 6 semaines, seuils 8/12 points, financement automatique du lot suivant si les seuils tombent — nommer les 2 ingénieurs qui ont évoqué un départ comme pilotes du lot, et lancer la mesure hebdomadaire des points de maintenance par module en parallèle.
+
+---FINAL---
+{"decision": "C", "justification": "Le module le plus coûteux représente 12 des 30 points de maintenance et se refait en un mois : c'est le meilleur rapport entre effort et soulagement de tout le dossier, deux fois meilleur que la moyenne du reste. Le faire d'abord coûte environ un demi-mois de capacité produit sur les six prochains, ce qui laisse l'essentiel du temps pour répondre au concurrent, dont l'annonce reste une rumeur datée par lui et non par nous. Une refonte totale engagerait presque toute la fenêtre, avec une chance sur quatre de doubler, exactement le scénario qui, selon vos propres termes, achèverait l'équipe. Ne rien faire garde la charge intacte et laisse partir deux ingénieurs : c'est la seule perte qu'on ne rattrape pas, car elle emporte la connaissance nécessaire à toute refonte future. Le petit lot donne en six semaines un soulagement visible et surtout un chiffre : le coût réel comparé à l'estimé. C'est l'information qui manque pour trancher le reste, et elle s'achète pour un mois. On l'arrête quand on veut en gardant le gain déjà acquis.", "confidence_0_100": 88, "ease_1_10": 8}

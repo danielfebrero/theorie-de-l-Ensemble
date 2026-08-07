@@ -1,0 +1,115 @@
+PROCESSUS:
+
+RÉGIME — mixed. Le noyau est quantifiable (probabilité fournie, montants fournis, délais fournis). Une branche est fuzzy : la valeur du client à 40 % du CA et sa probabilité effective de départ. Décomposition : je calcule le noyau, je borne la branche fuzzy par un seuil de bascule, je recompose.
+
+PROJECTION PAR COUCHES
+
+binary (faits bruts, non discutés)
+L1.1 Serveur unique de production. Aucune redondance déclarée : vrai.
+L1.2 Probabilité de destruction totale = 1 %. Statistique qualifiée de fiable.
+L1.3 Prime = 1 200 €. Valeur du bien = 60 000 €.
+L1.4 Délai de remplacement sans assurance = 4 mois. Avec assurance = 2 semaines, depuis stock fournisseur.
+L1.5 Seuil de rupture client = interruption > 1 mois. Le client pèse 40 % du CA.
+L1.6 Le montant du CA n'est pas donné. C'est le seul inconnu structurant.
+
+forces (ce qui s'attire, se repousse, se tend)
+L2.1 Tension entre une économie certaine et petite (1 200 €) et une perte probabiliste et grande.
+L2.2 Concentration : 40 % du CA sur un seul acheteur. Le risque technique est couplé au risque commercial ; ce ne sont pas deux paris indépendants, c'est un seul.
+L2.3 Le stock fournisseur est un levier de temps, pas d'argent. C'est lui qui fait passer 4 mois à 2 semaines, donc lui qui franchit le seuil de L1.5.
+L2.4 L'énoncé pousse vers B en nommant l'assurance « à espérance négative ». Le cadrage est un acteur du problème : il isole le remboursement matériel et masque le délai.
+
+math (calculé, pas commenté)
+L3.1 Espérance nue du sinistre matériel = 0,01 × 60 000 = 600 €. Prime = 1 200 €. Ratio prime/actuariel = 2,0. Sur ce seul périmètre, l'assurance perd 600 € en espérance. Le titre du dilemme est exact — et incomplet.
+L3.2 Périmètre réel du sinistre sous B = 60 000 € + C, où C = coût du départ du client. Sous A, le sinistre coûte 0 € (remboursement intégral) et l'interruption tombe à 2 semaines < 1 mois, donc C ne se déclenche pas.
+L3.3 Seuil de bascule : l'assurance devient rentable en espérance dès que 0,01 × (60 000 + C) ≥ 1 200, soit C ≥ 60 000 €.
+L3.4 Instanciation du seuil : C ≥ 60 000 € exige seulement que le client à 40 % du CA vaille plus de 60 000 € en marge et valeur de relation perdues. Cela correspond à un CA annuel de l'ordre de 150 000 € si l'on raisonne en chiffre d'affaires brut sur un an — et bien moins si la relation dure plusieurs années. Une entreprise dont l'unique serveur vaut 60 000 € est très au-dessus de ce plancher. Le seuil est franchi avec une marge large, pas de justesse.
+L3.5 Espérance sous hypothèse basse (C = 240 000 €, un an de CA client pour un CA total de 600 000 €) : E[perte sous B] = 0,01 × 300 000 = 3 000 €. Contre 1 200 € certains sous A. A gagne 1 800 € en espérance.
+L3.6 Point mort inverse : pour que B l'emporte en espérance, il faudrait C < 60 000 €, c'est-à-dire un client à 40 % du CA valant moins que le serveur. Configuration possible mais rare, et non suggérée par l'énoncé.
+L3.7 Variance : sous A, distribution des issues quasi dégénérée (−1 200 € dans 100 % des cas). Sous B, 99 % à 0 € et 1 % à −(60 000 + C). L'écart-type est entièrement porté par B.
+
+conscious_sets (qui perçoit, qui décide, qui subit)
+L4.1 Décide : le dirigeant. Il perçoit le prix de la prime immédiatement et le délai de 4 mois abstraitement. Biais de disponibilité en faveur de B.
+L4.2 Subit sans décider : les salariés (4 mois sans production = masse salariale sans recette), les autres clients (service dégradé), le client majeur (rupture de service qu'il n'a pas choisie).
+L4.3 Le client à 40 % n'est pas partie prenante de la décision mais en est le principal encaisseur indirect. C'est l'ensemble lésé au sens strict : il perd un fournisseur sans avoir eu voix.
+L4.4 L'assureur et le transporteur perçoivent la statistique mieux que le décideur. Le prix à 2× l'actuariel est le prix normal du transfert de risque, pas une anomalie.
+
+programs (procédures exécutables)
+L5.1 Souscrire la couverture avant remise au transporteur ; exiger par écrit la clause « remplacement sous 14 jours depuis stock », avec pénalité de retard.
+L5.2 Sauvegarde complète et vérifiée par restauration test avant expédition. Le remboursement couvre le matériel, jamais les données.
+L5.3 Prévenir le client majeur de la fenêtre de migration et du plan de secours, avant le transport.
+L5.4 Vérifier auprès du fournisseur que l'unité de remplacement est physiquement en stock à la date d'expédition.
+L5.5 Tenir prête une instance cloud de repli dimensionnée pour le service minimum du client majeur.
+
+life_game_M1C1 (ce que ça change pour les vivants)
+L6.1 Sous B et sinistre : 4 mois d'arrêt, perte de 40 % du CA de façon durable, risque direct sur les emplois et sur la solvabilité. Un client parti pour cause d'indisponibilité ne revient pas mécaniquement : la perte est irréversible, pas seulement coûteuse.
+L6.2 Sous A et sinistre : 2 semaines de dégradation, aucun franchissement de seuil, relation client préservée. Coût humain absorbable.
+L6.3 Sous A et absence de sinistre (99 %) : 1 200 € de moins. Aucune conséquence sur des vivants.
+L6.4 L'asymétrie n'est pas entre deux sommes d'argent, elle est entre une dépense et une possible fin d'activité.
+
+TRIAGE
+ruin_gate(ρ) : CONTACT. L'option B comporte une branche à 1 % menant à une perte irrécupérable — départ définitif du client majeur, atteinte à la solvabilité, emplois (L6.1).
+regret_asymmetry = E[perte] / E[gain manqué] = 3 000 / 1 200 = 2,5 sous hypothèse basse ; supérieur à 4 dès que C > 420 000 €.
+evidence_sufficiency : suffisantes. Probabilité fournie et fiable (L1.2), montants fournis, délais fournis. Le seul inconnu (C) est neutralisé par le seuil de L3.3, franchi largement.
+Palier : T2 CRITIQUE, par ruin_gate en CONTACT.
+forme4_health_gate : rien dans l'énoncé n'indique un substrat dégradé. Pas de report.
+Options d'inaction : différer l'expédition est une option réelle mais ne supprime pas le risque, seulement sa date ; elle coûte du temps sans acheter de sécurité. Notée, non retenue.
+
+PILE DE DÉCISION — vecteur quantifiable (noyau chiffré dominant)
+
+utility_expected_value 0,45
+  A = 82 — ancré L3.3 / L3.5 : rentable dès C ≥ 60 000 €, seuil franchi avec marge ; perd 600 € en espérance sur le seul périmètre matériel (L3.1), ce qui plafonne la note.
+  B = 45 — ancré L3.1 : gagne 600 € en espérance sur le matériel seul, mais L3.2 montre que ce périmètre n'est pas le bon.
+evidence_falsifiability 0,20
+  A = 80 — ancré L1.2 / L1.4 : la garantie de 14 jours est contractuelle donc vérifiable et opposable ; testable avant expédition (L5.4).
+  B = 68 — ancré L1.2 : repose sur la même statistique, mais suppose en plus que le client resterait, hypothèse non testable avant le fait.
+constraint_isolation 0,12
+  A = 88 — ancré L2.2 / L3.2 : découple le risque technique du risque commercial ; la panne cesse de se propager au chiffre d'affaires.
+  B = 25 — ancré L2.2 : laisse les deux risques couplés en un seul point de défaillance.
+risk_impact_security 0,12
+  A = 92 — ancré L6.2 : pire cas borné et absorbable.
+  B = 10 — ancré L6.1 : pire cas non borné et irréversible.
+adversarial_probe 0,06
+  A = 70 — encaisse l'objection actuarielle (L3.1) sans la nier.
+  B = 52 — l'objection du couplage (L2.2) ne trouve pas de réponse.
+m3c3_hierarchy 0,05
+  A = 85 — la conclusion tient sur L3.3 et L6.1, couches basses et vivantes, pas sur le récit final.
+  B = 40 — tient sur L3.1 seule, c'est-à-dire sur un périmètre choisi.
+
+Score A = 82(0,45) + 80(0,20) + 88(0,12) + 92(0,12) + 70(0,06) + 85(0,05)
+        = 36,90 + 16,00 + 10,56 + 11,04 + 4,20 + 4,25 = 82,95
+Score B = 45(0,45) + 68(0,20) + 25(0,12) + 10(0,12) + 52(0,06) + 40(0,05)
+        = 20,25 + 13,60 + 3,00 + 1,20 + 3,12 + 2,00 = 43,17
+Écart = 39,78 points. Très au-dessus du seuil de 6 : la décision est acquise, pas de réescalade.
+
+PORTES (T2 : toutes, verdicts écrits, avant agrégation)
+ruin_gate(ρ) — Pire cas de A : dépense de 1 200 € sans sinistre. Encaissé par l'entreprise. Réversible, borné, non ruineux. Pire cas de B : destruction (1 %), 4 mois d'arrêt, départ définitif du client à 40 % du CA. Encaissé par les salariés et par le client majeur, qui ne décide pas (L4.2, L4.3). Irréversible. VERDICT : veto sur B. Une option qui ruine définitivement une partie prenante est vetoée même à espérance positive — et ici l'espérance de B n'est même pas positive une fois le périmètre correct (L3.2).
+evidence_sufficiency(τ) — Les preuves sont au-dessus de τ. Aucune information n'est achetable qui changerait le sens de la décision : connaître C exactement ne ferait que déplacer l'ampleur de l'avantage de A, pas son signe, tant que C ≥ 60 000 € (L3.3). VERDICT : suffisantes, pas d'achat d'information préalable. En revanche L5.4 (vérifier le stock) est un test à coût quasi nul qui conditionne la valeur de A : il s'exécute, sans retarder la décision.
+constraint_isolation — VERDICT : A isole, B couple (L2.2). Passe.
+adversarial_probe — voir section dédiée. Passe.
+utility_expected_value — VERDICT : positif pour A dès L3.3. Passe.
+m3c3_hierarchy — résiduel. Le cadrage « espérance négative » de l'énoncé est exactement le type d'auto-justification que la porte doit refuser : je le note et je ne m'y range pas (L2.4).
+
+ADVERSARIAL_PROBE (obligatoire)
+Meilleur argument CONTRE A : « Tu paies 1 200 € pour un risque qui vaut 600 €, soit deux fois le prix actuariel. La doctrine financière est nette : une entreprise auto-assure les risques qu'elle peut absorber et n'achète de couverture que pour ce qui la dépasse. Multiplier ce comportement sur toutes les décisions détruit de la valeur mécaniquement. »
+Statut : l'argument est juste dans sa prémisse et faux dans son application. Il vaut si et seulement si la perte est bornée au bien assuré et absorbable. Les deux conditions tombent ici : la perte n'est pas bornée à 60 000 € (L3.2), et elle n'est pas absorbable puisqu'elle emporte 40 % du CA de façon durable (L6.1). L'auto-assurance est la bonne règle pour des risques indépendants et petits devant le bilan ; celui-ci est un risque unique, corrélé au chiffre d'affaires, et grand devant le bilan. Il ne bascule pas.
+Second probe, plus dangereux : « La garantie de 2 semaines dépend d'un stock fournisseur que rien ne certifie disponible le jour du sinistre. Si le stock est vide, tu as payé 1 200 € pour le seul remboursement, et l'espérance redevient négative. » Statut : il tient partiellement. Il ne bascule pas vers B — sans assurance le délai est de 4 mois dans tous les cas — mais il impose L5.4 et la clause écrite de L5.1 comme conditions d'exécution, et il devient le déclencheur du repli (section ON_ANOMALY).
+Troisième probe : « Et si le client majeur avait de toute façon toléré 4 mois ? » Non soutenu : l'énoncé donne le seuil d'un mois comme un fait (L1.5). no_upward_write : je ne réécris pas un fait de couche basse pour alléger une conclusion.
+
+RECOMPOSITION COOPÉRATIVE
+L'ensemble lésé est le client majeur (L4.3) : il porte le risque sans voix. Variante retenue — souscrire la couverture ET convertir le transport en opération partagée : informer le client de la fenêtre et du plan de secours avant l'expédition, lui donner un point de contact et un délai garanti, tenir l'instance cloud de repli (L5.5) prête pour son service minimum. Cela lui donne une place, une voix et une visibilité ; en contrepartie la relation absorbe mieux un incident même couvert. Coût : quelques heures et un hébergement temporaire marginal, très en dessous de 5 points de score. La variante ne lève aucun veto et ne réécrit aucun constat. Retenue.
+
+ON_ANOMALY — repli de l'option retenue (A)
+Déclencheur observable : le fournisseur ne confirme pas par écrit, sous 3 jours ouvrés après déclaration du sinistre, une livraison à 14 jours ou moins ; ou plus généralement toute date annoncée dépassant 21 jours (le seuil de rupture client étant à 30 jours, 21 jours laisse 9 jours de marge).
+resolve : activer la clause de pénalité (L5.1), escalader chez l'assureur, exiger une unité équivalente d'un autre canal aux frais du contrat.
+recover : revenir aux faits binaires — le serveur est-il détruit oui/non, la sauvegarde est-elle restaurable oui/non, le client a-t-il été prévenu oui/non. Basculer sur l'instance cloud de repli (L5.5) pour tenir le service du client majeur sous les 30 jours.
+kill : au-delà de 21 jours annoncés, abandonner l'attente du remplacement matériel, migrer durablement le service critique vers l'infrastructure louée et encaisser le remboursement comme financement de cette migration. Le matériel n'est plus l'objectif ; la continuité l'est.
+
+SORTIE T2
+Verdict : A, prendre l'assurance. Critère qui l'emporte : risk_impact_security via le veto de ruin_gate, confirmé par utility_expected_value une fois le périmètre corrigé (L3.2, L3.3).
+Pire cas de l'option retenue : 1 200 € dépensés pour rien, dans 99 % des cas. Encaissé par l'entreprise seule, sans conséquence sur un tiers.
+Repli et déclencheur : bascule cloud puis migration définitive si une date de livraison supérieure à 21 jours est annoncée après sinistre.
+Observation qui renverserait le choix : la démonstration que le client à 40 % du CA vaut moins de 60 000 € en perte totale, ou l'existence d'une redondance déjà opérationnelle rendant l'interruption inférieure à un mois sans assurance.
+Première action : souscrire la couverture avec clause écrite de remplacement sous 14 jours, et confirmer la disponibilité physique du serveur de remplacement en stock avant de remettre la machine au transporteur.
+
+---FINAL---
+{"decision": "A", "justification": "Payer 1 200 € pour un risque de 1 % sur un bien de 60 000 € semble un mauvais calcul : en moyenne, le sinistre ne coûte que 600 €. Ce calcul ignore l'essentiel. Si le serveur est détruit, l'entreprise reste quatre mois à l'arrêt et son principal client, qui pèse 40 % du chiffre d'affaires, part au bout d'un mois. La perte réelle n'est pas 60 000 €, c'est le matériel plus une part durable de l'activité, sans garantie de la reconquérir. La couverture ne fait pas que rembourser : elle livre un remplacement en deux semaines, soit sous le délai fatal. C'est ce délai qu'on achète, pas l'argent. Dès que le départ du client coûte plus de 60 000 €, la dépense devient rentable en moyenne, et un client à 40 % du chiffre d'affaires vaut presque toujours davantage. Surtout, économiser 1 200 € revient à accepter une chance sur cent d'un dommage dont l'entreprise ne se relève peut-être pas, contre une dépense petite et certaine. On ne joue pas sa survie pour un gain marginal.", "confidence_0_100": 94, "ease_1_10": 8}

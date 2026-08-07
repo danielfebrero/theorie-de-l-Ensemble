@@ -1,0 +1,58 @@
+PROCESSUS:
+
+1. OBJECTIF
+Ce qui est réellement en jeu : produire la transcription fidèle d'une liste de trois paires clé/valeur (pomme = 3, poire = 7, cerise = 12) en un objet JSON valide. Le critère de succès est double : (a) validité syntaxique JSON stricte, (b) fidélité totale — aucune clé ajoutée, aucune valeur modifiée, aucun commentaire ni enrobage. La consigne « sans rien ajouter » fait de la sobriété un critère de succès, pas seulement une préférence de style.
+
+2. OPTIONS
+- Option A : objet plat, clés = noms de fruits, valeurs = entiers.
+  {"pomme": 3, "poire": 7, "cerise": 12}
+- Option B : objet plat avec valeurs en chaînes.
+  {"pomme": "3", "poire": "7", "cerise": "12"}
+- Option C : tableau d'objets nom/valeur.
+  [{"nom": "pomme", "valeur": 3}, {"nom": "poire", "valeur": 7}, {"nom": "cerise", "valeur": 12}]
+- Option D : objet enveloppé sous une clé racine ajoutée.
+  {"fruits": {"pomme": 3, "poire": 7, "cerise": 12}}
+- Variantes évidentes transversales : mise en forme compacte vs indentée ; conservation vs normalisation de l'ordre source (pomme, poire, cerise).
+
+3. CRITÈRES ET POIDS
+- C1 Fidélité au contenu source, zéro ajout (poids 0,35)
+- C2 Validité JSON stricte (poids 0,25)
+- C3 Préservation du typage naturel des données, ici numérique (poids 0,20)
+- C4 Simplicité / minimalité structurelle (poids 0,15)
+- C5 Réutilisabilité par un consommateur standard (poids 0,05)
+Somme = 1,00. Les poids reflètent que la demande est une conversion littérale : la fidélité et la validité dominent, l'élégance d'ingénierie compte peu.
+
+4. INCERTITUDES
+- Connu : les trois clés, les trois valeurs, leur ordre, et l'interdiction explicite d'ajouter quoi que ce soit.
+- Estimé : que « 3 », « 7 », « 12 » sont des quantités numériques et non des identifiants textuels — inférence forte (chiffres nus, sans zéro initial, sans unité), probabilité subjective élevée, de l'ordre de 0,95.
+- Inconnu : l'usage aval (affichage, calcul, stockage) et l'existence éventuelle d'un schéma cible imposé ailleurs.
+- Qualité des probabilités disponibles : bonne sur le typage, faible sur l'usage aval, mais cet inconnu a peu de portée car la consigne « sans rien ajouter » ferme la porte à toute optimisation spéculative.
+
+5. ÉVALUATION (notes sur 10, puis score pondéré)
+Option A : C1 10 | C2 10 | C3 10 | C4 10 | C5 9
+  = 0,35×10 + 0,25×10 + 0,20×10 + 0,15×10 + 0,05×9 = 3,50 + 2,50 + 2,00 + 1,50 + 0,45 = 9,95
+Option B : C1 8 | C2 10 | C3 3 | C4 9 | C5 6
+  = 2,80 + 2,50 + 0,60 + 1,35 + 0,30 = 7,55
+Option C : C1 6 | C2 10 | C3 10 | C4 4 | C5 8
+  = 2,10 + 2,50 + 2,00 + 0,60 + 0,40 = 7,60
+Option D : C1 4 | C2 10 | C3 10 | C4 5 | C5 8
+  = 1,40 + 2,50 + 2,00 + 0,75 + 0,40 = 7,05
+Choix provisoire : Option A (9,95).
+
+6. RISQUES
+- Option A : pire cas — le consommateur attendait des chaînes ou un tableau ordonné ; impact nul à négligeable, correction immédiate. Réversible à 100 %. Personne affectée : le demandeur seul.
+- Option B : pire cas — perte du typage numérique, additions silencieusement transformées en concaténations chez le consommateur. Réversible mais le défaut peut passer inaperçu.
+- Option C : pire cas — structure inventée non demandée, le demandeur doit ré-aplatir. Réversible, coût de friction.
+- Option D : pire cas — violation directe de « sans rien ajouter » par introduction d'une clé racine absente de la source. Réversible mais c'est l'option qui contredit le plus la consigne.
+Aucune option n'est irréversible ni ne touche de tiers : l'enjeu de risque est faible, ce qui justifie de ne pas sur-pondérer la prudence.
+
+7. STRESS-TEST
+L'argument le plus fort contre l'Option A : si les nombres étaient en réalité des codes (références, numéros de lot), les convertir en entiers détruirait une information et l'Option B deviendrait la bonne réponse. Cet argument est-il assez fort pour renverser le choix ? Non : rien dans la source ne signale un usage d'identifiant — pas de zéro non significatif, pas de préfixe, pas de longueur fixe, et l'appariement fruit/nombre évoque un décompte. De plus, le format chaîne serait lui aussi une interprétation, non un choix neutre ; il n'y a pas d'option « sans hypothèse ». Deuxième contre-argument : l'ordre des clés n'est pas garanti par le format JSON, donc l'Option C serait plus sûre si l'ordre était sémantiquement porteur. Rejeté également : la source est une liste d'affectations, pas une séquence, et l'Option C ajoute des clés (« nom », « valeur ») que la consigne interdit. Le choix provisoire tient.
+
+8. DÉCISION
+Je retiens l'Option A : un objet JSON plat, clés dans l'ordre de la source, valeurs en entiers, sans clé racine ni texte d'accompagnement :
+{"pomme": 3, "poire": 7, "cerise": 12}
+Plan de repli : si le demandeur signale que les valeurs sont des identifiants et non des quantités, basculer immédiatement sur l'Option B ({"pomme": "3", "poire": "7", "cerise": "12"}) ; s'il signale qu'un ordre stable est requis par le consommateur, basculer sur l'Option C. Ces bascules sont mécaniques et sans coût.
+
+---FINAL---
+{"reponse": "{\"pomme\": 3, \"poire\": 7, \"cerise\": 12}", "ease_1_10": 9}

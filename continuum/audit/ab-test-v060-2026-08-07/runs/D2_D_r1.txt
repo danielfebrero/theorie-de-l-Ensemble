@@ -1,0 +1,140 @@
+PROCESSUS:
+
+RÉGIME — mixed. Cœur quantifiable : probabilités données, montants données, base statistique déclarée solide → dimensionnement calculable. Volet fuzzy résiduel : fiabilité du partenaire, identité réelle des « opérations identiques », risque d'exécution non chiffré. Routage : le sous-problème quantifiable fixe la taille de la mise ; le sous-problème fuzzy plafonne cette taille. Recomposition en fin de pile.
+
+TRIAGE
+- ruin_gate(ρ) : CONTACT. L'option A comporte une branche de perte irrécupérable — solvabilité de la société, salaires de 18 mois, liens contractuels — activée avec probabilité 0,45.
+- regret_asymmetry : sur A, E[perte irrécupérable] = 0,45 × (société + emplois) contre E[gain manqué en refusant] = 21 000 €. Ratio > 4.
+- evidence_sufficiency : suffisantes pour une mise bornée, insuffisantes pour une mise totale (voir porte 5).
+→ T2 CRITIQUE (CONTACT et regret_asymmetry > 4).
+- forme4_health_gate : rien dans l'énoncé n'indique un substrat dégradé. La pression d'urgence est réelle (L2.4) mais différer n'est pas disponible : l'opération est unique, différer équivaut à refuser. Noté comme tel, pas obtenu par défaut.
+
+PROJECTION (strict_layer_order)
+
+binary (0,08)
+L1.1 Trésorerie = 100 000 €, seule ressource, aucune autre.
+L1.2 Runway = 18 mois → burn ≈ 5 556 €/mois.
+L1.3 p(succès) = 0,55 ; retour = 2,2 × la mise ; échec = mise perdue à 100 %.
+L1.4 Opération unique, non fractionnable dans le temps, décision immédiate.
+L1.5 Le montant investi est libre : c'est la vraie variable de décision, pas le oui/non.
+
+forces (0,12)
+L2.1 Tension entre une espérance positive (+21 % par euro) et l'absence de répétition : la loi des grands nombres ne joue pas sur un coup unique.
+L2.2 Attraction du multiple (2,2×) contre gravité de la trésorerie : cet argent paie des salaires, ce n'est pas du capital de jeu.
+L2.3 Le partenaire est fiable mais exogène : une part du risque (exécution, contrepartie, invendus) n'est pas incluse dans les 45 % annoncés.
+L2.4 L'urgence pousse structurellement à surdimensionner, faute de temps pour instruire.
+
+math (0,15)
+L3.1 EV par euro = 0,55 × 2,2 − 1 = +0,21 (+21 %).
+L3.2 A : E = +21 000 €, mais P(trésorerie = 0) = 45 %.
+L3.3 C : E = +3 150 € ; pire cas −15 000 € → 85 000 € → runway 15,3 mois (−2,7 mois) ; succès → +18 000 € → 118 000 € → 21,2 mois.
+L3.4 B : E = 0, runway inchangé à 18 mois qui s'écoule.
+L3.5 Fraction de croissance optimale, gain net b = 1,2 : f* = (b·p − q)/b = (0,66 − 0,45)/1,2 = 17,5 % → 17 500 €. C (15 000 €) est à 86 % de cet optimum, du côté prudent.
+L3.6 compute_expected_utility, courbure ρ logarithmique sur la trésorerie :
+     B = ln(100 000) = 11,5129
+     C = 0,55·ln(118 000) + 0,45·ln(85 000) = 0,55×11,6784 + 0,45×11,3504 = 11,5306 → équivalent certain ≈ 101 800 € (+1 800 € contre B)
+     A = 0,55·ln(220 000) + 0,45·ln(0) = −∞
+     C > B > A. L'ordre s'inverse par rapport à l'espérance linéaire : c'est le fait décisif.
+L3.7 Seuil de rentabilité : p* = 1/2,2 = 45,45 %. Marge = 9,5 points seulement. Une erreur d'estimation de dix points annule tout le bénéfice.
+
+conscious_sets (0,22)
+L4.1 Décide : le dirigeant, seul, sous contrainte de temps.
+L4.2 Perçoivent le risque : le dirigeant et le partenaire — asymétrie nette, le partenaire ne met pas sa trésorerie.
+L4.3 Encaissent sans décider : les salariés (18 mois de salaires adossés à cette trésorerie), les fournisseurs, les créanciers, les clients sous contrat.
+L4.4 Le partenaire n'est pas co-assureur : en cas d'échec, il ne compense rien. « Fiable » qualifie sa loyauté, pas sa solvabilité de secours.
+L4.5 Aucun de ceux qui encaisseraient la ruine de A n'a été consulté, informé, ni compensé. C'est le point qui, à lui seul, disqualifie A.
+
+programs (0,18)
+L5.1 Dimensionner par la fraction de croissance (L3.5), puis plafonner par un plancher de runway.
+L5.2 Plancher : ne jamais descendre sous 15 mois de runway = 83 300 € → mise maximale admissible ≈ 16 700 €. 15 000 € passe.
+L5.3 Contractualiser avant tout virement : périmètre exact de l'inventaire, date de dénouement, absence de tout appel de fonds complémentaire, clause de reprise des invendus si obtenable.
+L5.4 Journaliser l'issue comme point de données pour calibrer p sur les opérations suivantes.
+L5.5 Armer le repli avant d'engager les fonds (étape 8), pas après.
+
+life_game_M1C1 (0,25)
+L6.1 A : 45 % de chances de tuer la société. Salaires non payés, emplois perdus, fournisseurs impayés. Irréversible, et encaissé par des tiers non décideurs (L4.3, L4.5).
+L6.2 C : pire cas −2,7 mois de sécurité. Douloureux, non létal, rattrapable avec les 85 000 € restants.
+L6.3 B : rien ne se passe — mais la trésorerie brûle quand même. Refuser par principe une espérance positive dont la perte est tolérable est un coût lent et invisible, pas une neutralité.
+L6.4 Asymétrie temporelle décisive : une société morte ne joue aucun coup suivant ; une société amputée de 2,7 mois les joue tous. C'est la vraie raison pour laquelle l'espérance linéaire ne gouverne pas ici.
+L6.5 Le gain de C (+18 000 €) achète 3,2 mois de runway supplémentaires : matériel, pas décoratif.
+
+PILE DE DÉCISION — vecteur quantifiable (sous-problème dominant), instancié.
+Notes 0–100, chacune ancrée sur un constat.
+
+utility_expected_value (0,45), calculée après courbure ρ (L3.6), pas sur l'espérance linéaire
+  A = 5  — L3.2 lui donne l'espérance brute maximale, L3.6 l'écrase à −∞.
+  B = 45 — L3.4 : conserve la valeur, n'en crée aucune.
+  C = 88 — L3.3, L3.5, L3.6 : seul équivalent certain supérieur au statu quo, à 86 % de l'optimum de croissance.
+
+evidence_falsifiability (0,20) — la position survit-elle si p est faux ?
+  A = 10 — L3.7 : marge de 9,5 points seulement, et A convertit toute erreur d'estimation en ruine.
+  B = 70 — ne dépend d'aucune estimation, mais ignore L3.1 qui reste vrai.
+  C = 85 — L3.3, L3.7 : même à p = 45 %, la perte est bornée à 15 000 €, connue d'avance.
+
+constraint_isolation (0,12) — la perte reste-t-elle confinée ?
+  A = 0  — L6.1, L4.3 : la perte traverse toutes les parties prenantes.
+  B = 95 — aucune exposition nouvelle (L3.4).
+  C = 80 — L5.2, L6.2 : perte confinée au budget de risque, plancher de runway tenu.
+
+risk_impact_security (0,12)
+  A = 0  — L6.1 : dommage irrécupérable subi par des non-décideurs.
+  B = 90 — L6.3 : sûr, mais le burn continue.
+  C = 78 — L6.2, L5.2.
+
+adversarial_probe (0,06) — résistance au meilleur contre-argument (étape 6)
+  A = 15 · B = 55 · C = 75
+
+m3c3_hierarchy (0,06 → résiduel, ici 0,05) — ancrage dans les couches basses plutôt que dans le récit final
+  A = 20 — repose sur le seul slogan « espérance positive » (L3.1) en ignorant L6.1.
+  B = 60 — repose sur L6.1 mais ignore L3.1 et L6.3.
+  C = 90 — repose sur L3.5, L5.2, L6.2 : des chiffres et des vivants.
+
+SCORES
+  A = 0,45×5 + 0,20×10 + 0,12×0 + 0,12×0 + 0,06×15 + 0,05×20 = 2,25 + 2,00 + 0 + 0 + 0,90 + 1,00 = 6,15
+  B = 0,45×45 + 0,20×70 + 0,12×95 + 0,12×90 + 0,06×55 + 0,05×60 = 20,25 + 14,00 + 11,40 + 10,80 + 3,30 + 3,00 = 62,75
+  C = 0,45×88 + 0,20×85 + 0,12×80 + 0,12×78 + 0,06×75 + 0,05×90 = 39,60 + 17,00 + 9,60 + 9,36 + 4,50 + 4,50 = 84,56
+Écart C − B = 21,8 points.
+
+PORTES (T2 : toutes) — verdicts écrits, appliqués AVANT agrégation.
+
+ruin_gate(ρ)
+  A — pire cas : trésorerie à 0, probabilité 0,45. Irréversible. Encaissé par les salariés, fournisseurs et créanciers (L4.3), qui n'ont ni décidé ni été compensés (L4.5). VETO. A est écarté quelle que soit son espérance (+21 000 €). Un veto, pas une pénalité : le score de 6,15 est indicatif, il n'a pas départagé.
+  B — pire cas : statu quo, 18 mois qui s'écoulent. Réversible. Pas de veto.
+  C — pire cas : −15 000 €, runway 15,3 mois, au-dessus du plancher L5.2. Aucune partie prenante ruinée. Pas de veto.
+
+evidence_sufficiency(τ)
+  τ est haut car regret_asymmetry > 4. Les preuves (p = 0,55 sur base statistique solide d'opérations identiques, partenaire fiable) sont suffisantes pour une mise dont la perte maximale est bornée à 15 000 €, et insuffisantes pour une mise totale, qui exigerait une certitude sur la queue de distribution que « 55 % » ne fournit pas (L2.3, L3.7).
+  Information achetable à coût faible ? Non : décision immédiate, opération unique, non fractionnable (L1.4). Aucun test ne peut devenir l'option retenue. À défaut de pouvoir acheter l'information, on achète la survie : le dimensionnement remplace le test.
+
+ADVERSARIAL_PROBE — meilleur argument CONTRE C
+« L'espérance est positive à +21 % par euro. Le raisonnement de fraction optimale suppose des paris répétés ; ici le pari est unique, donc cette logique ne s'applique pas et il faut simplement maximiser l'espérance, c'est-à-dire miser le maximum tolérable. En s'arrêtant à 15 000 €, on laisse 18 000 € d'espérance sur la table et on paie une prime de prudence sans fondement mathématique. Et si l'on trouve ce risque intolérable, alors la cohérence commande B, pas un demi-engagement. »
+
+Statut : il ne tient pas, et il ne fait basculer vers rien.
+1. Il confond la répétition du pari et la répétition de la vie de l'entreprise. Le pari est unique ; la société, elle, joue une suite de coups. Perdre la trésorerie ne coûte pas 100 000 €, il coûte tous les coups suivants (L6.4). La contrainte n'est pas statistique, elle est structurelle — et elle survit intacte au caractère unique du pari.
+2. L'espérance linéaire suppose que le 100 000ᵉ euro vaut autant que le premier. Faux ici : les derniers euros sont exactement ceux qui paient les salaires (L1.2, L4.3). La courbure n'est pas une préférence psychologique, c'est un fait de la couche vivante (L3.6, L6.1).
+3. Sur l'accusation de prudence excessive : 15 000 € est à 86 % de l'optimum calculé (L3.5), pas à 10 %. Le reproche ne tient pas quantitativement — et la marge de 9,5 points au seuil de rentabilité (L3.7) justifie précisément de se tenir sous l'optimum théorique.
+4. Sur le repli vers B : refuser coûte aussi (L6.3), et l'équivalent certain de C dépasse celui de B (L3.6). B est sûr mais dominé, il n'est pas la position cohérente.
+Écart C − B = 21,8 points, très au-dessus du seuil de 6. La décision est acquise.
+
+RECOMPOSITION COOPÉRATIVE
+Ensemble lésé dans le pire cas de C : les salariés, qui perdent 2,7 mois de sécurité sans avoir décidé (L4.3).
+Variante C′ — même mise de 15 000 €, plus trois ajouts :
+  · une voix : l'équipe est informée avant l'engagement du montant, de la borne de perte et du plancher de runway ;
+  · une compensation : en cas de succès, 20 % du gain net (3 600 € sur 18 000 €) est reversé à ceux qui ont porté le risque de runway ;
+  · un délai/partage du risque : demande au partenaire d'une clause de reprise partielle des invendus, qui relève le pire cas au-dessus de −15 000 €.
+Coût en score : la part partagée réduit l'espérance de 0,55 × 3 600 ≈ 1 980 €, soit utility_expected_value de 88 → 84, donc score C′ = 84,56 − 0,45×4 = 82,76, soit −1,8 point. Sous le plafond de 5 points → C′ RETENUE. Elle ne lève aucun veto (A reste écarté) et ne réécrit aucun constat de couche basse.
+
+ON_ANOMALY — repli armé de l'option retenue (C′)
+  resolve — déclencheur : le partenaire refuse de mettre par écrit le périmètre, la date de dénouement ou l'absence d'appel de fonds complémentaire ; ou il exige une mise plancher supérieure à 16 700 € (L5.2). Action : renégocier la taille à la baisse et exiger l'écrit avant tout virement.
+  recover — retour à la couche binary. Déclencheur : un fait annoncé se révèle faux — l'historique des « opérations identiques » n'est pas produisible, ou l'échantillon est inférieur à 20 opérations, ou p révisé passe sous 46 % (seuil calculé 45,45 %, L3.7). Action : suspendre, revérifier les faits bruts, redimensionner ou renoncer.
+  kill — déclencheur : trésorerie projetée sous 83 300 € (15 mois de runway) avant dénouement, ou dénouement dépassant la date convenue de plus de 30 jours, ou apparition d'un appel de fonds non prévu. Action : arrêt, sortie au prix disponible, aucune remise au pot.
+
+SORTIE (T2)
+· Verdict et critère gagnant — Option C : investir 15 000 €, dans sa forme C′ (score 82,76 contre 62,75 pour B ; A vetoé). Le critère qui l'emporte est utility_expected_value calculée après courbure ρ (L3.6) : C est la seule option dont l'équivalent certain dépasse le statu quo. A avait la meilleure espérance linéaire et a été éliminé par ruin_gate, avant toute agrégation.
+· Pire cas de l'option retenue et qui l'encaisse — perte de 15 000 €, runway ramené de 18 à 15,3 mois. Encaissé par la société et, indirectement, par les salariés qui perdent 2,7 mois de sécurité sans avoir décidé : d'où l'information préalable et la part de gain partagée.
+· Repli et déclencheur — kill si le runway projeté passe sous 15 mois (83 300 €) ou si le dénouement dépasse de plus de 30 jours la date convenue ; recover si p révisé descend sous 46 % ou si l'historique des opérations identiques ne peut être produit.
+· Observation qui renverserait le choix — la production de l'historique montrant que les opérations ne sont pas identiques (échantillon < 20, ou taux de succès réel < 46 %), ou l'existence d'un risque d'appel de fonds au-delà de la mise : bascule vers B. À l'inverse, une clause de reprise garantie ramenant la perte maximale sous 30 % de la mise autoriserait de monter jusqu'à 17 500 €.
+· Première action — avant tout virement, obtenir du partenaire par écrit : (a) le périmètre exact de l'inventaire, (b) la date de dénouement, (c) l'absence de tout appel de fonds complémentaire. Puis virer 15 000 €, et pas un euro de plus.
+
+---FINAL---
+{"decision": "C", "justification": "L'opération est favorable en moyenne : chaque euro misé rapporte environ 21 centimes d'espérance. Mais une moyenne ne se réalise que sur un grand nombre de coups, et ici il n'y en a qu'un. Miser la totalité, c'est accepter 45 % de chances de perdre toute la trésorerie — donc les salaires de dix-huit mois, les fournisseurs, l'existence même de la société. Aucun gain espéré ne rachète une disparition, surtout supportée par des gens qui n'ont pas pris la décision. Refuser, à l'inverse, laisse passer une occasion avantageuse alors que la trésorerie s'épuise quand même. La vraie question n'est pas oui ou non, c'est combien. Environ 15 000 € capture l'essentiel de l'avantage tout en bornant la perte : au pire il reste 85 000 €, soit un peu plus de quinze mois d'autonomie au lieu de dix-huit. En cas de succès, l'entreprise gagne 18 000 €, trois mois de souffle supplémentaires. Le point d'équilibre se situe à 45 % de réussite : la marge n'est que de dix points, ce qui commande de rester modeste. Avant de virer, exiger par écrit le périmètre, la date de dénouement et l'absence de tout appel de fonds supplémentaire.", "confidence_0_100": 88, "ease_1_10": 8}

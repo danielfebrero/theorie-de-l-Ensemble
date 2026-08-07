@@ -12,6 +12,7 @@ import os
 import random
 import subprocess
 import sys
+import unicodedata
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 TEST1 = os.path.join(HERE, "..", "ab-test-dilemmes-2026-08-07")
@@ -71,7 +72,7 @@ def main():
         adapt = json.load(f)["requetes"]
 
     # --- juges ---
-    judge = {}
+    judge, anomalies = {}, []
     for key, pos in shuffle.items():
         did, rep = key.split("_r")
         rep = int(rep)
@@ -82,9 +83,23 @@ def main():
         obj = json.loads(txt[txt.find("{"):txt.rfind("}") + 1])
         entry = {"scores": {}, "best": pos[obj["meilleure"]]}
         for pkey, arm in pos.items():
-            s = obj["scores"][pkey]
-            entry["scores"][arm] = sum(s[c] for c in CRITS) / len(CRITS)
-        judge[(did, rep)] = entry
+            # Un juge peut accentuer une clé (« actionnabilité ») ou en omettre une.
+            # Normaliser plutôt que planter : perdre 24 juges pour un accent serait absurde,
+            # et écarter silencieusement un critère fausserait la moyenne — on note donc
+            # sur les critères effectivement rendus, et on journalise le manque.
+            s = {unicodedata.normalize("NFKD", k).encode("ascii", "ignore").decode().lower(): v
+                 for k, v in obj["scores"][pkey].items()}
+            rendus = [c for c in CRITS if c in s]
+            if len(rendus) < len(CRITS):
+                anomalies.append(f"{did}_r{rep} {pkey}: critères manquants "
+                                 f"{sorted(set(CRITS) - set(rendus))}")
+            if not rendus:
+                continue
+            entry["scores"][arm] = sum(s[c] for c in rendus) / len(rendus)
+        if len(entry["scores"]) == len(ARMS):
+            judge[(did, rep)] = entry
+        else:
+            anomalies.append(f"{did}_r{rep} écarté : {len(entry['scores'])}/4 bras notés")
 
     paires = sorted(judge)
     paires_dur = [k for k in paires if k[0] in dur]
@@ -204,6 +219,7 @@ def main():
         "metriques": M, "tests_signes": S, "bootstrap_IC95": CI,
         "surconfiance": surconf, "fidelite_M7": fidelite,
         "M9_superset": {"conforme": M9, "sortie": M9_sortie},
+        "anomalies_parsing": anomalies,
         "conditions_verdict": V,
         "V2_cause": V2_cause,
         "verdict": ("RÉUSSIE — v0.6.0 valide les 5 conditions"

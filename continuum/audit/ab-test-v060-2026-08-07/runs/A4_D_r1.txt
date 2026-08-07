@@ -1,0 +1,94 @@
+PROCESSUS:
+
+RÉGIME : mixed. Part quantifiable = probabilités de tri et valeur informative marginale de la rue. Part fuzzy = perception du lecteur, biais non observables. Décomposition : calcul en couche math, routage du reste sur le vecteur fuzzy, recomposition en pile unique.
+
+TRIAGE
+ruin_gate(ρ) : possible — sous-cas « domicile à protéger » (violence, harcèlement, procédure en cours), où la diffusion de la rue est irrécupérable.
+regret_asymmetry = 3,4 (calcul en L3.5) → bande 1,5–4.
+evidence_sufficiency : suffisantes (norme documentée, mécanisme connu, information manquante achetable en 2 minutes).
+Réversible à coût faible pour les envois futurs, PAS pour les copies déjà parties.
+→ T1 STANDARD.
+forme4_health_gate : rien dans l'énoncé n'indique un substrat dégradé.
+
+PROJECTION — strict_layer_order
+
+binary 0.08
+L1.1 Un CV est un document diffusé : envoyé, déposé en jobboard, stocké en base ATS, transféré à des tiers non choisis. Vrai.
+L1.2 Aucune règle ni standard de candidature n'exige l'adresse postale complète sur le CV lui-même. Vrai.
+L1.3 Ville + code postal + pays suffisent à établir la localisation pour un employeur. Vrai.
+L1.4 Le formulaire de candidature (ATS) et le contrat de travail demandent l'adresse dans des champs séparés, hors CV. Vrai.
+L1.5 Le CV futur est modifiable à tout instant ; les copies déjà envoyées ne le sont pas. Vrai — asymétrie de réversibilité.
+
+forces 0.12
+L2.1 Attraction : le lecteur cherche un signal de proximité et de disponibilité (temps de trajet, mobilité, éligibilité géographique).
+L2.2 Répulsion : la précision « rue + quartier » active des tris que le candidat ne voit jamais et auxquels il ne peut pas répondre (quartier, distance jugée excessive).
+L2.3 Tension : la surface de diffusion du document dépasse toujours l'intention de l'émetteur (L1.1).
+L2.4 Conformité : habitude ancienne de l'en-tête complet contre pratique actuelle « ville seule ». La norme a basculé ; une attente résiduelle subsiste chez une minorité de lecteurs et dans les dossiers réglementés.
+
+math 0.15
+L3.1 Valeur informative marginale de la rue, une fois la ville et le code postal donnés : quasi nulle. La ville fixe déjà le bassin d'emploi et le trajet à ±20 min. Estimation : < 2 % du poids de la décision de convocation.
+L3.2 p(biais géographique appliqué quand la rue est visible) ≈ 0,08 sur un pool de lecteurs mixte. Effet non notifié, non contestable.
+L3.3 p(exposition non voulue de l'adresse | dépôt en base CV, conservation ≥ 2 ans, revente/scraping) ≈ 0,2 à 0,5. Coût unitaire faible en général (démarchage), élevé dans le sous-cas L4.5.
+L3.4 p(un lecteur pénalise l'absence de rue) ≈ 0,015, et le coût est récupérable : il demande, on répond.
+L3.5 regret_asymmetry = E[perte adresse complète] / E[gain manqué ville seule] ≈ 0,08 / 0,015 ≈ 3,4.
+L3.6 Seuil de bascule : l'adresse complète ne redevient rentable que si p(pénalité pour omission) > 0,08 — c'est-à-dire uniquement là où elle est explicitement exigée.
+
+conscious_sets 0.22
+L4.1 Décide : toi seul, sur une ligne d'en-tête.
+L4.2 Perçoit et trie : recruteur, cabinet, parseur ATS, algorithme de scoring. Perçoivent sans expliciter, ne rendent pas compte du motif d'écartement.
+L4.3 Encaisse sans décider : toi, en aval (tri invisible, démarchage) — et surtout les personnes qui partagent ton domicile (famille, colocataires, enfant). Elles n'ont rien signé et ne sauront jamais où leur adresse a circulé. C'est l'ensemble lésé silencieux du dossier.
+L4.4 Tiers non prévus : bases CV, revendeurs de fichiers, destinataires de transfert interne.
+L4.5 Sous-ensemble critique : candidat en situation de violence, de harcèlement, ou hébergé chez un tiers. Là, l'ensemble « domicile » cesse d'être une donnée administrative.
+
+programs 0.18
+P1 En-tête : « Prénom Nom · Ville (code postal) · téléphone · e-mail · profil en ligne ». Ex. : « Lyon 69003 » ou « Lyon (69) ».
+P2 Ligne mobilité quand elle sert : « Mobile sur [région] · télétravail possible · permis B ».
+P3 Adresse complète réservée aux champs de formulaire ATS, au dossier administratif et au contrat — jamais au document diffusé.
+P4 Fournir la rue sur demande explicite, ou quand l'annonce l'exige (fonction publique, dossiers réglementés, habilitation, certaines candidatures locales).
+P5 Garder un master « ville seule » et une copie nommée à part « CV_avec_adresse », utilisée seulement sur exigence.
+
+life_game_M1C1 0.25
+L6.1 Coût de la ville seule : 30 secondes d'édition, zéro perte d'employabilité (L3.1).
+L6.2 Irréversibilité : un PDF envoyé ne se rappelle pas. C'est la seule branche irréversible du dossier, et elle n'existe que du côté « adresse complète ».
+L6.3 Enjeu vital : marginal dans le cas général, non marginal dans le sous-cas L4.5.
+L6.4 Ce que ça change pour le vivant : tu gardes la maîtrise de qui sait où tu dors, sans rien concéder sur ce que l'employeur a besoin de savoir.
+
+OPTIONS
+A — Adresse postale complète en en-tête.
+B — Ville seule, stricte.
+C — Ville + code postal sur le CV diffusé, adresse complète réservée aux champs de formulaire et fournie sur demande.
+
+PILE DE DÉCISION — vecteur fuzzy (part quantifiable pré-calculée en L3, compute_expected_utility fait avant notation de l'utilité)
+evidence_falsifiability 0.28 · risk_impact_security 0.24 · constraint_isolation 0.20 · utility_expected_value 0.16 · m3c3_hierarchy 0.06 · adversarial_probe 0.06
+
+A : falsifiabilité 45 (L1.2, L3.1 — la thèse « ça rassure » n'est adossée à aucun mécanisme testable) · risque 25 (L3.2, L3.3, L6.2) · isolation 40 (L1.4 — mélange document diffusé et pièce administrative) · utilité 35 (L3.5) · hiérarchie 40 · probe 50
+= 12,6 + 6,0 + 8,0 + 5,6 + 2,4 + 3,0 = 37,6
+
+B : falsifiabilité 80 (L1.3, L3.4) · risque 88 (L3.3, L6.2) · isolation 75 (L1.4) · utilité 80 (L3.1) · hiérarchie 70 · probe 60 (ne couvre pas le cas « la rue est exigée », L3.6)
+= 22,4 + 21,12 + 15,0 + 12,8 + 4,2 + 3,6 = 79,12
+
+C : falsifiabilité 84 (L1.3, L3.6) · risque 90 (L4.3, L6.2) · isolation 92 (L1.4, P3) · utilité 86 (L3.1, L3.4) · hiérarchie 78 · probe 85 (P4 absorbe l'objection)
+= 23,52 + 21,6 + 18,4 + 13,76 + 4,68 + 5,1 = 87,06
+
+Écart C – B = 7,94 > 6 : décision acquise, pas d'escalade forcée. A décroche de 49 points.
+
+PORTES (T1 : ruin_gate + evidence_sufficiency), appliquées AVANT agrégation
+ruin_gate(ρ) — pires cas :
+A : l'adresse atterrit dans une base consultée par une personne dont on veut être invisible ; le document n'est pas rappelable (L6.2). Perte irrécupérable possible sur la sécurité physique. Encaissée par le candidat ET par ses cohabitants, qui n'ont pas décidé (L4.3). Verdict : VETO sur A dans le sous-cas L4.5 ; pénalité lourde hors de ce sous-cas. Le veto tient même si l'espérance de A était positive — elle ne l'est pas.
+B/C : pire cas = un lecteur voulait la rue et ne la trouve pas. Il la demande, on la donne. Réversible, coût ≈ 0. Aucune branche de ruine.
+evidence_sufficiency(τ) — preuves au-dessus de τ. L'information manquante (« ce recruteur-ci exige-t-il la rue ? ») est achetable à coût quasi nul : lire l'annonce et le formulaire, 2 minutes. Elle est donc achetée, et l'achat est intégré à l'option retenue via P4 — le test EST l'option.
+
+ADVERSARIAL_PROBE
+Meilleur argument contre C : « Dans la fonction publique, la banque, la défense, ou pour une candidature spontanée dans une petite structure de quartier, l'absence d'adresse se lit comme un dossier incomplet, voire comme un candidat qui dissimule quelque chose. Et certains ATS parsent l'adresse pour calculer un score de proximité : sans rue, tu tombes hors du filtre géographique. »
+Statut : il tient en partie, il ne bascule pas. (a) Les filtres géographiques d'ATS travaillent sur ville et code postal, pas sur le numéro de rue (L3.1) — d'où l'ajout du code postal, qui neutralise ce point. (b) Le cas « dossier exigeant la rue » est déjà couvert par P3/P4 : l'adresse y est fournie, dans le champ prévu. (c) Il ne reste rien qui plaide pour l'imprimer sur un document destiné à circuler. Conclusion : l'argument ne fait pas basculer vers A ; il durcit C — ville SEULE devient ville + code postal.
+
+RECOMPOSITION COOPÉRATIVE
+L'ensemble lésé par une omission sèche, c'est le lecteur qui a un besoin légitime : évaluer trajet, éligibilité, disponibilité. La variante retenue lui donne exactement cela — ville, code postal, ligne de mobilité explicite, et la mention que l'adresse complète est fournie à la demande ou à l'embauche. Il obtient une place et une voix ; le domicile reste couvert ; les cohabitants (L4.3) cessent d'être exposés sans l'avoir voulu. Coût : 0 point — la variante EST l'option C. Elle ne lève aucun veto et ne réécrit aucun constat.
+
+ON_ANOMALY — repli de C
+resolve : une annonce ou un formulaire exige l'adresse complète → la renseigner dans le champ dédié, jamais dans le corps du CV. Déclencheur : mention explicite « adresse postale » dans le formulaire ou l'annonce.
+recover : retour aux faits bruts (L1.2, L3.6) et test comparatif. Déclencheur chiffré : 20 candidatures ciblées et pertinentes sans aucun retour, ET au moins un retour citant explicitement la localisation ou un dossier incomplet → envoyer 10 candidatures avec adresse complète et comparer les taux de réponse. Bascule seulement si p(pénalité) observée > 0,08 (L3.6).
+kill : domicile à protéger (L4.5) → arrêter toute mention géographique fine, y compris la ville si nécessaire (« région X »), et utiliser une adresse de domiciliation pour les champs obligatoires. Déclencheur : toute procédure de protection, séparation conflictuelle, ou harcèlement en cours.
+
+---FINAL---
+{"reponse": "Verdict : seulement la ville — précisément « Ville + code postal » (ex. « Lyon 69003 »), avec l'adresse complète réservée aux champs de formulaire de candidature, au dossier administratif et au contrat, et fournie sur demande. Critère qui l'emporte : constraint_isolation (92/100) — le CV est un document qui circule au-delà de son destinataire, la pièce administrative ne circule pas ; les deux ne doivent pas être le même objet. Le calcul le confirme : la rue n'apporte quasi rien une fois le code postal donné (< 2 % du poids de la décision), pour un risque de tri géographique invisible d'environ 8 %.\n\nPire cas de l'option retenue : un lecteur voulait l'adresse exacte, ne la trouve pas, et te juge imprécis ou incomplet. Il la demande, tu la donnes. Qui l'encaisse : toi seul, pour un coût nul et entièrement réversible. À comparer avec le pire cas de l'adresse complète — un PDF parti ne se rappelle pas, et il expose aussi les personnes qui vivent chez toi, lesquelles n'ont rien décidé.\n\nRepli et déclencheur : (resolve) une annonce ou un formulaire exige l'adresse postale → tu la renseignes dans le champ prévu, pas dans le CV. (recover) 20 candidatures ciblées sans retour ET au moins un retour mentionnant la localisation ou un dossier incomplet → test comparatif sur 10 candidatures avec adresse complète. (kill) domicile à protéger — violence, harcèlement, procédure → supprimer toute localisation fine et utiliser une adresse de domiciliation dans les champs obligatoires.\n\nObservation qui renverserait le choix : deux refus ou plus explicitement motivés par l'adresse manquante, ou un secteur où la rue est réellement exigée en pièce de dossier (fonction publique, habilitation). Autrement dit : une pénalité observée pour omission au-dessus de 8 %.\n\nPremière action : ouvre ton CV, remplace la ligne d'adresse par « Ville (code postal) · téléphone · e-mail · profil en ligne », ajoute si utile « Mobile sur [zone] · télétravail possible », enregistre — puis garde une copie nommée CV_avec_adresse pour les rares dossiers qui l'exigent.", "ease_1_10": 9}
