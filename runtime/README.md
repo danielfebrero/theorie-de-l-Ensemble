@@ -1,4 +1,4 @@
-# Runtime M3C3 v2.0.0
+# Runtime M3C3 v2.1.0
 
 Implémentation Python standard-library de référence du LTS M3C3. Le runtime
 matérialise `S=(H,R,E,A,M)`, sans modifier le noyau v1 gelé : types et ordre des

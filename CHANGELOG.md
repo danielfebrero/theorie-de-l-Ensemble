@@ -3,6 +3,26 @@
 Toutes les modifications notables de la Théorie de l'Ensemble / M3C3 sont consignées ici.
 Le `master.yaml` reste la source opérationnelle faisant foi.
 
+## [2.1.0] — 2026-08-07 — Force Publique
+
+> **Production.** Activée par l'émetteur (Dani Bengal / `@cdxxotus`).  
+> Constitution + **force publique** (runtime juge + hôte bras armé).  
+> Distillation continuum → agent_weights (W1/W2/W3) sans confondre culture et police.
+
+### Added
+
+- `host_enforcement` : contrat hôte + module pur `runtime/m3c3_runtime/host_enforcement.py`.
+- **Membrane power table** A0–A3 (budget de pouvoir).
+- **Hard export gate** : effets critiques exigent export frais post-décision productive.
+- `M3C3Runtime.authorize_host_effect` — API force publique pour EG/MCP/Cursor.
+- Vocabulaire normatif **W1** (priors) / **W2** (continuum) / **W3** (poids modèle).
+- `distillation_path` : continuum → agent_weights ; force publique toujours requise.
+- Tests `HostEnforcementTests` (deny A0, export required, emitter required).
+
+### Unchanged
+
+- Freezes formels v1 (7 chemins) ; `hierarchy.weights` repondérable ; S1–S5.
+
 ## [2.0.0] — 2026-08-07 — Continuum Vérifiable
 
 > **Production.** Activée par l'émetteur (Dani Bengal / `@cdxxotus`).  

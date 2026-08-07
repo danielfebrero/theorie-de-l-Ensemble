@@ -260,7 +260,7 @@ class InstallerTests(unittest.TestCase):
             "schema_version": "1.0",
             "distribution": "REACH-MAX",
             "distribution_version": version,
-            "manifest_version": "2.0.0",
+            "manifest_version": "2.1.0",
             "manifest_sha256": hashlib.sha256(MANIFEST.read_bytes()).hexdigest(),
             "installed_profiles": ["core"],
             "created_at": "2026-08-07T18:30:45Z",
@@ -292,7 +292,7 @@ class InstallerTests(unittest.TestCase):
     def test_exact_version_forged_destination_is_still_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             target = Path(temporary)
-            state_path = self._write_forged_state(target, "2.0.0")
+            state_path = self._write_forged_state(target, "2.1.0")
             with self.assertRaises(ValidationError):
                 uninstall(MANIFEST, target, now=FIXED_NOW)
             self.assertEqual((target / "important.txt").read_text(encoding="utf-8"), "must survive\n")
@@ -413,7 +413,7 @@ class InstallerTests(unittest.TestCase):
             forged = {
                 "schema_version": "1.0",
                 "distribution": "REACH-MAX",
-                "distribution_version": "2.0.0",
+                "distribution_version": "2.1.0",
                 "manifest_sha256": hashlib.sha256(MANIFEST.read_bytes()).hexdigest(),
                 "transaction_id": "a" * 32,
                 "status": "prepared",
@@ -448,7 +448,7 @@ class InstallerTests(unittest.TestCase):
             forged = {
                 "schema_version": "1.0",
                 "distribution": "REACH-MAX",
-                "distribution_version": "2.0.0",
+                "distribution_version": "2.1.0",
                 "manifest_sha256": hashlib.sha256(MANIFEST.read_bytes()).hexdigest(),
                 "transaction_id": transaction_id,
                 "status": "prepared",
@@ -486,7 +486,7 @@ class InstallerTests(unittest.TestCase):
             forged = {
                 "schema_version": "1.0",
                 "distribution": "REACH-MAX",
-                "distribution_version": "2.0.0",
+                "distribution_version": "2.1.0",
                 "manifest_sha256": hashlib.sha256(MANIFEST.read_bytes()).hexdigest(),
                 "transaction_id": transaction_id,
                 "status": "prepared",

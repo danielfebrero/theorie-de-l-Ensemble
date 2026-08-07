@@ -41,10 +41,22 @@ from .model import (
     MembraneLevel,
     Regime,
 )
+from .host_enforcement import (
+    EffectClass,
+    EnforcementVerdict,
+    authorize_host_effect,
+    effects_requiring_export,
+    power_table_as_dict,
+)
 from .replay import ReplayResult, replay_entries, replay_file
 from .validation import validate_event, validate_export, validate_state
 
 __all__ = [
+    "EffectClass",
+    "EnforcementVerdict",
+    "authorize_host_effect",
+    "effects_requiring_export",
+    "power_table_as_dict",
     "ACTION_ALPHABET",
     "AUTHORSHIP",
     "AbstractAction",

@@ -97,7 +97,7 @@ def active_runtime(**kwargs: object) -> M3C3Runtime:
 
 class CanonicalInvariantTests(unittest.TestCase):
     def test_frozen_kernel_constants_are_exact(self) -> None:
-        self.assertEqual(RUNTIME_VERSION, "2.0.0")
+        self.assertEqual(RUNTIME_VERSION, "2.1.0")
         self.assertEqual(KERNEL_VERSION, "1.0.0")
         self.assertEqual(
             LAYER_ORDER,
@@ -1039,6 +1039,69 @@ class ArtifactTests(unittest.TestCase):
         )
         self.assertEqual(process.returncode, 0, process.stderr)
         self.assertTrue(json.loads(process.stdout)["safe"])
+
+
+class HostEnforcementTests(unittest.TestCase):
+    """v2.1 force publique: membrane power table + hard export gate."""
+
+    def test_a0_denies_tools(self) -> None:
+        instance = runtime()
+        with self.assertRaises(RuntimeViolation) as ctx:
+            instance.authorize_host_effect("tool_critical", actor="agent-a")
+        self.assertEqual(ctx.exception.code, "A0_DORMANT")
+
+    def test_a1_denies_capital_live_and_git_push(self) -> None:
+        instance = runtime()
+        instance.activate_scope("shadow", membrane="A1", actor="agent-a")
+        with self.assertRaises(RuntimeViolation) as ctx:
+            instance.authorize_host_effect("capital_live", actor="agent-a")
+        self.assertIn(ctx.exception.code, {"MEMBRANE_TOO_LOW", "MEMBRANE_DENY", "EXPORT_REQUIRED"})
+        with self.assertRaises(RuntimeViolation) as ctx2:
+            instance.authorize_host_effect("git_push", actor="agent-a")
+        self.assertIn(ctx2.exception.code, {"MEMBRANE_TOO_LOW", "MEMBRANE_DENY", "EXPORT_REQUIRED"})
+
+    def test_a2_requires_export_before_critical_effect(self) -> None:
+        instance = active_runtime()
+        instance.execute(
+            Action(
+                kind=ActionType.ALLOCATE,
+                actor="agent-a",
+                payload={"budget": "attention"},
+            )
+        )
+        with self.assertRaises(RuntimeViolation) as ctx:
+            instance.authorize_host_effect("capital_live", actor="agent-a")
+        self.assertEqual(ctx.exception.code, "EXPORT_REQUIRED")
+        instance.export()
+        allowed = instance.authorize_host_effect("capital_live", actor="agent-a")
+        self.assertEqual(allowed.outcome, "applied")
+        self.assertTrue(allowed.value["allowed"])
+
+    def test_reweight_activate_requires_emitter(self) -> None:
+        instance = runtime()
+        instance.activate_scope("canon", membrane="A3", actor="agent-a")
+        instance.export()
+        with self.assertRaises(RuntimeViolation) as ctx:
+            instance.authorize_host_effect("reweight_activate", actor="agent-a")
+        self.assertEqual(ctx.exception.code, "EMITTER_REQUIRED")
+        allowed = instance.authorize_host_effect(
+            "reweight_activate",
+            actor=EMITTER,
+            authority_proof=AUTH_PROOF,
+        )
+        self.assertTrue(allowed.value["allowed"])
+
+    def test_power_table_is_complete(self) -> None:
+        from m3c3_runtime.host_enforcement import (
+            EffectClass,
+            validate_power_table_complete,
+            power_table_as_dict,
+        )
+
+        validate_power_table_complete()
+        table = power_table_as_dict()
+        self.assertIn("A2_CRITICAL", table)
+        self.assertIn("capital_live", table["A2_CRITICAL"])
 
 
 if __name__ == "__main__":

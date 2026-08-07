@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from types import MappingProxyType
 
-RUNTIME_VERSION = "2.0.0"
+RUNTIME_VERSION = "2.1.0"
 KERNEL_VERSION = "1.0.0"
 
 LAYER_ORDER = (

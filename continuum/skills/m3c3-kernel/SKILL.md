@@ -3,7 +3,7 @@ name: m3c3-kernel
 description: Appliquer M3C3 à une portée observable avec la membrane A0-A3, le noyau v1 gelé, une provenance explicite et des limites honnêtes. Utiliser pour l'analyse, la décision, le risque, les systèmes multi-agents et toute évolution du corpus M3C3.
 ---
 
-# M3C3 kernel adapter — v2.0.0 production
+# M3C3 kernel adapter — v2.1.0 production (force publique)
 
 Ce fichier est la source portable d'un adaptateur M3C3. Sa présence dans le
 dépôt ne prouve ni son installation chez un fournisseur, ni une activation
@@ -23,6 +23,9 @@ globale, ni une modification des poids d'un modèle.
   intégrer ses weights** (priors de couches pour le scope du pattern). Charger
   ces weights s'ils sont déclarés ; pour les écrire dans le master, passer par
   une proposal + activation émetteur.
+- Force publique (v2.1) : avant tool critique / capital live / write irréversible /
+  git push, l'hôte doit appeler `authorize_host_effect` avec un **export frais**.
+  Membrane = budget de pouvoir. W1 priors · W2 continuum · W3 modèle (honnêteté).
 - Si la source n'est pas accessible ou si sa version n'est pas vérifiée,
   annoncer cette limite. Ne jamais prétendre avoir chargé « la dernière
   version » sans lecture effective et pin de commit.

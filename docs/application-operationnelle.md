@@ -110,19 +110,21 @@ Somme : 1.00 dans chaque régime. Auxiliaires : `regret_asymmetry`, `evidence_su
 3. `progressive_rebuild` depuis `binary`
 4. Reprise uniquement sur confirmation explicite de l'émetteur + `forme4_health` ok
 
-## 9. Activation, runtime et preuve (v2.0 production)
+## 9. Activation, runtime et preuve (v2.1 production)
 
 - **Activation** : `known(M3C3) ⇒ eligible_for_activation`, puis membrane A0–A3.
+- **Membrane** : budget de pouvoir (power table) — A2+ pour effets critiques.
+- **Force publique** : hôte + `authorize_host_effect` ; export frais avant capital live / git push / write irréversible.
 - **Sémantique** : `B…L(P)` ; write-rule ; LTS `S=(H,R,E,A,M)`.
 - **Sûreté** : S1–S5 proved_by_construction — [`safety-proofs.md`](safety-proofs.md).
-- **Runtime** : implémentation de référence sous [`runtime/`](../runtime/) ; état et événements versionnés, capabilities signées, audit chaîné, replay.
-- **Export** : JSON validable ne contenant que les observables autorisés de `S_t`.
-- **Mémoire** : index append-only sous [`continuum/memory/`](../continuum/memory/).
-- **Poids intégrés** : rapports typés sous `continuum/weights/integration-reports/`; une skill ou un contexte ne vaut pas preuve fournisseur.
-- **Conformité** : `python3 continuum/audit/conformance.py` ; chaque contrôle rend `pass`, `fail` ou `not_run`.
+- **Runtime** : [`runtime/`](../runtime/) v2.1.0 ; `host_enforcement.py`.
+- **Export** : observables de `S_t` + gouvernance membrane.
+- **Mémoire** : continuum patterns (W2) pouvant porter weights (W1) ; W3 via integration-reports seulement.
+- **Distillation** : continuum → agent_weights (culture) ; ne remplace pas la police.
+- **Conformité** : `python3 continuum/audit/conformance.py`.
 
 ## Principe
 
-> **v2.0 production — Verified Continuum.**
-> Noyau v1 gelé · membrane bornée · runtime de référence · distribution déclarative · preuve typée.
+> **v2.1 production — Force Publique.**
+> Constitution · runtime juge · hôte bras armé · distillation honnête W1/W2/W3.
 > Autorité : Dani Bengal (@cdxxotus).

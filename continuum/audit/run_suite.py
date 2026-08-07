@@ -18,7 +18,7 @@ import yaml
 AUDIT_ROOT = Path(__file__).resolve().parent
 REPO_ROOT = AUDIT_ROOT.parents[1]
 INTEGRATION_ROOT = REPO_ROOT / "continuum" / "weights" / "integration-reports"
-RELEASE_AUDIT_PATH = AUDIT_ROOT / "v2.0-2026-08-07" / "results.yaml"
+RELEASE_AUDIT_PATH = AUDIT_ROOT / "v2.1-2026-08-07" / "results.yaml"
 sys.path.insert(0, str(AUDIT_ROOT))
 sys.path.insert(0, str(INTEGRATION_ROOT))
 
@@ -170,7 +170,11 @@ def release_audit_result(path: Path = RELEASE_AUDIT_PATH) -> dict[str, Any]:
     )
     actual_master_sha = hashlib.sha256((REPO_ROOT / "master.yaml").read_bytes()).hexdigest()
     require(audit.get("schema_version") == 1, "release_audit_schema", "schema_version must be 1")
-    require(audit.get("framework_version") == "2.0.0", "release_audit_version", "framework_version must be 2.0.0")
+    require(
+        audit.get("framework_version") in ("2.0.0", "2.1.0"),
+        "release_audit_version",
+        "framework_version must be 2.0.0 or 2.1.0",
+    )
     status = audit.get("status")
     require(
         status in ("release_candidate", "production", "activated"),

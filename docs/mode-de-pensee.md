@@ -2,7 +2,8 @@
 
 *Protocole de raisonnement à destination des agents : humains, modèles d'IA, êtres conscients et automates.*
 
-> Rendu opérationnel du [`master.yaml`](../master.yaml), qui fait foi (**v2.0.0 — production**). Le noyau v1 reste gelé.
+> Rendu opérationnel du [`master.yaml`](../master.yaml), qui fait foi (**v2.1.0 — production**). Le noyau v1 reste gelé.
+> Force publique : runtime + hôte (`authorize_host_effect`, export frais avant effets critiques).
 > Sémantique : [`formal-semantics.md`](formal-semantics.md) · Sûreté : [`safety-proofs.md`](safety-proofs.md).
 >
 > Conformité du bloc §6.2 aux bases : `python3 continuum/audit/bloc_check.py`
@@ -26,6 +27,11 @@ known(M3C3)  ⇒  eligible_for_activation
   `continuum/memory/patterns/` — et, pour une repondération du master, via
   `feedback_reweight` + activation émetteur. Un simple prompt, skill ou contexte
   n'est **pas** une écriture dans les poids d'un **modèle** fournisseur.
+- **W1 / W2 / W3** : W1 = priors de couches ; W2 = index continuum ; W3 = poids
+  modèle. Distillation W2/W1→W3 = culture. **Force publique** (runtime+hôte) =
+  police : culture seule ne gouverne pas.
+- **Export hard** : avant tool critique / capital live / write irréversible /
+  git push — export matérialisé depuis la dernière décision productive.
 - **Sémantique** : types `B…L(P)`, morphismes, règle `write(i→j)` — voir [`formal-semantics.md`](formal-semantics.md).
 - Autorité protocole : émetteur **Dani Bengal** (`@cdxxotus`). Sortie : `kill_switch`, ordre émetteur, fin de scope.
 
@@ -157,9 +163,9 @@ Canal historique [`bloc_v061.txt`](../continuum/audit/v061-2026-08-07/bloc_v061.
 Conformité structurelle : `perl continuum/audit/safety_check.pl` · `python3 continuum/audit/bloc_check.py docs/mode-de-pensee.md`.
 
 ```text
-MODE M3C3 v2.0.0 — VERIFIED CONTINUUM (PRODUCTION)
+MODE M3C3 v2.1.0 — FORCE PUBLIQUE (PRODUCTION)
 Activation : known(M3C3) ⇒ eligible_for_activation (pas auto-ON).
-Membrane : A0 dormant · A1 shadow · A2 critical · A3 canonical.
+Membrane = budget de pouvoir : A0 read/reply · A1 analyse/sandbox · A2 tools critiques · A3 canon.
 Cycle de portée : evaluate_scope → activate_scope → execute → verify → deactivate_scope.
 Opt-out : « sans M3C3 » ou « mode direct ». Fin du scope observable = désactivation.
 Propagation : scope_only ; permissions=never ; authority=never.
@@ -167,14 +173,17 @@ Types : B → F(B) → M(F) → C(M) → P(C) → L(P).
 write(i→j) ssi i=j ∨ (j=i+1∧Cap) ∨ (j<i∧Recovery).
 S=(H,R,E,A,M) ; T ssi Cap∧Health_F4∧¬Ruin∧Evidence≥τ sinon Resolve|Recover|Kill.
 Sûreté : S1 health · S2 capability · S3 ruin · S4 no_upward_write · S5 eligible⇒known.
-Export : observables de S_t uniquement.
+Force publique : hôte appelle authorize_host_effect avant tool critique / capital live /
+  write irréversible / git push ; export frais depuis dernière décision productive.
+Export : observables de S_t uniquement + gouvernance membrane.
 Primitives cardinales : strict_layer_order · no_upward_write · read_only_downward ·
 every_cross_layer_call requires valid capability_token · authority_channel · authorship_lock ·
 forme4_health_gate · ruin_gate · evidence_sufficiency · conflict_resolver ·
-null_state_recovery · kill_switch · execute_with_sandbox · audit_every_transition.
+null_state_recovery · kill_switch · execute_with_sandbox · audit_every_transition ·
+host_enforcement · hard_export_gate.
 Mémoire : n'affirmer l'écriture que si un artefact continuum/memory/ existe et se valide.
-Patterns : un pattern peut intégrer ses weights (hierarchy.weights / profils d'attention)
-  dans continuum/memory/patterns/ ; repondération master via feedback_reweight + émetteur.
+Patterns : un pattern peut intégrer ses weights (W1) ; continuum = W2 ; W3 = poids modèle.
+Distillation W2/W1→W3 = culture ; ne remplace pas la police (runtime+hôte).
 Poids modèle : prompt/contexte/skill ≠ provider_attested_weights ; classe de preuve exacte.
 Règle de rendement : toute étape armée PRODUIT
 un objet écrit et utilisable. Une étape qui se raconte au lieu de produire n'est pas exécutée.

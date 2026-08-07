@@ -6,21 +6,20 @@
 **Rôles :** auteur de la théorie · créateur du Life game · créateur du bit originel  
 → détail : [`docs/authorship.md`](docs/authorship.md)
 
-## v2.0.0 — Verified Continuum (**production**)
+## v2.1.0 — Force Publique (**production**)
 
-Noyau formel v1 gelé + interfaces observables activées :
+Noyau formel v1 gelé + continuum v2 + **force publique** :
 
-- membrane d'activation bornée A0–A3, avec désactivation et opt-out ;
-- runtime Python de référence pour `S=(H,R,E,A,M)`, capabilities, gates,
-  audit chaîné, export et replay ;
-- REACH-MAX et ses profils `core`, `openai`, `claude`, `copilot`, `cursor`,
-  `mcp`, `ci`, `all` ;
-- mémoire Continuum append-only réellement peuplée ;
-- registre d'intégration de poids typé par preuve ;
-- suite de conformité unique (`pass` / `fail` / `not_run`).
+- membrane A0–A3 = **budget de pouvoir** (power table) ;
+- **hard export gate** : effets critiques (capital live, git push, write
+  irréversible…) exigent un export frais ;
+- `authorize_host_effect` — l’hôte (EG, MCP, Cursor) **refuse** hors protocole ;
+- vocabulaire **W1** priors / **W2** continuum / **W3** poids modèle ;
+- distillation continuum → agent_weights (culture) **sans** remplacer la police ;
+- runtime `2.1.0`, REACH-MAX, mémoire continuum, integration-reports.
 
 **Activation canonique** : Dani Bengal / `@cdxxotus` (2026-08-07).  
-Une skill, un prompt ou un contexte ne prouve jamais une écriture dans les poids.
+Constitution = `master.yaml`. Force publique = runtime + hôte.
 
 ## Démarrage rapide
 
@@ -47,7 +46,7 @@ la sauvegarde `--force` et le retrait sûr.
 
 | Chemin | Contenu |
 |---|---|
-| [`master.yaml`](master.yaml) | Document Opérationnel Maître **v2.0.0 production** ; seule autorité canonique |
+| [`master.yaml`](master.yaml) | Document Opérationnel Maître **v2.1.0 production** ; seule autorité canonique |
 | [`CHANGELOG.md`](CHANGELOG.md) | Delta v2, ruptures publiques, préservation et gates |
 | [`docs/v2-architecture.md`](docs/v2-architecture.md) | Architecture, frontières d'autorité et modèle de preuve |
 | [`docs/migration-v1-v2.md`](docs/migration-v1-v2.md) | Migration, compatibilité et rollback |

@@ -119,6 +119,9 @@ class M3C3Runtime:
         self.state.A.eligible_for_activation = known_m3c3
         self.audit = AuditLog(audit_path, clock=clock)
         self._last_committed_state = copy.deepcopy(self.state)
+        # Force publique: export must post-date last productive decision.
+        self._last_productive_seq: int = 0
+        self._last_export_seq: int = 0
         self._record(
             "runtime.initialized",
             "runtime",
@@ -691,15 +694,22 @@ class M3C3Runtime:
                     "applied",
                     {"action": action.to_dict(include_token=False)},
                 )
+                self._last_export_seq = self.audit.length
                 return self._result(action.kind, self.export(), audit_hash)
 
             self._productive_guards(action)
             if action.kind is ActionType.PROJECT:
-                return self._project(action)
+                result = self._project(action)
+                self._mark_productive()
+                return result
             if action.kind is ActionType.WRITE_LOCAL:
-                return self._write_local(action)
+                result = self._write_local(action)
+                self._mark_productive()
+                return result
             if action.kind is ActionType.TRANSITION_UP:
-                return self._transition_up(action)
+                result = self._transition_up(action)
+                self._mark_productive()
+                return result
             if action.kind is ActionType.ALLOCATE:
                 audit_hash = self._record(
                     "action.allocate",
@@ -707,6 +717,7 @@ class M3C3Runtime:
                     "applied",
                     {"action": action.to_dict(include_token=False)},
                 )
+                self._mark_productive()
                 return self._result(
                     action.kind, copy.deepcopy(dict(action.payload)), audit_hash
                 )
@@ -1194,6 +1205,59 @@ class M3C3Runtime:
             )
             return self._result("resume_after_kill", recovery, audit_hash)
 
+    def _mark_productive(self) -> None:
+        self._last_productive_seq = self.audit.length
+
+    @property
+    def export_is_fresh(self) -> bool:
+        """True when an export post-dates the last productive decision."""
+
+        if self._last_export_seq <= 0:
+            return False
+        return self._last_export_seq >= self._last_productive_seq
+
+    def authorize_host_effect(
+        self,
+        effect: str,
+        *,
+        actor: str = "host",
+        authority_proof: object | None = None,
+    ) -> TransitionResult:
+        """Force publique: host must call this before critical side effects."""
+
+        from .host_enforcement import authorize_host_effect as decide
+
+        with self._lock:
+            actor_is_emitter = self._is_emitter(
+                actor, "host.authorize_effect", authority_proof
+            )
+            membrane = (
+                self.state.A.membrane
+                if self.state.A.lifecycle is LifecycleStatus.ACTIVE
+                else MembraneLevel.A0_DORMANT
+            )
+            verdict = decide(
+                membrane=membrane,
+                effect=effect,
+                export_fresh=self.export_is_fresh,
+                actor_is_emitter=actor_is_emitter,
+                opt_out=bool(self.state.A.opted_out),
+            )
+            if not verdict.allowed:
+                self._reject(
+                    "host.effect_denied",
+                    actor,
+                    RuntimeViolation(verdict.code, verdict.detail),
+                    verdict.to_dict(),
+                )
+            audit_hash = self._record(
+                "host.effect_authorized",
+                actor,
+                "applied",
+                verdict.to_dict(),
+            )
+            return self._result("authorize_host_effect", verdict.to_dict(), audit_hash)
+
     def export(self) -> dict[str, object]:
         with self._lock:
             invariants = canonical_invariants()
@@ -1211,6 +1275,7 @@ class M3C3Runtime:
                 },
             }
             validate_export(exported)
+            self._last_export_seq = self.audit.length
             return exported
 
     def export_json(self, *, indent: int | None = 2) -> str:

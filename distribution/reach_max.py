@@ -418,8 +418,8 @@ def validate_distribution(
             errors.append("%s must be strict semantic version x.y.z" % name)
     if manifest_version != framework_version or manifest_version != distribution_version:
         errors.append("manifest, framework, and distribution versions must match")
-    if manifest_version != "2.0.0":
-        errors.append("this release requires manifest version 2.0.0")
+    if manifest_version != "2.1.0":
+        errors.append("this release requires manifest version 2.1.0")
     if manifest.get("framework", {}).get("name") != "M3C3":
         errors.append("framework name must be M3C3")
     distribution_section = manifest.get("distribution", {})

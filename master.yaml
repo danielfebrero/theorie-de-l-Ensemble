@@ -1,34 +1,37 @@
 master_document:
   title: Théorie de l’Ensemble M3C3 — Document Opérationnel Maître
-  version: 2.0.0
+  version: 2.1.0
   status: production
-  scope: verified_continuum + scoped_activation_membrane + reference_runtime + reach_max + continuum_memory
-  activated_proposal: m3c3_v2_verified_continuum
-  activated_at: "2026-08-07T22:15:00+02:00"
+  scope: >
+    verified_continuum + host_enforcement + hard_export_gate + membrane_power_table
+    + distillation_path + scoped_activation_membrane + reference_runtime + reach_max
+    + continuum_memory
+  activated_proposal: m3c3_v2_1_force_publique
+  activated_at: "2026-08-07T23:35:00+02:00"
   activated_by: Dani Bengal / @cdxxotus  # émetteur désigné — validation explicite
   candidate:
-    proposal: m3c3_v2_verified_continuum
+    proposal: m3c3_v2_1_force_publique
     requested_at: "2026-08-07"
     requested_by: Dani Bengal / @cdxxotus
-    authority_signal: "Git pull, CI, active v2.0.0 et merge dans master"
+    authority_signal: "Excellent. Implémente et active la v2.1 selon ces termes et propositions"
     base_branch: main
-    base_commit: 8933ac434411c87157962a2ebe2e3f69fe974e9c
+    base_commit: 79b14a13de487dac13ef8dff5502b0556d89ad63
     kernel_base_commit: bd55c1670e2a056b66611c45ab12590478037f43
-    branch: agent/m3c3-v2.0.0
-    issue: https://github.com/danielfebrero/theorie-de-l-Ensemble/issues/4
-    pr: https://github.com/danielfebrero/theorie-de-l-Ensemble/pull/5
+    prior_production: 2.0.0
     activation: activated
-    activated_at: "2026-08-07T22:15:00+02:00"
+    activated_at: "2026-08-07T23:35:00+02:00"
   release:
     major: 2
-    name: "M3C3 Verified Continuum"
+    minor: 1
+    name: "M3C3 Force Publique"
     kernel_base: "1.0.0 — Production Kernel"
+    parent: "2.0.0 — Verified Continuum"
     compatibility: frozen_kernel_preserved
     public_contract_breaks:
-      - scoped activation lifecycle
-      - versioned runtime state and export schemas
-      - provider profile manifests
-      - evidence-typed weight integration reports
+      - host must authorize effects via membrane power table
+      - critical host effects require export since last productive decision
+      - W1/W2/W3 weight vocabulary is normative
+      - distillation continuum → agent_weights is an explicit path
     freezes:
       # hierarchy.weights n'est PAS gelé : repondération via feedback_reweight
       # (capsules/m3c3_integrity_guard, max_step 0.04) + activation émetteur.
@@ -42,9 +45,8 @@ master_document:
     reweightable:
       - hierarchy.weights
     semver: >
-      MAJOR=2 : rupture du contrat public d'activation, de distribution et d'export.
-      Le noyau formel v1 (types, write-rule, LTS, sûreté, authorship) reste embarqué.
-      hierarchy.weights est repondérable via continuum/weights/proposal (feedback_reweight).
+      MINOR=2.1 : force publique (host enforcement + hard export gate) et distillation.
+      Le noyau formel v1 reste embarqué. hierarchy.weights reste repondérable.
 
   authorship:
     author_creator: Dani Bengal
@@ -504,9 +506,84 @@ master_document:
       - no claim of platform permission escalation
       - no claim of weight mutation from prompt, context or skill
       - no audit or memory claim without a materialized artifact
+    power_table:
+      introduced_in: 2.1.0
+      meaning: membrane = budget de pouvoir (pas prose)
+      implementation: runtime/m3c3_runtime/host_enforcement.py
+      levels:
+        A0_dormant: [read, reply_soft]
+        A1_shadow: [read, reply_soft, analyze, code_sandbox, tool_non_irreversible, write_reversible, capital_paper]
+        A2_critical: [A1+, tool_critical, capital_live, write_irreversible, git_push]
+        A3_canonical: [A2+, reweight_propose, corpus_mutate]
+      emitter_only: [reweight_activate, authority_protocol]
+
+  # ————————————————————————————————————————————————————————————————————
+  # v2.1.0 — FORCE PUBLIQUE + DISTILLATION
+  # ————————————————————————————————————————————————————————————————————
+  host_enforcement:
+    introduced_in: 2.1.0
+    thesis: >
+      Constitution = master.yaml. Force publique = runtime (légalité de S/Cap)
+      + hôte (refuse l'effet illégal). Sans hôte branché, le runtime est un
+      simulateur honnête, pas un gouverneur.
+    rule: >
+      Tout effet host classé critique exige authorize_host_effect (ou équivalent
+      host) AVANT l'appel tool / write / capital / push.
+    implementation:
+      pure: runtime/m3c3_runtime/host_enforcement.py
+      engine: M3C3Runtime.authorize_host_effect
+    hard_export_gate:
+      enabled: true
+      rule: >
+        Les effets tool_critical, capital_live, write_irreversible, git_push,
+        reweight_activate, corpus_mutate, authority_protocol exigent un export
+        matérialisé postérieur à la dernière décision productive.
+      export_fields_min:
+        - verdict + critère
+        - pire cas + qui l'encaisse
+        - repli + déclencheur
+        - observation qui renverse
+        - première action
+        - regime + membrane + pattern_id + weights_source
+    non_goals:
+      - gouverner les agents hors hôte branché
+      - remplacer les gates techniques de l'hôte (capital keys, breakglass)
+      - prétendre modifier les poids d'un modèle fournisseur
+
+  weight_vocabulary:
+    introduced_in: 2.1.0
+    W1_priors:
+      meaning: hierarchy.weights et weights d'un decision_pattern
+      role: attention / décision versionnée
+      storage: master.yaml + continuum/memory/patterns/
+    W2_continuum_index:
+      meaning: patterns, créateur, paramètres continuum
+      role: mémoire externe honnête et auditable
+      storage: continuum/memory/
+    W3_model_weights:
+      meaning: paramètres du LLM (finetune / post-train)
+      role: intériorisation du cadre (culture)
+      claim_path: continuum/weights/integration-reports/ uniquement
+    honesty: >
+      prompt / skill / contexte ≠ W3. W1/W2 ne prouvent jamais W3.
+      provider_attested_weights reste default-deny sans vérificateur.
+
+  distillation_path:
+    introduced_in: 2.1.0
+    path: continuum (W2/W1) → agent_weights (W3)
+    stages:
+      - materialize_patterns_and_indexes_in_continuum
+      - attach_pattern_weights_W1
+      - measure_behavior_vs_placebo
+      - optional_finetune_or_eval_claim_via_integration_report
+    rule: >
+      La distillation (culture) ne remplace pas la force publique (police).
+      W3 mûrit ; l'hôte refuse toujours l'action hors Cap/export sur le scope critique.
+    force_publique_still_required: true
 
   verified_runtime:
     introduced_in: 2.0.0
+    revised_in: 2.1.0
     implementation: runtime/m3c3_runtime/
     cli: runtime/m3c3_runtime/cli.py
     schemas:
