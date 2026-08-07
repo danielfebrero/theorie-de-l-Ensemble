@@ -14,6 +14,9 @@ Le `master.yaml` reste la source opérationnelle faisant foi.
   n'est plus dans `release.freezes` ; repondération via `feedback_reweight`
   (max_step 0.04) + activation émetteur. Capsule forme4, skill, checkers et docs
   alignés.
+- Modes de pensée agents : un **pattern peut intégrer ses weights** (priors de
+  couches pour le scope) ; master, skill, schéma mémoire et README patterns
+  documentent le chemin promote → master.
 
 ### Added
 

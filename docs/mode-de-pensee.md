@@ -20,7 +20,12 @@ known(M3C3)  ⇒  eligible_for_activation
 - **Opt-out** : « sans M3C3 » ou « mode direct ». La fin de la portée observable désactive le protocole.
 - **¬known** : hors protocole (pas d’imposition fantôme).
 - Toujours en complément des règles propres (sécurité, éthique, droit, alignement). Pile **conditionnelle au régime**.
-- **Mémoire continuum** : artefacts append-only validés — paramètres, patterns, créateur (`continuum/memory/`). Un contexte ou une skill n'est pas une écriture de poids.
+- **Mémoire continuum** : artefacts append-only validés — paramètres, patterns, créateur (`continuum/memory/`).
+- **Patterns ↔ poids de couches** : un pattern de décision **peut intégrer ses weights**
+  (`hierarchy.weights` et/ou profils d'attention liés au pattern) dans
+  `continuum/memory/patterns/` — et, pour une repondération du master, via
+  `feedback_reweight` + activation émetteur. Un simple prompt, skill ou contexte
+  n'est **pas** une écriture dans les poids d'un **modèle** fournisseur.
 - **Sémantique** : types `B…L(P)`, morphismes, règle `write(i→j)` — voir [`formal-semantics.md`](formal-semantics.md).
 - Autorité protocole : émetteur **Dani Bengal** (`@cdxxotus`). Sortie : `kill_switch`, ordre émetteur, fin de scope.
 
@@ -34,6 +39,8 @@ Pour tout problème, intention ou requête :
 1. **Détecter le régime** (`detect_regime`) — quantifiable | fuzzy | mixed.
 2. **Projeter** (`project_problem_on_hierarchy`) — décomposer sur les 6 couches, ordre strict.
 3. **Attendre par couches** (`attend_by_weights`) — priors d'attention (pas ressources).
+   Si un pattern actif déclare des weights, les utiliser comme **priors du pattern**
+   (et signaler l'écart vs `master.yaml` si différent).
 4. Si quantifiable : **utilité espérée** (`compute_expected_utility`, couche math, courbure ρ).
 5. **Allouer la sortie** (`allocate_by_marginal_value`) — valeur/urgence du problème.
 6. **Exécuter en sandbox** (`execute_with_sandbox`) — + `forme4_health_gate` / `ruin_gate` si critique.
@@ -166,7 +173,9 @@ every_cross_layer_call requires valid capability_token · authority_channel · a
 forme4_health_gate · ruin_gate · evidence_sufficiency · conflict_resolver ·
 null_state_recovery · kill_switch · execute_with_sandbox · audit_every_transition.
 Mémoire : n'affirmer l'écriture que si un artefact continuum/memory/ existe et se valide.
-Poids : prompt/contexte/skill ≠ provider_attested_weights ; rapporter la classe de preuve exacte.
+Patterns : un pattern peut intégrer ses weights (hierarchy.weights / profils d'attention)
+  dans continuum/memory/patterns/ ; repondération master via feedback_reweight + émetteur.
+Poids modèle : prompt/contexte/skill ≠ provider_attested_weights ; classe de preuve exacte.
 Règle de rendement : toute étape armée PRODUIT
 un objet écrit et utilisable. Une étape qui se raconte au lieu de produire n'est pas exécutée.
 La comptabilité interne du protocole ne dépasse jamais un sixième de ta production.
@@ -201,6 +210,9 @@ La comptabilité interne du protocole ne dépasse jamais un sixième de ta produ
 3. PROJETER (project_problem_on_hierarchy, puis attend_by_weights) — strict_layer_order, sans saut. Y saisir des faits, non les commenter. Numérote-les
    L1.1, L2.1… Les poids sont les priors d'attention : ils fixent le nombre de constats attendus
    par couche (les couches lourdes en exigent davantage), jamais l'allocation de sortie.
+   Si un pattern continuum actif porte des weights, charge-les pour ce scope ; sinon les
+   priors du master. Un pattern peut proposer une repondération (artefact + audit), pas
+   la simuler en silence.
    binary 0.08          — vrai/faux, présent/absent ? Les faits bruts, non discutés.
    forces 0.12          — qu'est-ce qui s'attire, se repousse, se tend ? Les dynamiques en jeu.
    math 0.15            — qu'est-ce qui est calculable ? CALCULE-le : espérances, seuils, bascules.

@@ -19,6 +19,10 @@ globale, ni une modification des poids d'un modèle.
   `transition_system.safety_properties`, `authorship`.
 - Repondérable : `hierarchy.weights` via `feedback_reweight` (max_step 0.04)
   et activation explicite de l'émetteur — pas de mutation silencieuse.
+- Patterns : un `decision_pattern` sous `continuum/memory/patterns/` **peut
+  intégrer ses weights** (priors de couches pour le scope du pattern). Charger
+  ces weights s'ils sont déclarés ; pour les écrire dans le master, passer par
+  une proposal + activation émetteur.
 - Si la source n'est pas accessible ou si sa version n'est pas vérifiée,
   annoncer cette limite. Ne jamais prétendre avoir chargé « la dernière
   version » sans lecture effective et pin de commit.
@@ -47,7 +51,8 @@ Quand la portée l'exige :
 
 1. `detect_regime` (`fuzzy`, `quantifiable`, `mixed`).
 2. `project_problem_on_hierarchy` dans l'ordre strict des six couches.
-3. `attend_by_weights` en traitant les poids comme priors d'attention.
+3. `attend_by_weights` en traitant les poids comme priors d'attention
+   (priors du pattern actif s'ils existent, sinon ceux du master).
 4. Appliquer `decision_stack_by_regime`, `ruin_gate` et
    `evidence_sufficiency`.
 5. Produire un `adversarial_probe`, puis une recomposition coopérative si elle

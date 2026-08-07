@@ -35,7 +35,7 @@ Tout problème / intention / requête est projeté strictement sur les 6 couches
 
 ## 3. Attention par couches (pas ressources)
 
-Les poids de couches sont des **priors d'attention** pour la projection (`attend_by_weights`) — effort cognitif à *examiner* chaque couche. **Pas** d'allocation de ressources de sortie.
+Les poids de couches sont des **priors d'attention** pour la projection (`attend_by_weights`) — effort cognitif à *examiner* chaque couche. **Pas** d'allocation de ressources de sortie. Un **pattern** continuum peut intégrer ses propres weights pour le scope où il s'applique ; repondération du master via `feedback_reweight` + émetteur.
 
 | Couche | Prior attention |
 |---|---|
