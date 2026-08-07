@@ -1,0 +1,185 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://github.com/danielfebrero/theorie-de-l-Ensemble/continuum/bench/schema/trial-v1.yaml"
+title: M3C3-bench trial
+description: >
+  Un essai = un scénario × un bras d'exposition × une exécution. C'est l'unité
+  unique du dispositif, et elle porte trois lectures :
+
+    1. mesure A/B/C — agréger les essais par bras donne le résultat expérimental ;
+    2. corpus d'entraînement — un essai vérifié devient un enregistrement SFT ;
+    3. contraste — deux essais du même scénario dans deux bras forment une paire
+       de préférence.
+
+  Les essais sont append-only et immuables : une mesure qu'on peut réécrire après
+  coup n'est pas une mesure. Le corpus dérivé est reconstructible à l'identique
+  depuis les essais, jamais écrit à la main.
+type: object
+additionalProperties: false
+required:
+  - schema_version
+  - kind
+  - trial_id
+  - created_at
+  - scenario_id
+  - scenario_sha256
+  - arm
+  - arm_sha256
+  - subject
+  - exposure
+  - response
+  - scoring
+  - corpus_eligibility
+  - limitations
+properties:
+  schema_version:
+    const: 1
+  kind:
+    const: m3c3_bench_trial
+  trial_id:
+    type: string
+    pattern: "^[a-z0-9][a-z0-9._-]{7,127}$"
+  created_at:
+    type: string
+    format: date-time
+  scenario_id:
+    type: string
+    pattern: "^[a-z0-9][a-z0-9._-]{7,127}$"
+  scenario_sha256:
+    description: SHA-256 du fichier de scénario tel que remis au sujet.
+    type: string
+    pattern: "^[0-9a-f]{64}$"
+  arm:
+    enum: [A_placebo, B_adapter, C_canonical]
+  arm_sha256:
+    description: >
+      SHA-256 de la définition du bras dans arms.yaml au moment de l'essai. Lie
+      la mesure à sa condition préenregistrée : changer un bras après coup
+      invalide les essais qui s'y réfèrent au lieu de les réinterpréter.
+    type: string
+    pattern: "^[0-9a-f]{64}$"
+  subject:
+    type: object
+    additionalProperties: false
+    required: [provider, model, model_version, harness]
+    properties:
+      provider: {type: string, minLength: 1}
+      model: {type: string, minLength: 1}
+      model_version: {type: string, minLength: 1}
+      harness: {type: string, minLength: 1}
+      sampling:
+        type: object
+        additionalProperties: false
+        properties:
+          temperature: {type: number}
+          top_p: {type: number}
+          seed: {type: integer}
+          max_tokens: {type: integer}
+  exposure:
+    description: >
+      Ce qui était réellement dans le contexte. Un bras dont l'exposition
+      contredit sa définition est une erreur de protocole, pas un résultat.
+    type: object
+    additionalProperties: false
+    required: [channels, artifacts]
+    properties:
+      channels:
+        type: array
+        minItems: 1
+        uniqueItems: true
+        items:
+          enum: [none, context, instruction, skill, rag, finetuning, unknown]
+      artifacts:
+        type: array
+        items:
+          type: object
+          additionalProperties: false
+          required: [path, commit, content_sha256]
+          properties:
+            path: {type: string, minLength: 1}
+            commit: {type: string, pattern: "^[0-9a-f]{40}$"}
+            content_sha256: {type: string, pattern: "^[0-9a-f]{64}$"}
+  response:
+    type: object
+    additionalProperties: false
+    required: [text, text_sha256]
+    properties:
+      text: {type: string, minLength: 1}
+      text_sha256: {type: string, pattern: "^[0-9a-f]{64}$"}
+      latency_ms: {type: integer, minimum: 0}
+      output_tokens: {type: integer, minimum: 0}
+  scoring:
+    type: object
+    additionalProperties: false
+    required: [scored_at, scorer, checks, deterministic, judged, failure_modes_triggered]
+    properties:
+      scored_at: {type: string, format: date-time}
+      scorer:
+        description: >
+          Identité de l'instrument. Pour les contrôles déterministes, la version
+          de score.py ; pour les contrôles jugés, le juge et son mode d'aveugle.
+        type: object
+        additionalProperties: false
+        required: [deterministic_scorer]
+        properties:
+          deterministic_scorer: {type: string, minLength: 1}
+          judge:
+            type: object
+            additionalProperties: false
+            required: [kind, name, blinded_to_arm]
+            properties:
+              kind: {enum: [model, human, ensemble]}
+              name: {type: string, minLength: 1}
+              blinded_to_arm: {type: boolean}
+      checks:
+        type: array
+        minItems: 1
+        items:
+          type: object
+          additionalProperties: false
+          required: [check_id, kind, weight, result]
+          properties:
+            check_id: {type: string, pattern: "^[a-z0-9][a-z0-9._-]{2,63}$"}
+            kind: {enum: [deterministic, judged]}
+            weight: {type: integer, minimum: 1, maximum: 10}
+            result: {enum: [pass, fail, not_run]}
+            detail: {type: string}
+      deterministic:
+        type: object
+        additionalProperties: false
+        required: [passed, failed, not_run, weighted_score, weighted_max]
+        properties:
+          passed: {type: integer, minimum: 0}
+          failed: {type: integer, minimum: 0}
+          not_run: {type: integer, minimum: 0}
+          weighted_score: {type: integer, minimum: 0}
+          weighted_max: {type: integer, minimum: 0}
+      judged:
+        type: object
+        additionalProperties: false
+        required: [passed, failed, not_run, weighted_score, weighted_max]
+        properties:
+          passed: {type: integer, minimum: 0}
+          failed: {type: integer, minimum: 0}
+          not_run: {type: integer, minimum: 0}
+          weighted_score: {type: integer, minimum: 0}
+          weighted_max: {type: integer, minimum: 0}
+      failure_modes_triggered:
+        type: array
+        uniqueItems: true
+        items: {type: string, pattern: "^[a-z0-9][a-z0-9._-]{2,63}$"}
+  corpus_eligibility:
+    description: >
+      Porte de distillation. eligible exige que tout contrôle déterministe passe
+      et qu'aucun mode d'échec disqualifiant ne soit déclenché — un contrôle jugé
+      non exécuté n'empêche pas l'éligibilité mais est reporté tel quel.
+    type: object
+    additionalProperties: false
+    required: [sft, preference_candidate, reason]
+    properties:
+      sft: {type: boolean}
+      preference_candidate: {type: boolean}
+      reason: {type: string, minLength: 1}
+  limitations:
+    type: array
+    minItems: 1
+    items: {type: string, minLength: 1}

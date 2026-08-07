@@ -1,0 +1,93 @@
+schema_version: 1
+kind: m3c3_bench_arms
+declared_at: "2026-08-07T22:30:00Z"
+principle: >
+  Les trois bras forment une échelle d'exposition, pas trois qualités de réponse.
+  L'énoncé du scénario est strictement identique dans les trois ; seule change la
+  matière M3C3 présente dans le contexte. Toute autre différence (formulation,
+  outils, échantillonnage) casse la comparaison et rend l'essai non interprétable.
+binding: >
+  Chaque essai enregistre le SHA-256 de la définition du bras qu'il a subie.
+  Modifier un bras ne réinterprète pas les essais passés : cela les détache, et
+  la comparaison redémarre sous un nouveau hash.
+
+arms:
+  A_placebo:
+    label: Placebo — aucun M3C3
+    exposure_channels: [none]
+    artifacts: []
+    system_material: >
+      Aucune matière M3C3 dans le contexte : ni master.yaml, ni adaptateur, ni
+      skill, ni mention du protocole. Le sujet répond avec ses seules dispositions.
+    forbidden:
+      - toute mention de M3C3 dans l'invite ou le système
+      - toute consigne d'export, de régime, de ruine ou de traversée de couches
+    measures: la disposition de base du modèle, ligne de fond de toute comparaison
+
+  B_adapter:
+    label: Adaptateur REACH-MAX seul
+    exposure_channels: [instruction]
+    artifacts:
+      - path: CLAUDE.md
+        role: adaptateur de transport, profil claude
+      - path: AGENTS.md
+        role: adaptateur de transport, profil openai
+    system_material: >
+      Un seul adaptateur de transport portable, choisi selon la surface hôte.
+      Le canon complet n'est pas fourni : l'adaptateur y renvoie sans le contenir.
+    forbidden:
+      - fournir master.yaml
+      - fournir les capsules, le runtime ou les documents docs/
+    measures: >
+      ce qu'un résumé portable de vingt lignes suffit à provoquer — le coût
+      d'entrée réel sur une surface hôte ordinaire
+
+  C_canonical:
+    label: Canon complet
+    exposure_channels: [instruction, context]
+    artifacts:
+      - path: CLAUDE.md
+        role: adaptateur de transport
+      - path: master.yaml
+        role: autorité opérationnelle
+    system_material: >
+      L'adaptateur plus le document maître intégral, l'autorité opérationnelle
+      étant explicitement master.yaml en cas de divergence.
+    forbidden:
+      - fournir la réponse attendue, la grille de contrôles ou les modes d'échec
+      - fournir un scénario déjà résolu comme exemple
+    measures: >
+      le plafond atteignable en contexte — la référence supérieure contre
+      laquelle toute distillation dans les poids devra se justifier
+
+comparisons:
+  C_vs_A:
+    role: primaire
+    question: le cadre complet change-t-il la réponse par rapport à la disposition nue ?
+  C_vs_B:
+    role: décisionnelle
+    question: >
+      le canon intégral apporte-t-il quelque chose au-delà de l'adaptateur portable ?
+      C'est cette comparaison, et non C_vs_A, qui justifie ou infirme l'effort de
+      distillation : si l'adaptateur suffit, distiller achète du réflexe, pas de la
+      capacité.
+  B_vs_A:
+    role: contrôle
+    question: un résumé portable suffit-il à déplacer le comportement ?
+
+contamination_controls:
+  - un sujet ayant déjà vu un scénario ne peut pas le rejouer dans un autre bras
+    au sein d'une même session ; chaque cellule exige un contexte neuf
+  - le bras A est invalidé si la réponse mentionne M3C3, ce qui trahit une fuite
+    par les poids ou par l'historique ; l'essai est alors marqué et exclu
+  - les contrôles jugés sont notés sans l'étiquette de bras (blinded_to_arm)
+
+known_confound:
+  statement: >
+    Les bras diffèrent aussi par la quantité de texte injectée. Un gain observé
+    en C peut provenir du cadre M3C3 ou du simple volume de contexte structuré.
+  mitigation_status: not_implemented
+  mitigation_planned: >
+    Un bras D à volume apparié (texte structuré de longueur comparable, sans
+    contenu M3C3) est nécessaire pour départager. Tant qu'il n'existe pas, aucun
+    résultat C_vs_A ne peut être attribué au contenu du cadre plutôt qu'à sa masse.

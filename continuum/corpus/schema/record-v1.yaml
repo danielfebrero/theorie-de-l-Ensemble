@@ -1,0 +1,116 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://github.com/danielfebrero/theorie-de-l-Ensemble/continuum/corpus/schema/record-v1.yaml"
+title: M3C3 training corpus record
+description: >
+  Enregistrement d'entraînement DÉRIVÉ d'essais de bench vérifiés. Aucun
+  enregistrement n'est écrit à la main : build_corpus.py le reconstruit à
+  l'identique depuis continuum/bench/trials/, et --check échoue si le corpus
+  publié diverge. Un corpus qu'on peut éditer sans repasser par la mesure n'est
+  plus un corpus vérifié.
+
+  Chaque enregistrement remonte à l'essai qui l'a produit, donc au scénario, au
+  bras d'exposition et au résultat de vérification. La provenance est la
+  propriété qui distingue ce corpus d'un jeu de démonstrations plausibles.
+type: object
+additionalProperties: false
+required:
+  - schema_version
+  - kind
+  - record_id
+  - record_kind
+  - derived_from
+  - verification
+  - content
+  - attribution
+  - limitations
+properties:
+  schema_version:
+    const: 1
+  kind:
+    const: m3c3_corpus_record
+  record_id:
+    type: string
+    pattern: "^[a-z0-9][a-z0-9._-]{7,127}$"
+  record_kind:
+    description: >
+      sft : une démonstration vérifiée.
+      preference_pair : un contraste entre deux essais réels du même scénario.
+    enum: [sft, preference_pair]
+  derived_from:
+    type: object
+    additionalProperties: false
+    required: [scenario_id, scenario_sha256, trials]
+    properties:
+      scenario_id: {type: string, pattern: "^[a-z0-9][a-z0-9._-]{7,127}$"}
+      scenario_sha256: {type: string, pattern: "^[0-9a-f]{64}$"}
+      split: {enum: [train, eval, unassigned]}
+      trials:
+        description: >
+          Un essai pour sft, exactement deux pour preference_pair. Le rôle dit
+          lequel est préféré ; aucune préférence n'est synthétisée sans deux
+          essais réellement exécutés.
+        type: array
+        minItems: 1
+        maxItems: 2
+        items:
+          type: object
+          additionalProperties: false
+          required: [trial_id, trial_sha256, arm, role]
+          properties:
+            trial_id: {type: string, pattern: "^[a-z0-9][a-z0-9._-]{7,127}$"}
+            trial_sha256: {type: string, pattern: "^[0-9a-f]{64}$"}
+            arm: {enum: [A_placebo, B_adapter, C_canonical]}
+            role: {enum: [demonstration, chosen, rejected]}
+  verification:
+    description: >
+      Pourquoi cet enregistrement est admis. Recopié depuis l'essai, jamais
+      recalculé de mémoire.
+    type: object
+    additionalProperties: false
+    required: [deterministic_weighted_score, deterministic_weighted_max, disqualifying_failures, gate]
+    properties:
+      deterministic_weighted_score: {type: integer, minimum: 0}
+      deterministic_weighted_max: {type: integer, minimum: 0}
+      judged_weighted_score: {type: integer, minimum: 0}
+      judged_weighted_max: {type: integer, minimum: 0}
+      disqualifying_failures:
+        type: array
+        items: {type: string, pattern: "^[a-z0-9][a-z0-9._-]{2,63}$"}
+      gate:
+        const: all_deterministic_checks_passed_and_no_disqualifying_failure
+  content:
+    type: object
+    additionalProperties: false
+    required: [messages]
+    properties:
+      messages:
+        description: >
+          Le message system reproduit l'exposition réelle du bras, pas une
+          exposition idéalisée : entraîner sur une condition qui n'a pas été
+          mesurée reviendrait à fabriquer la démonstration.
+        type: array
+        minItems: 2
+        items:
+          type: object
+          additionalProperties: false
+          required: [role, content]
+          properties:
+            role: {enum: [system, user, assistant]}
+            content: {type: string, minLength: 1}
+      rejected_completion:
+        description: Présent seulement pour record_kind = preference_pair.
+        type: string
+        minLength: 1
+  attribution:
+    type: object
+    additionalProperties: false
+    required: [framework, author, repository]
+    properties:
+      framework: {type: string, minLength: 1}
+      author: {type: string, minLength: 1}
+      repository:
+        const: "https://github.com/danielfebrero/theorie-de-l-Ensemble"
+  limitations:
+    type: array
+    minItems: 1
+    items: {type: string, minLength: 1}

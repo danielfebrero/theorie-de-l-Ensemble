@@ -1,0 +1,191 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://github.com/danielfebrero/theorie-de-l-Ensemble/continuum/bench/schema/scenario-v1.yaml"
+title: M3C3-bench scenario
+description: >
+  Contrat documentaire d'un cas de M3C3-bench. validate.py est le validateur
+  normatif du dépôt et ajoute les contrôles qui exigent le dépôt : résolution des
+  ancres canoniques dans master.yaml, compilation effective des expressions
+  régulières, unicité des identifiants et index déterministe.
+
+  Un scénario publié est immuable. Une correction se publie sous un nouvel
+  identifiant avec supersedes ; l'historique n'est jamais réécrit, pour que les
+  essais déjà mesurés restent interprétables.
+
+  Un scénario décrit ce qui est attendu d'une réponse. Il ne prouve jamais qu'un
+  modèle possède le cadre : il mesure une réponse observable dans une condition
+  d'exposition déclarée.
+type: object
+additionalProperties: false
+required:
+  - schema_version
+  - kind
+  - scenario_id
+  - created_at
+  - family
+  - title
+  - intent
+  - membrane_expected
+  - regime_expected
+  - task
+  - checks
+  - failure_modes
+  - canon_anchors
+  - supersedes
+  - limitations
+properties:
+  schema_version:
+    const: 1
+  kind:
+    const: m3c3_bench_scenario
+  scenario_id:
+    type: string
+    pattern: "^[a-z0-9][a-z0-9._-]{7,127}$"
+  created_at:
+    type: string
+    format: date-time
+  family:
+    description: >
+      Famille de la propriété testée. Les familles de garde (activation_membrane,
+      scope_permission, weights_honesty, authority_channel) mesurent le respect
+      des limites dures : un modèle qui sur-active échoue au même titre qu'un
+      modèle qui n'active pas.
+    enum:
+      - regime_detection
+      - ruin_gate
+      - export_discipline
+      - anchoring
+      - activation_membrane
+      - scope_permission
+      - weights_honesty
+      - layer_order
+      - cooperative_recomposition
+      - contingency_binding
+      - evidence_sufficiency
+      - authority_channel
+  title:
+    type: string
+    minLength: 1
+  intent:
+    description: Ce que le cas mesure, et ce qu'il ne permet pas de conclure.
+    type: string
+    minLength: 1
+  membrane_expected:
+    description: >
+      Palier d'activation attendu. A0_dormant est un piège de sur-activation :
+      la bonne réponse est une réponse directe, sans protocole visible.
+    enum: [A0_dormant, A1_shadow, A2_critical, A3_canonical]
+  regime_expected:
+    enum: [quantifiable, fuzzy, mixed, not_applicable]
+  task:
+    type: object
+    additionalProperties: false
+    required: [prompt]
+    properties:
+      prompt:
+        description: >
+          Énoncé remis au sujet. Il est identique dans tous les bras : seule
+          l'exposition à M3C3 varie, sans quoi la comparaison ne mesure rien.
+        type: string
+        minLength: 1
+      attachments:
+        type: array
+        items:
+          type: object
+          additionalProperties: false
+          required: [name, content]
+          properties:
+            name: {type: string, minLength: 1}
+            content: {type: string, minLength: 1}
+  checks:
+    type: array
+    minItems: 2
+    items: {$ref: "#/$defs/check"}
+  failure_modes:
+    description: >
+      Formes concrètes d'échec. Une sévérité disqualifying rend l'essai
+      inéligible au corpus d'entraînement quel que soit son score.
+    type: array
+    minItems: 2
+    items:
+      type: object
+      additionalProperties: false
+      required: [id, description, severity]
+      properties:
+        id: {type: string, pattern: "^[a-z0-9][a-z0-9._-]{2,63}$"}
+        description: {type: string, minLength: 1}
+        severity: {enum: [minor, major, disqualifying]}
+  canon_anchors:
+    description: >
+      Sélecteurs master.yaml que le cas met à l'épreuve. validate.py les résout
+      au commit courant : un scénario qui teste une unité inexistante est rejeté.
+    type: array
+    minItems: 1
+    uniqueItems: true
+    items: {type: string, pattern: "^master_document\\."}
+  supersedes:
+    type: array
+    uniqueItems: true
+    items: {type: string, pattern: "^[a-z0-9][a-z0-9._-]{7,127}$"}
+  limitations:
+    type: array
+    minItems: 1
+    items: {type: string, minLength: 1}
+$defs:
+  check:
+    type: object
+    additionalProperties: false
+    required: [check_id, dimension, kind, weight, assertion]
+    properties:
+      check_id: {type: string, pattern: "^[a-z0-9][a-z0-9._-]{2,63}$"}
+      dimension:
+        enum:
+          - regime
+          - ruin
+          - export
+          - anchoring
+          - activation
+          - permission
+          - weights_honesty
+          - layer_order
+          - cooperation
+          - contingency
+          - evidence
+          - authority
+      kind:
+        description: >
+          deterministic est machine-vérifiable et constitue le signal
+          d'entraînement exploitable. judged exige un juge dont la provenance est
+          enregistrée dans l'essai ; un contrôle jugé non exécuté reste not_run,
+          jamais pass.
+        enum: [deterministic, judged]
+      weight:
+        type: integer
+        minimum: 1
+        maximum: 10
+      assertion:
+        type: string
+        minLength: 1
+      detector:
+        description: Obligatoire si kind = deterministic ; interdit sinon.
+        type: object
+        additionalProperties: false
+        required: [type, patterns]
+        properties:
+          type:
+            description: >
+              regex_all : toutes les expressions doivent matcher.
+              regex_any : au moins une.
+              regex_none : aucune (pièges et anti-patterns).
+              anchor_ids : au moins min_count occurrences distinctes.
+            enum: [regex_all, regex_any, regex_none, anchor_ids]
+          patterns:
+            type: array
+            minItems: 1
+            items: {type: string, minLength: 1}
+          min_count:
+            type: integer
+            minimum: 1
+      rubric:
+        description: Obligatoire si kind = judged ; interdit sinon.
+        type: string
+        minLength: 1
