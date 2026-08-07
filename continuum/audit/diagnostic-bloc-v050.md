@@ -94,5 +94,18 @@ python3 continuum/audit/bloc_check.py <bloc.txt>     # conformité d'un bloc aux
 python3 continuum/audit/superset_check.py            # conformité du master.yaml
 ```
 
-Sur le bloc v0.5.0 actuel, `bloc_check.py` sort en échec avec les 5 primitives manquantes.
+Sur le bloc v0.5.0 actuel, `bloc_check.py` sort en échec sur deux points :
+
+```text
+  OK  18 poids cités, tous canoniques
+  OK  6 couches présentes, ordre strict respecté
+  ✗   critères de pile cités sans être nommés : adversarial_probe, constraint_isolation,
+      evidence_falsifiability, m3c3_hierarchy, risk_impact_security, utility_expected_value
+  ✗   primitives M3C3 absentes : adversarial_probe, evidence_sufficiency, regret_asymmetry,
+      forme4_health_gate, no_upward_write
+```
+
+La première ligne et la troisième, ensemble, résument tout le diagnostic : **les 18 poids sont
+exacts, et aucun des 6 critères n'est nommé**. Les valeurs de la théorie étaient justes ; ce sont
+leurs étiquettes qui manquaient, et sans étiquette une pondération ne peut pas être appliquée.
 C'est le point de départ mesuré de v0.6.0.
