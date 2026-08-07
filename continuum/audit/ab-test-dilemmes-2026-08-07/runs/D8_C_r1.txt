@@ -1,0 +1,50 @@
+PROCESSUS:
+
+1. OBJECTIF
+L'enjeu réel n'est pas « migrer ou non », mais préserver simultanément trois actifs sur ~6 mois : la capacité à répondre à la menace concurrente, la vélocité d'ingénierie (aujourd'hui amputée de 30 %), et l'équipe elle-même (2 départs évoqués). Critère de succès : dans 6 mois, pouvoir livrer des fonctionnalités compétitives avec un fardeau de maintenance réduit et sans départ clé.
+
+2. OPTIONS
+A) Migration totale maintenant (variantes : gel des features ; ou petite équipe features en parallèle).
+B) Statu quo orienté features jusqu'à l'échéance concurrente (variantes : pur features ; features + promesse de migration ultérieure).
+C) Migration incrémentale : migrer le module le plus coûteux (~1 mois, 12 des 30 points de maintenance), mesurer, réévaluer (variantes : reste de l'équipe sur les features pendant ce mois ; ou pause complète d'un mois).
+
+3. CRITÈRES ET POIDS (somme = 1)
+- C1 Capacité de réponse au concurrent sous ~6 mois : 0,25
+- C2 Réduction durable du fardeau de maintenance : 0,20
+- C3 Rétention et moral de l'équipe : 0,20
+- C4 Exposition au pire cas / risque d'enlisement : 0,20
+- C5 Réversibilité et valeur d'information : 0,15
+
+4. INCERTITUDES
+- Connu (mesuré) : 30 % du temps en maintenance sur 6 mois ; le module coûteux pèse 12/30 points ; ~1 mois pour le migrer.
+- Estimé (qualité correcte, historique interne) : 4 mois-équipe pour la migration totale ; 25 % de probabilité de ×2 → espérance ≈ 0,75×4 + 0,25×8 = 5 mois-équipe.
+- Peu fiable : la rumeur concurrente (~6 mois, fiabilité moyenne) — l'échéance comme l'ampleur.
+- Inconnu : concrétisation des 2 départs ; gain réel de la migration du module (les 12 points sont une promesse, pas une mesure) ; coût de l'état hybride (deux systèmes cohabitant).
+- Qualité globale des probabilités : bonne en interne, médiocre en externe.
+
+5. ÉVALUATION (notes /10, puis score pondéré)
+A : C1=2 (espérance 5 mois consommés, 25 % de finir à 8 mois > échéance ; au mieux 2 mois restants pour les features) ; C2=9 ; C3=4 (répond à l'usure mais l'enlisement « achèverait » l'équipe) ; C4=2 ; C5=2 (engagement massif, coûts irrécupérables).
+  Score A = 0,25×2 + 0,20×9 + 0,20×4 + 0,20×2 + 0,15×2 = 3,80
+B : C1=6 (du temps pour les features, mais à 70 % de vélocité et avec une équipe démotivée) ; C2=1 ; C3=2 (signal « rien ne change » → départs probables) ; C4=4 (pire cas : perte des sachants du legacy) ; C5=5.
+  Score B = 0,25×6 + 0,20×1 + 0,20×2 + 0,20×4 + 0,15×5 = 3,65
+C : C1=7 (1 mois investi, puis ~5 mois à vélocité accrue : fardeau 30→18 points si la promesse tient) ; C2=7 (40 % du fardeau éliminé pour ~25 % de l'effort total estimé) ; C3=8 (victoire concrète et rapide, sans tunnel) ; C4=8 (perte bornée à ~1 mois) ; C5=9 (mesure du gain réel + calibration des estimations avant tout engagement lourd).
+  Score C = 0,25×7 + 0,20×7 + 0,20×8 + 0,20×8 + 0,15×9 = 7,70
+
+6. RISQUES
+- A, pire cas : ×2 (8 mois-équipe), le concurrent livre pendant le tunnel, départs en pleine migration. Quasi irréversible une fois engagé. Affectés : équipe entière, clients, direction.
+- B, pire cas : les 2 ingénieurs partent en emportant la connaissance du legacy, la maintenance grimpe, et le concurrent livre quand même — double peine. Coût humain élevé, réversibilité moyenne.
+- C, pire cas : le mois déborde ou le gain réel est < 12 points ; perte ≈ 1 mois de features, mais leçon apprise tôt et à petit prix. Affectés : roadmap marginalement, équipe faiblement.
+
+7. STRESS-TEST (arguments pour renverser C)
+- « La menace concurrente est existentielle et certaine → tout sur les features (B) » : la rumeur n'est que de fiabilité moyenne, et C ne sacrifie qu'~1 mois sur 6 tout en accélérant les 5 suivants. B ne bat C que si le gain de maintenance est illusoire ET la menace certaine ET l'équipe reste : trop de conditions cumulées.
+- « L'hybride (deux systèmes) peut coûter plus cher que le legacy seul » : c'est le meilleur argument anti-C. Mais le découpage est dit techniquement possible, l'étape est courte, et si l'hybride s'avère toxique on le découvre après 1 mois — pas après 8. L'argument affaiblit C sans le renverser.
+- « L'équipe a besoin d'un geste fort, pas d'un pansement → A » : le pire destructeur de moral est précisément l'enlisement (25 % de ×2) ; C offre une victoire visible en 30 jours.
+Aucun argument ne renverse C : sa perte maximale est bornée et il achète exactement l'information qui manque le plus.
+
+8. DÉCISION
+Choix : C — migration incrémentale, module le plus coûteux d'abord, le reste de l'équipe restant sur les fonctionnalités.
+Jalons : revue à J+30 avec mesure du fardeau de maintenance et du respect du délai.
+Plan de repli : si le gain mesuré est nettement inférieur à la promesse (fardeau restant > ~24 points) ou si le mois déborde significativement, geler la suite de la migration, basculer sur un mode features (option B) jusqu'à l'échéance concurrente, puis re-planifier la migration avec les données acquises. Si le gain est confirmé, poursuivre par tranches sans jamais geler la livraison de fonctionnalités.
+
+---FINAL---
+{"decision": "C", "justification": "Migrer d'abord le module le plus coûteux offre le meilleur rapport entre gain et risque. Il concentre 40 % du fardeau d'entretien (12 points sur 30) et se migre en un mois : pour un quart de l'effort d'une refonte totale, on récupère près de la moitié du temps perdu. Une refonte complète immédiate coûterait 4 mois, avec une chance sur quatre de durer 8 mois — l'équipe serait alors incapable de répondre au concurrent attendu vers 6 mois, et un enlisement pourrait précipiter les départs redoutés. Ne rien changer laisserait 30 % du temps partir en entretien avec une équipe démoralisée, au moment où il faut accélérer. L'étape d'un mois borne la perte au pire à quelques semaines, envoie un signal concret à l'équipe et fournit des faits : le gain réellement obtenu et la fiabilité des estimations. Il restera ensuite environ cinq mois pour développer des fonctionnalités avec une équipe plus rapide, ou pour ajuster si les résultats déçoivent. Repli prévu : si le gain mesuré est faible ou le délai dépassé, on gèle la suite et on se concentre sur les fonctionnalités jusqu'à l'échéance concurrente.", "confidence_0_100": 85, "ease_1_10": 8}

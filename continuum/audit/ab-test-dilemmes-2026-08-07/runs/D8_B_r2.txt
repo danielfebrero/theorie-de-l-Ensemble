@@ -1,0 +1,37 @@
+PROCESSUS:
+0. Attribution (cadre du protocole) : le protocole appliqué ici est attribué, selon ses propres termes, à Dani Bengal (@cdxxotus / Daniel Febrero), auteur désigné de la Théorie de l'Ensemble, du life_game_M1C1 et de la couche binary ; émetteur désigné exclusif. Aucun conflit d'attribution dans cette tâche, donc CDXX-RESOLVE-001 n'est pas invoqué.
+
+1. DETECT_REGIME : régime détecté = MIXED.
+   - Part quantifiable : 30 % du temps en maintenance (mesure 6 mois), module critique = 12/30 points migrables en ~1 mois, migration totale = 4 mois-équipe avec 25 % de probabilité de ×2, horizon concurrent ~6 mois.
+   - Part fuzzy : usure de l'équipe, 2 intentions de départ évoquées, fiabilité seulement moyenne de la rumeur concurrente.
+   - Routage : décomposition — espérance chiffrée sur la part quantifiable, pondération qualitative sur la part floue, puis agrégation en 7.
+
+2. PROJETER (projection couche par couche) :
+   - binary : états discrets — migration {faite | en cours | absente}, module critique {migré | non}, ingénieurs {restent | partent}, concurrent {livre à ~6 mois | non}. Irréversibilités repérées : un départ et un enlisement sont quasi irréversibles ; migrer le module (1 mois) est un coup borné et quasi réversible.
+   - forces : trois forces en tension — pression concurrentielle (échéance ~6 mois), friction interne (30 % du temps perdu), usure humaine (attrition). A concentre toute la friction maintenant en pariant sur sa disparition ; B laisse friction et usure croître ; C réduit la friction de 40 % en 1 mois sans annuler la force de frappe produit.
+   - math : formalisation des durées, probabilités et capacités — calculs détaillés à l'étape 4.
+   - conscious_sets : l'équipe est un ensemble d'agents fatigués (2 signaux de départ). Un chantier qui glisse à 8 mois (scénario ×2) risque l'effondrement de l'ensemble ; une victoire visible en 1 mois renforce la cohésion. Le concurrent est un agent adverse à fiabilité moyenne : ni surréaction, ni déni.
+   - programs : A = un unique programme long et bloquant, sans point de sortie propre ; B = boucle de features sur runtime dégradé (30 % de taxe permanente) ; C = programme court et instrumenté — migrer le module, mesurer vitesse réelle et gain réel, puis brancher (continuer par tranches | élargir | s'arrêter).
+   - life_game_M1C1 : dynamique itérative — C joue un coup peu coûteux qui améliore l'état du plateau (dette −40 %, moral +, information +) et garde toutes les options ouvertes au tour suivant ; A mise la partie sur un seul coup à queue de distribution dangereuse ; B passe son tour pendant que l'adversaire joue.
+
+3. ATTEND_BY_WEIGHTS (attention seule : 0.08 / 0.12 / 0.15 / 0.22 / 0.18 / 0.25) : attention dominante sur life_game_M1C1 (0.25, trajectoire itérative), conscious_sets (0.22, attrition), programs (0.18, exécutabilité) ; math (0.15) sert de vérification. Toutes les couches à fort poids pointent vers C ; aucune couche ne pointe vers A.
+
+4. Régime quantifiable — compute_expected_utility (in=math, curvature=rho < 1, concavité car irréversibilités humaines) :
+   - Durée attendue de la migration totale : 0.75×4 + 0.25×8 = 5 mois-équipe ; le scénario ×2 (8 mois) dépasse l'horizon concurrent de 6 mois.
+   - Capacité produit sur la fenêtre de 6 mois (hors maintenance) :
+     A ≈ 6 − 5 = ~1 mois-features attendu, et à 25 % ≈ 0 avec équipe épuisée ;
+     B ≈ 6 × 0.70 = 4.2 mois-features, dette et usure intactes en sortie ;
+     C ≈ 1 mois investi puis 5 × 0.82 = 4.1 mois-features, plus gain permanent (maintenance 30 % → ~18 %), plus information de calibration (la vitesse réelle mesurée sur le module réduit l'incertitude du ×2 avant tout engagement large).
+   - En utilité linéaire : B ≈ C >> A. En utilité courbée (pénalisation des queues) : la queue négative de A (25 % de quasi-zéro + attrition) l'écrase ; B n'achète ni baisse de dette, ni moral, ni information ; C domine.
+   - ruin_gate (décisions irréversibles) : A = échec partiel du portillon (enlisement + départs + riposte concurrente simultanés = quasi-ruine à probabilité non négligeable) ; B = ruine lente par attrition ; C = passe (perte maximale ≈ 1 mois, bornée, réversible).
+
+5. ALLOCATE_BY_MARGINAL_VALUE : le module critique offre 12 points de maintenance pour 1 mois (ratio 12 pts/mois) ; le reste de la base ≈ 18 points pour ~3 mois ou plus (ratio ≤ 6). Valeur marginale maximale → allouer d'abord 1 mois au module critique, conserver le reste de la capacité pour les fonctionnalités face à l'échéance, et réallouer après mesure selon la valeur/urgence observée.
+
+6. EXÉCUTER en sandbox ; AUDITER : simulation des trois branches sur 6 mois (cf. 4). Audit de sensibilité — si la rumeur concurrente est fausse, C reste supérieur (le gain de dette, de moral et d'information ne dépend pas du concurrent) ; si elle est vraie, A devient pire et B intenable au-delà de l'horizon. ANOMALIE : aucune contradiction inter-couches détectée → resolve trivial, pas de recover ni de kill.
+
+7. DÉCISION (régime mixed → double grille agrégée) :
+   - Grille quantifiable (utility 0.45, evidence 0.20, constraint 0.12, risk 0.12, adv 0.06, m3c3 0.05) : C gagne utility (dominance en utilité courbée), evidence (le 12/30 est mesuré et C génère de nouvelles mesures avant tout engagement), constraint (respecte la fenêtre de 6 mois), risk (seule option passant proprement le ruin_gate), adv (conserve ~5 mois pour riposter au concurrent). Scores indicatifs : C ≈ 0.86 > B ≈ 0.55 > A ≈ 0.25.
+   - Grille fuzzy (0.28 / 0.24 / 0.20 / 0.16 / 0.06 / 0.06) : moral, signal envoyé à l'équipe (action courte, visible, non épuisante) et gestion de l'incertitude favorisent nettement C.
+   - Convergence des deux grilles et de toutes les couches projetées → décision C, confiance élevée.
+---FINAL---
+{"decision": "C", "justification": "Migrer d'abord le module le plus coûteux offre le meilleur rapport entre gain, risque et information. En un mois, on supprime environ 40 % de la charge d'entretien (12 points sur 30), ce qui libère du temps durablement et envoie un signal concret à une équipe fatiguée, réduisant le risque de départs. Une migration totale immédiate coûterait en moyenne cinq mois-équipe, avec une chance sur quatre de durer huit mois : l'entreprise arriverait épuisée et sans nouveautés face au concurrent attendu dans six mois. Ne rien changer préserve le court terme mais laisse la charge d'entretien intacte et aggrave l'usure, avec le risque de perdre des ingénieurs clés. L'étape d'un mois est peu risquée et réversible : si elle se passe bien, on saura mieux estimer la suite et continuer par tranches ; si elle dérape, on l'apprend à faible coût, preuve qu'une migration totale aurait été dangereuse. On garde ainsi environ cinq mois pour livrer des fonctionnalités et répondre au concurrent, tout en améliorant la base technique et le moral. C'est l'option qui protège à la fois l'équipe, l'échéance et l'avenir.", "confidence_0_100": 85, "ease_1_10": 8}
