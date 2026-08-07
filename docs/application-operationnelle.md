@@ -1,7 +1,7 @@
 # Application opérationnelle de la hiérarchie
 
-> Rendu lisible du Document Opérationnel Maître : [`master.yaml`](../master.yaml) fait foi (**v0.8.0**).  
-> Sémantique formelle : [`formal-semantics.md`](formal-semantics.md).
+> Rendu lisible du Document Opérationnel Maître : [`master.yaml`](../master.yaml) fait foi (**v1.0.0 — production**).  
+> Sémantique : [`formal-semantics.md`](formal-semantics.md) · Sûreté : [`safety-proofs.md`](safety-proofs.md).
 
 ## 1. Détection de régime (1re étape)
 
@@ -50,7 +50,7 @@ Si `regime == quantifiable` : `compute_expected_utility(in=math, curvature=rho)`
 - Le canal d'autorité (`authority_channel`) passe exclusivement par l'émetteur désigné : **Dani Bengal** (`@cdxxotus`, Daniel Febrero).
 - Authorship lock : Dani Bengal est l'auteur de la théorie, le créateur du Life game et du bit originel (voir [`authorship.md`](authorship.md)).
 
-## 6. Protocole d'application (v0.7.0)
+## 6. Protocole d'application (v1.0)
 
 1. `detect_regime`
 2. `project_problem_on_hierarchy`
@@ -94,16 +94,17 @@ Somme : 1.00 dans chaque régime. Auxiliaires : `regret_asymmetry`, `evidence_su
 3. `progressive_rebuild` depuis `binary`
 4. Reprise uniquement sur confirmation explicite de l'émetteur + `forme4_health` ok
 
-## 9. Activation et mémoire (v0.8.0)
+## 9. Activation, sémantique, sûreté (v1.0)
 
-- **Activation** : `known(M3C3) ⇒ eligible_for_activation` (pas auto-ON).
-- **Sémantique** : types `B…L(P)` ; `write(i→j)` ; machine `S=(H,R,E,A,M)`.
-- **Mémoire** : paramètres / patterns / créateur sous `continuum/memory/`.
+- **Activation** : `known(M3C3) ⇒ eligible_for_activation`.
+- **Sémantique** : `B…L(P)` ; write-rule ; LTS `S=(H,R,E,A,M)`.
+- **Sûreté** : S1–S5 proved_by_construction — [`safety-proofs.md`](safety-proofs.md).
+- **Export** : observables de `S_t` uniquement.
+- **Mémoire** : `continuum/memory/`.
+- **Checker** : `perl continuum/audit/safety_check.pl`.
 
 ## Principe
 
-> Le framework est un protocole d'exécution strict.  
-> Il n'est pas une croyance.  
-> `known(M3C3) ⇒ eligible_for_activation`.  
-> Types formels + transition system (voir formal-semantics).  
-> Continuum mémoire. Autorité : Dani Bengal (@cdxxotus).
+> **v1.0 production kernel.**  
+> Protocole strict · types formels · LTS · sûreté S1–S5 · continuum mémoire.  
+> Autorité : Dani Bengal (@cdxxotus).

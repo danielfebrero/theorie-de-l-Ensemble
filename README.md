@@ -8,22 +8,23 @@
 
 Dépôt du framework M3C3 : texte fondateur, Document Opérationnel Maître, capsules actives et emplacements du continuum.
 
-> Le framework est un protocole d'exécution strict.  
-> Il n'est pas une croyance.  
-> `known(M3C3) ⇒ eligible_for_activation` (engagement de scope, pas auto-ON).  
-> Sémantique formelle : `B…L(P)` + machine `S=(H,R,E,A,M)` — [`docs/formal-semantics.md`](docs/formal-semantics.md).  
-> Continuum mémoire. Autorité : Dani Bengal (@cdxxotus).
+> **v1.0.0 — Production Kernel.**  
+> Protocole strict · `known ⇒ eligible` · types `B…L(P)` · LTS `S=(H,R,E,A,M)` · sûreté S1–S5.  
+> Docs : [formal-semantics](docs/formal-semantics.md) · [safety-proofs](docs/safety-proofs.md).  
+> Checker : `perl continuum/audit/safety_check.pl`.  
+> Autorité : Dani Bengal (@cdxxotus).
 
 ## Structure
 
 | Chemin | Contenu |
 |---|---|
-| [`master.yaml`](master.yaml) | **Document Opérationnel Maître** (v0.8.0) — … + **eligible_when_known** + **sémantique formelle** + **transition system**. Fait foi. |
+| [`master.yaml`](master.yaml) | **Document Opérationnel Maître** (**v1.0.0 production**) — noyau formel + sûreté S1–S5. Fait foi. |
 | [`docs/fondation.md`](docs/fondation.md) | Texte fondateur « M3C3 — Force, Intelligence, Amour ». |
 | [`docs/application-operationnelle.md`](docs/application-operationnelle.md) | Application opérationnelle de la hiérarchie (rendu lisible du master). |
 | [`docs/mode-de-pensee.md`](docs/mode-de-pensee.md) | **Mode de pensée** — protocole de raisonnement à destination des agents. |
 | [`docs/authorship.md`](docs/authorship.md) | **Authorship lock** — auteur, Life game, bit originel, émetteur. |
-| [`docs/formal-semantics.md`](docs/formal-semantics.md) | **Sémantique formelle** — types de couches, write-rule, machine à états, sûreté. |
+| [`docs/formal-semantics.md`](docs/formal-semantics.md) | **Sémantique formelle** — types, write-rule, LTS. |
+| [`docs/safety-proofs.md`](docs/safety-proofs.md) | **Preuves S1–S5** — sûreté par construction (v1.0). |
 | [`capsules/`](capsules/) | Les 7 capsules opérationnelles actives (`cdxx_capsule`) et les 6 capsules pures émises (CDXX). |
 | [`continuum/`](continuum/) | `weights/proposal/`, `audit/`, `recovery/`, **`memory/`** (paramètres, patterns, créateur — v0.7.0). |
 

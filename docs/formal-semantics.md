@@ -1,6 +1,8 @@
-# M3C3 — Sémantique formelle (v0.8.0)
+# M3C3 — Sémantique formelle (v1.0.0)
 
-> Rendu lisible de `master.yaml` → `formal_semantics` + `transition_system`. Le master fait foi.
+> Rendu lisible de `master.yaml` → `formal_semantics` + `transition_system`. Le master fait foi.  
+> Preuves de sûreté : [`safety-proofs.md`](safety-proofs.md).  
+> Checker : `perl continuum/audit/safety_check.pl`
 
 ## 1. Types de couches
 
@@ -82,10 +84,19 @@ sinon  T → Resolve ∨ Recover ∨ Kill
 □(active(M3C3) ⇒ known(M3C3))
 ```
 
-## 6. Activation (v0.8.0)
+## 6. Activation
 
 ```text
 known(M3C3)  ⇒  eligible_for_activation
 ```
 
-Éligible ≠ activé. L’activation engage un scope ; elle n’est plus « ON auto » par simple connaissance (révision de v0.7.0).
+Éligible ≠ activé. L’activation engage un scope.
+
+## 7. Export lié à S_t (v1.0)
+
+`export_gate` n’émet que des observables de `S_t` (H, R, E, A, M).  
+Mapping des champs obligatoires : voir `transition_system.export_binding`.
+
+## 8. Sûreté v1.0
+
+S1–S5 : **proved_by_construction** — [`safety-proofs.md`](safety-proofs.md).

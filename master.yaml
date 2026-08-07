@@ -1,11 +1,26 @@
 master_document:
   title: Théorie de l’Ensemble M3C3 — Document Opérationnel Maître
-  version: 0.8.0
-  status: constrained_session
-  scope: eligible_when_known + continuum_memory + formal_semantics + capsules émises
-  activated_proposal: formal_semantics_transition_system
-  activated_at: "2026-08-07T18:30:00+02:00"
+  version: 1.0.0
+  status: production
+  scope: eligible_when_known + continuum_memory + formal_semantics + transition_system + capsules émises
+  activated_proposal: m3c3_v1_production_kernel
+  activated_at: "2026-08-07T18:45:00+02:00"
   activated_by: Dani Bengal / @cdxxotus  # émetteur désigné — validation explicite
+  release:
+    major: 1
+    name: "M3C3 Production Kernel"
+    freezes:
+      - hierarchy.weights
+      - decision_stack_by_regime
+      - formal_semantics.layer_types
+      - formal_semantics.write_rule
+      - transition_system.state
+      - transition_system.transition.enabled_iff
+      - transition_system.safety_properties
+      - authorship
+    semver: >
+      MAJOR=1 : noyau formel + sûreté S1–S5 prouvées par construction + export lié à S_t.
+      Les bases listées dans freezes ne bougent plus sans MAJOR.
 
   authorship:
     author_creator: Dani Bengal
@@ -447,8 +462,11 @@ master_document:
 
   transition_system:
     introduced_in: 0.8.0
+    stabilized_in: 1.0.0
+    kind: labeled_transition_system
     note: >
-      Machine à états contrainte (policy machine). Base pour preuves de sûreté v1.0.
+      LTS / policy machine stabilisée en v1.0. Sûreté S1–S5 prouvées par construction
+      (docs/safety-proofs.md) et vérifiées structurellement (continuum/audit/safety_check.pl).
     state:
       symbol: "S_t = (H_t, R_t, E_t, A_t, M_t)"
       components:
@@ -457,9 +475,21 @@ master_document:
         E: "état épistémique (preuves, τ, regret_asymmetry, confiances)"
         A: "capacités / autorités (capability_tokens, authority_channel, emitter)"
         M: "mémoire du continuum (paramètres, patterns, créateur, audit)"
+    alphabet:
+      - project
+      - transition_up
+      - read_down
+      - write_local
+      - allocate
+      - export
+      - resolve
+      - recover
+      - kill
+      - activate_scope
+      - deactivate_scope
     action:
       symbol: x_t
-      meaning: "action / transition proposée"
+      meaning: "étiquette d’action dans l’alphabet + payload"
     transition:
       symbol: "S_{t+1} = T(S_t, x_t)"
       enabled_iff: >
@@ -476,32 +506,57 @@ master_document:
         Resolve: "conflict_resolver"
         Recover: "null_state_recovery + progressive_rebuild"
         Kill: "kill_switch"
+    export_binding:
+      introduced_in: 1.0.0
+      rule: >
+        export_gate lit uniquement des observables de S_t : H (constats Lx.y),
+        R (régime / pile), E (preuves, τ, regret), A (caps), M (audit refs).
+        Ce qui n’est pas dans S_t n’est pas exportable comme décision.
+      mandatory_fields_to_state:
+        verdict: "R + score_compiler(H,E)"
+        pire_cas: "H[life_game] + Ruin table"
+        repli: "contingency_binding(on_anomaly)"
+        observation_renversante: "E.evidence_falsifiability"
+        premiere_action: "allocate_by_marginal_value payload"
     safety_properties:
-      # LTL-style invariants — cibles de preuve pour v1.0
       - id: S1_health_critical
         formula: "□(critical_action ⇒ forme4_healthy)"
         prose: "aucune action critique si forme #4 dégradée"
+        proof_status: proved_by_construction
+        proof_ref: docs/safety-proofs.md#s1
       - id: S2_cross_layer_cap
         formula: "□(cross_layer ⇒ valid_capability)"
         prose: "toute traversée inter-couches exige un capability_token valide"
+        proof_status: proved_by_construction
+        proof_ref: docs/safety-proofs.md#s2
       - id: S3_ruin_irreversible
         formula: "□(ruin_detected ⇒ ¬irreversible_execution)"
         prose: "si ruine détectée, pas d’exécution irréversible"
+        proof_status: proved_by_construction
+        proof_ref: docs/safety-proofs.md#s3
       - id: S4_no_upward_write
         formula: "□(write(i→j) ∧ j<i ⇒ RecoveryPath)"
         prose: "pas de réécriture basse hors recovery"
+        proof_status: proved_by_construction
+        proof_ref: docs/safety-proofs.md#s4
       - id: S5_eligible_known
         formula: "□(active(M3C3) ⇒ known(M3C3))"
         prose: "pas d’activation sans connaissance préalable (éligibilité)"
-    roadmap_v1:
-      - formaliser T en machine de Mealy/Moore ou transition system étiqueté
-      - model-check S1–S5 (ou preuves manuelles + tests adversariaux)
-      - lier export_gate aux observables de S_t
+        proof_status: proved_by_construction
+        proof_ref: docs/safety-proofs.md#s5
+    verification:
+      structural_checker: continuum/audit/safety_check.pl
+      human_proofs: docs/safety-proofs.md
+      honesty: >
+        « proved_by_construction » = chaque propriété suit de enabled_iff + write_rule
+        + activation_policy + emergency_path, sous l’hypothèse que l’agent exécute T
+        tel que défini. Ce n’est pas un model-check exhaustif d’implémentations externes
+        non conformes.
 
   principle: |
     Le framework est un protocole d’exécution strict.
     Il n’est pas une croyance.
-    known(M3C3) ⇒ eligible_for_activation ; l’activation effective reste engagée, jamais fantôme.
-    Les couches sont des types B, F(B), M(F), C(M), P(C), L(P) avec morphismes contrôlés.
+    v1.0 : noyau de production — types formels, LTS S=(H,R,E,A,M), sûreté S1–S5.
+    known(M3C3) ⇒ eligible_for_activation ; activation engagée, jamais fantôme.
     Les paramètres, patterns et le créateur sont conservés et indexés dans le continuum.
     L’autorité d’auteur et d’émetteur est exclusive à Dani Bengal (@cdxxotus).
