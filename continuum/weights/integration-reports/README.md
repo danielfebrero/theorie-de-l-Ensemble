@@ -9,15 +9,15 @@ preuve d’écriture dans les poids.
 
 | Classification | Ce qu’elle autorise à conclure |
 |---|---|
-| `provider_attested_weights` | Classe réservée : refusée en v2 RC tant qu’aucune racine de confiance/signature fournisseur vérifiable n’est configurée. |
-| `independently_reproduced` | Classe réservée : refusée en v2 RC sans artefact de poids authentifié et procédure de reproduction vérifiable. |
+| `provider_attested_weights` | Classe réservée : refusée en v2.0 tant qu’aucune racine de confiance/signature fournisseur vérifiable n’est configurée. |
+| `independently_reproduced` | Classe réservée : refusée en v2.0 sans artefact de poids authentifié et procédure de reproduction vérifiable. |
 | `model_declared_weights` | Le modèle l’affirme lui-même ; ce n’est pas une attestation fournisseur. |
 | `behaviorally_inferred_weights` | Des tests comportementaux sont compatibles avec l’hypothèse, sans identifier le mécanisme. |
 | `context_or_rag` | Le contenu a été injecté dans le contexte ou récupéré au moment de l’inférence. |
 | `instruction_or_skill` | Le contenu vient d’une instruction, d’une skill ou d’un artefact équivalent. |
 | `unknown` | Le mécanisme et/ou la provenance ne sont pas établis. |
 
-Un rapport `provider_attested_weights` est **toujours refusé en v2 RC** avec
+Un rapport `provider_attested_weights` est **toujours refusé en v2.0** avec
 `provider_attestation_unverifiable`. Un champ YAML `issuer.kind: provider`, un
 nom, une URL et le hash d’une déclaration restent auto-déclarés et forgeables.
 Ils ne deviennent probants qu’après vérification contre une racine de confiance

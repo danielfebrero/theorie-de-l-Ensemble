@@ -110,7 +110,7 @@ Somme : 1.00 dans chaque régime. Auxiliaires : `regret_asymmetry`, `evidence_su
 3. `progressive_rebuild` depuis `binary`
 4. Reprise uniquement sur confirmation explicite de l'émetteur + `forme4_health` ok
 
-## 9. Activation, runtime et preuve (v2.0 RC)
+## 9. Activation, runtime et preuve (v2.0 production)
 
 - **Activation** : `known(M3C3) ⇒ eligible_for_activation`, puis membrane A0–A3.
 - **Sémantique** : `B…L(P)` ; write-rule ; LTS `S=(H,R,E,A,M)`.

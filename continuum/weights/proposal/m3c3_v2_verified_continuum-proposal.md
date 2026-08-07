@@ -1,8 +1,8 @@
 # Proposition — M3C3 v2.0 « Continuum Vérifiable »
 
-**Statut :** release candidate, non activée
+**Statut :** **activée** · production (2026-08-07)
 **Base noyau :** v1.0.0 / `bd55c1670e2a056b66611c45ab12590478037f43`
-**Branche :** `agent/m3c3-v2.0.0`
+**Merge :** PR #5 → `main` / tag `v2.0.0`
 **RFC :** [issue #4](https://github.com/danielfebrero/theorie-de-l-Ensemble/issues/4)
 
 La v2 change les interfaces publiques du framework : activation par scope, runtime et export
@@ -17,9 +17,8 @@ justifie le MAJOR ; elle ne prétend ni modifier un modèle, ni agir dans une co
 
 ## Condition d'activation
 
-L'implémentation sur branche ne vaut pas activation canonique. La proposition ne passe à
-`activated` qu'après validations reproductibles, revue du diff et confirmation explicite de
-Dani Bengal / `@cdxxotus`.
+Activation canonique prononcée par Dani Bengal / `@cdxxotus` après validations
+reproductibles, revue du diff et merge de PR #5 sur `main` (tag `v2.0.0`).
 
 Les champs complets — delta, invariants, hors-scope et critères d'acceptation — sont dans le
 fichier YAML homonyme.

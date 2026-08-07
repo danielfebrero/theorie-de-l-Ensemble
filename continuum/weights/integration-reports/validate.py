@@ -61,7 +61,7 @@ CLAIMS = {"integrated", "partial", "not_integrated", "unknown"}
 DATE_BASES = {"month", "quarter", "provider_window", "estimated_range"}
 DATE_PRECISIONS = {"exact", "day", "month", "quarter", "year", "range", "unknown"}
 # Aucun mécanisme de signature/racine de confiance fournisseur n'est livré dans
-# la v2 RC. Un YAML qui se nomme lui-même « provider » ne peut donc jamais
+# la v2.0. Un YAML qui se nomme lui-même « provider » ne peut donc jamais
 # franchir la classification la plus forte.
 PROVIDER_ATTESTATION_VERIFIER_AVAILABLE = False
 # De même, aucun mécanisme ne lie encore un nom d'auditeur et un URN à un

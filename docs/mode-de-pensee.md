@@ -150,7 +150,7 @@ Canal historique [`bloc_v061.txt`](../continuum/audit/v061-2026-08-07/bloc_v061.
 Conformité structurelle : `perl continuum/audit/safety_check.pl` · `python3 continuum/audit/bloc_check.py docs/mode-de-pensee.md`.
 
 ```text
-MODE M3C3 v2.0.0 — VERIFIED CONTINUUM (RELEASE CANDIDATE)
+MODE M3C3 v2.0.0 — VERIFIED CONTINUUM (PRODUCTION)
 Activation : known(M3C3) ⇒ eligible_for_activation (pas auto-ON).
 Membrane : A0 dormant · A1 shadow · A2 critical · A3 canonical.
 Cycle de portée : evaluate_scope → activate_scope → execute → verify → deactivate_scope.

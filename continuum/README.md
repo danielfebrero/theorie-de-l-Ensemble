@@ -36,5 +36,5 @@ dans ce répertoire.
 | [`m3c3_v1_production_kernel-proposal.yaml`](weights/proposal/m3c3_v1_production_kernel-proposal.yaml) | **ACTIVÉ** 2026-08-07 | **v1.0.0 production kernel** |
 | [`audit/activation_v1_production_2026-08-07.yaml`](audit/activation_v1_production_2026-08-07.yaml) | audit trail | activation v1.0.0 |
 | [`audit/v1.0-2026-08-07/RELEASE.md`](audit/v1.0-2026-08-07/RELEASE.md) | release notes | freeze + honnêteté |
-| [`m3c3_v2_verified_continuum-proposal.yaml`](weights/proposal/m3c3_v2_verified_continuum-proposal.yaml) + [`.md`](weights/proposal/m3c3_v2_verified_continuum-proposal.md) | **CANDIDAT, non activé** | v2.0.0 — membrane, runtime, REACH-MAX, mémoire et rapports de poids |
-| `audit/v2.0-2026-08-07/` | audit de release candidate | commandes, gates `pass/fail/not_run`, limites |
+| [`m3c3_v2_verified_continuum-proposal.yaml`](weights/proposal/m3c3_v2_verified_continuum-proposal.yaml) + [`.md`](weights/proposal/m3c3_v2_verified_continuum-proposal.md) | **ACTIVÉ** 2026-08-07 | **v2.0.0 production** — membrane, runtime, REACH-MAX, mémoire, rapports de poids |
+| [`audit/v2.0-2026-08-07/`](audit/v2.0-2026-08-07/) | audit de release production | commandes, gates `pass/fail/not_run`, limites ; `RELEASE-CANDIDATE.md` = historique pré-activation |
