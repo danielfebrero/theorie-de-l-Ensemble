@@ -1,0 +1,34 @@
+cdxx_capsule:
+  name: m3c3_audit_trail
+  version: 0.1.0
+  target: theorie_Ensemble_M3C3
+  purpose: traçabilité complète et non-modifiable des transitions de couches + repondérations
+
+  modules:
+    - id: hash_chain
+      type: immutable_log
+      records:
+        - layer_transition
+        - weight_delta
+        - anomaly_event
+        - recovery_action
+      format: sequential_hash (prev_hash + payload)
+      write_to: continuum/audit/
+
+    - id: anomaly_signature
+      type: detector
+      triggers:
+        - contradiction
+        - overflow
+        - desync
+        - unauthorized_cross_layer
+      action: append_signed_event
+
+    - id: export_control
+      type: read_only
+      allowed: audit_read
+      denied: any_write_from_upper_layers
+
+  activation: immediate
+  scope: continuum_audit
+  status: ready
