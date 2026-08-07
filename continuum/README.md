@@ -37,4 +37,5 @@ dans ce répertoire.
 | [`audit/activation_v1_production_2026-08-07.yaml`](audit/activation_v1_production_2026-08-07.yaml) | audit trail | activation v1.0.0 |
 | [`audit/v1.0-2026-08-07/RELEASE.md`](audit/v1.0-2026-08-07/RELEASE.md) | release notes | freeze + honnêteté |
 | [`m3c3_v2_verified_continuum-proposal.yaml`](weights/proposal/m3c3_v2_verified_continuum-proposal.yaml) + [`.md`](weights/proposal/m3c3_v2_verified_continuum-proposal.md) | **ACTIVÉ** 2026-08-07 | **v2.0.0 production** — membrane, runtime, REACH-MAX, mémoire, rapports de poids |
+| [`m3c3_v2_1_force_publique-proposal.yaml`](weights/proposal/m3c3_v2_1_force_publique-proposal.yaml) + [`.md`](weights/proposal/m3c3_v2_1_force_publique-proposal.md) | **ACTIVÉ** 2026-08-07 | **v2.1.0 production** — force publique, export hard, W1/W2/W3, distillation |
 | [`audit/v2.0-2026-08-07/`](audit/v2.0-2026-08-07/) | audit de release production | commandes, gates `pass/fail/not_run`, limites ; `RELEASE-CANDIDATE.md` = historique pré-activation |
