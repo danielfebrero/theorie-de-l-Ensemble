@@ -8,6 +8,7 @@ Emplacements déclarés dans `continuum_locations` du [`master.yaml`](../master.
 | [`audit/`](audit/) | `audit` | `m3c3_audit_trail` (module `hash_chain`) | Journal immuable en chaîne de hachage : transitions de couches, deltas de poids, anomalies, actions de recovery |
 | [`audit/capability/`](audit/capability/) | `capability` | `m3c3_capability_token_manager` (module `token_audit`) | Journal des tokens : issue / validate / revoke / expire |
 | [`recovery/`](recovery/) | `recovery` | `m3c3_null_state_recovery` (module `post_rebuild_verify`) | Rapports post-reconstruction |
+| [`memory/`](memory/) | `continuum_memory` (v0.7.0) | — | Paramètres, patterns, créateur |
 
 ## Proposals présentes (`weights/proposal/`)
 
@@ -20,3 +21,5 @@ Emplacements déclarés dans `continuum_locations` du [`master.yaml`](../master.
 | [`audit/activation_ruin_gate_precision_2026-08-07.yaml`](audit/activation_ruin_gate_precision_2026-08-07.yaml) | audit trail | activation v0.6.1, défauts connus consignés |
 | [`audit/activation_execution_envelope_2026-08-07.yaml`](audit/activation_execution_envelope_2026-08-07.yaml) | audit trail | activation additive · `unchanged` vérifié par machine · prononcée une première fois sans preuve, retirée sur grief, reprise après mesure |
 | [`audit/activation_reweight_regime_2026-08-07.yaml`](audit/activation_reweight_regime_2026-08-07.yaml) | audit trail | activation structurelle (exceeds_max_step) |
+| [`continuum_memory_default_activation_v0.7.0-proposal.yaml`](weights/proposal/continuum_memory_default_activation_v0.7.0-proposal.yaml) | **ACTIVÉ** 2026-08-07 | `default_when_known` + mémoire continuum → master **v0.7.0** |
+| [`audit/activation_continuum_memory_v070_2026-08-07.yaml`](audit/activation_continuum_memory_v070_2026-08-07.yaml) | audit trail | activation v0.7.0 |
