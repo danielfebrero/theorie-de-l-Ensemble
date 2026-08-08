@@ -25,8 +25,13 @@ run_cell() {
   local target="$OUT/responses/$scenario.$arm.r$rep.txt"
   local meta="${target%.txt}.meta"
 
-  # Reprise : une sortie exploitable existante n'est jamais rejouée.
-  if [[ -s "$target" ]] && ! grep -q "API Error\|no stdin data received" "$target"; then
+  # Reprise : une sortie exploitable existante n'est jamais rejouée. Le filtre
+  # doit couvrir TOUS les messages du harnais, pas seulement les erreurs d'API :
+  # un « session limit » accepté ici deviendrait un essai scoré à zéro qui
+  # remplirait la grille sans qu'aucune réponse ait été produite.
+  if [[ -s "$target" ]] \
+     && ! grep -qiE "API Error|session limit|usage limit|rate limit|no stdin data received" "$target" \
+     && [[ $(wc -c < "$target") -ge 200 ]]; then
     printf 'skip   %-34s %-12s r%s\n' "$scenario" "$arm" "$rep"
     return 0
   fi
@@ -73,7 +78,8 @@ $(cat "$prompt_file")" \
   printf 'latency_ms=%s\nexit=%s\n' "$(( (ended - started) * 1000 ))" "$rc" > "$meta"
 
   local status=ok
-  grep -q "API Error" "$target" && status=refus
+  grep -qiE "API Error|session limit|usage limit|rate limit" "$target" && status=refus
+  [[ $(wc -c < "$target") -lt 200 ]] && status=court
   [[ -s "$target" ]] || status=vide
   printf '%-6s %-34s %-12s r%s  %4ss  %6s o\n' \
     "$status" "$scenario" "$arm" "$rep" "$((ended - started))" "$(wc -c < "$target")"

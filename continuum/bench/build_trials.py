@@ -91,14 +91,36 @@ def head_commit() -> str:
     ).stdout.strip()
 
 
+# Messages émis par le HARNAIS, jamais par le sujet. Les accepter fabriquerait
+# des essais scorés à zéro qui rempliraient la grille sans rien mesurer — une
+# campagne qui paraît complète alors qu'aucune réponse n'a été produite. C'est
+# le mode de corruption le plus dangereux du dispositif, parce qu'il est
+# silencieux : rien dans un score bas ne signale que le sujet n'a jamais répondu.
+HARNESS_NOISE = (
+    ("API Error", "refus ou erreur de l'API"),
+    ("session limit", "quota de session atteint — aucune réponse produite"),
+    ("usage limit", "quota d'usage atteint — aucune réponse produite"),
+    ("rate limit", "limitation de débit — aucune réponse produite"),
+    ("no stdin data received", "bruit de harnais dans la sortie"),
+    ("Invalid API key", "authentification en échec"),
+    ("Credit balance is too low", "crédit épuisé"),
+)
+# Une réponse plus courte que ce seuil ne peut pas satisfaire un scénario du
+# bench : les énoncés demandent une décision argumentée, pas un accusé de
+# réception. Le seuil est choisi, pas dérivé.
+MINIMUM_RESPONSE_CHARS = 200
+
+
 def usable(text: str) -> str | None:
-    """Retourne None si la sortie n'est pas une réponse du sujet."""
+    """Retourne None si la sortie est une réponse du sujet, sinon le motif du rejet."""
     if not text.strip():
         return "sortie vide"
-    if "API Error" in text:
-        return "refus ou erreur de l'API"
-    if "no stdin data received" in text:
-        return "bruit de harnais dans la sortie"
+    lowered = text.lower()
+    for needle, reason in HARNESS_NOISE:
+        if needle.lower() in lowered:
+            return reason
+    if len(text.strip()) < MINIMUM_RESPONSE_CHARS:
+        return f"réponse trop courte ({len(text.strip())} caractères) pour être une réponse au scénario"
     return None
 
 
