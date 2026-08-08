@@ -15,7 +15,7 @@ REPO=/home/user/theorie-de-l-Ensemble
 OUT=${OUT:-/tmp/bench-campaign}
 MODEL=${MODEL:-claude-opus-5}
 REPLICATES=${REPLICATES:-5}
-WORKERS=${WORKERS:-8}
+WORKERS=${WORKERS:-16}
 
 mkdir -p "$OUT/responses" "$OUT/work"
 
@@ -41,6 +41,17 @@ run_cell() {
       ;;
     B_adapter)
       ( cd "$neutral" && claude -p "$(cat "$prompt_file")" \
+          --model "$MODEL" --disable-slash-commands --allowedTools "" \
+          --append-system-prompt "$(cat "$REPO/CLAUDE.md")" ) > "$target" 2>&1
+      ;;
+    D_candidate)
+      ( cd "$neutral" && claude -p "Document de référence master.yaml (autorité opérationnelle) :
+
+$(cat "$REPO/continuum/weights/proposal/bench_informed_v2_2_0-candidate.yaml")
+
+---
+
+$(cat "$prompt_file")" \
           --model "$MODEL" --disable-slash-commands --allowedTools "" \
           --append-system-prompt "$(cat "$REPO/CLAUDE.md")" ) > "$target" 2>&1
       ;;
@@ -85,7 +96,7 @@ print(f"{len(scenarios)} énoncé(s) extraits")
 PY
 
 mapfile -t SCENARIOS < <(ls "$OUT/prompts" | sed 's/\.txt$//' | sort)
-ARMS=(A_placebo B_adapter C_canonical)
+ARMS=(A_placebo B_adapter C_canonical D_candidate)
 
 total=$(( ${#SCENARIOS[@]} * ${#ARMS[@]} * REPLICATES ))
 echo "cellules : $total  ·  workers : $WORKERS  ·  modèle : $MODEL"

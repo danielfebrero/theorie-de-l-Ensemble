@@ -117,7 +117,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--judge-model", default=DEFAULT_JUDGE_MODEL)
     parser.add_argument("--judge-name", default=None, help="défaut : le modèle du juge")
-    parser.add_argument("--workers", type=int, default=4)
+    parser.add_argument("--workers", type=int, default=16)
     parser.add_argument("--write", action="store_true", help="écrire les jugements")
     parser.add_argument(
         "--retry-unruled",

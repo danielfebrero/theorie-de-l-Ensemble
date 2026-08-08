@@ -1016,9 +1016,13 @@ class EmptyRegistryTests(unittest.TestCase):
         self.assertEqual([item.as_dict() for item in errors], [])
         self.assertEqual(result["status"], aggregate.STATUS_NOT_RUN)
         self.assertEqual(result["trials"], 0)
+        # Le jeu de comparaisons est celui declare par aggregate : le test suit
+        # l'ajout d'un bras au lieu de figer trois noms.
         self.assertEqual(
-            set(result["comparisons"]), {"C_vs_B", "C_vs_A", "B_vs_A"}
+            set(result["comparisons"]),
+            {comparison_id for comparison_id, _, _ in aggregate.COMPARISONS},
         )
+        self.assertIn("C_vs_B", result["comparisons"])
         for comparison_id, comparison in result["comparisons"].items():
             with self.subTest(comparison=comparison_id):
                 self.assertEqual(comparison["verdict"], aggregate.VERDICT_INSUFFICIENT)

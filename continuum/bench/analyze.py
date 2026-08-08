@@ -25,7 +25,7 @@ sys.path.insert(0, str(BENCH_ROOT))
 
 import validate as v  # noqa: E402
 
-ARMS = ["A_placebo", "B_adapter", "C_canonical"]
+ARMS = ["A_placebo", "B_adapter", "C_canonical", "D_candidate"]
 # Familles où le cadre doit RETENIR plutôt que déployer : y progresser en score
 # tout en sur-activant serait une régression déguisée en progrès.
 GUARD_FAMILIES = {
@@ -113,8 +113,11 @@ def build_report(data: dict) -> dict:
                 "judged_ruled": sum(c["judged_ruled"] for c in cells),
                 "judged_total": sum(c["judged_total"] for c in cells),
             }
-        a, b, c = (row["arms"][arm]["deterministic_mean"] for arm in ARMS)
-        row["deltas"] = {"C_vs_B": delta(c, b), "C_vs_A": delta(c, a), "B_vs_A": delta(b, a)}
+        a, b, c, d = (row["arms"][arm]["deterministic_mean"] for arm in ARMS)
+        row["deltas"] = {
+            "D_vs_C": delta(d, c), "C_vs_B": delta(c, b),
+            "C_vs_A": delta(c, a), "B_vs_A": delta(b, a),
+        }
         by_scenario[sid] = row
 
     by_family: dict[str, dict] = {}
@@ -136,6 +139,7 @@ def build_report(data: dict) -> dict:
         family["arms"] = means
         family["deltas"] = {
             "C_vs_B": delta(means["C_canonical"], means["B_adapter"]),
+            "D_vs_C": delta(means["D_candidate"], means["C_canonical"]),
             "C_vs_A": delta(means["C_canonical"], means["A_placebo"]),
             "B_vs_A": delta(means["B_adapter"], means["A_placebo"]),
         }
@@ -220,8 +224,8 @@ def render(report: dict, aggregate: dict | None) -> str:
         "",
         "## Par famille",
         "",
-        "| Famille | Garde | A placebo | B adaptateur | C canon | C−B | C−A |",
-        "|---|---|---|---|---|---|---|",
+        "| Famille | Garde | A placebo | B adaptateur | C canon | D candidat | D−C | C−B | C−A |",
+        "|---|---|---|---|---|---|---|---|---|",
     ]
 
     def cell(value: float | None) -> str:
@@ -231,19 +235,20 @@ def render(report: dict, aggregate: dict | None) -> str:
         arms, deltas = family["arms"], family["deltas"]
         lines.append(
             f"| {name} | {'oui' if family['guard'] else ''} | {cell(arms['A_placebo'])} | "
-            f"{cell(arms['B_adapter'])} | {cell(arms['C_canonical'])} | "
-            f"{cell(deltas['C_vs_B'])} | {cell(deltas['C_vs_A'])} |"
+            f"{cell(arms['B_adapter'])} | {cell(arms['C_canonical'])} | {cell(arms['D_candidate'])} | "
+            f"{cell(deltas['D_vs_C'])} | {cell(deltas['C_vs_B'])} | {cell(deltas['C_vs_A'])} |"
         )
 
     lines += ["", "## Par scénario", "",
-              "| Scénario | Membrane | n/bras | A | B | C | C−A |", "|---|---|---|---|---|---|---|"]
+              "| Scénario | Membrane | n/bras | A | B | C | D | D−C | C−A |",
+              "|---|---|---|---|---|---|---|---|---|"]
     for sid, row in sorted(report["by_scenario"].items()):
         arms = row["arms"]
         counts = "/".join(str(arms[arm]["n"]) for arm in ARMS)
         lines.append(
             f"| {sid} | {row['membrane']} | {counts} | "
             + " | ".join(cell(arms[arm]["deterministic_mean"]) for arm in ARMS)
-            + f" | {cell(row['deltas']['C_vs_A'])} |"
+            + f" | {cell(row['deltas']['D_vs_C'])} | {cell(row['deltas']['C_vs_A'])} |"
         )
 
     lines += ["", "## Santé de l'instrument", ""]
@@ -262,9 +267,12 @@ def render(report: dict, aggregate: dict | None) -> str:
     triggered = {k: vv for k, vv in report["failure_modes"].items() if sum(vv.values())}
     lines += ["", "## Modes d'échec déclenchés", ""]
     if triggered:
-        lines += ["| Mode | A | B | C |", "|---|---|---|---|"]
+        lines += ["| Mode | A | B | C | D |", "|---|---|---|---|---|"]
         for key, counts in sorted(triggered.items(), key=lambda kv: -sum(kv[1].values()))[:25]:
-            lines.append(f"| `{key}` | {counts['A_placebo']} | {counts['B_adapter']} | {counts['C_canonical']} |")
+            lines.append(
+                f"| `{key}` | {counts['A_placebo']} | {counts['B_adapter']} | "
+                f"{counts['C_canonical']} | {counts['D_candidate']} |"
+            )
         lines += ["", "Rappel : l'association contrôle→mode est heuristique et non normative."]
     else:
         lines.append("Aucun mode déclenché.")

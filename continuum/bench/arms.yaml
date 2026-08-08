@@ -2,8 +2,8 @@ schema_version: 1
 kind: m3c3_bench_arms
 declared_at: "2026-08-07T22:30:00Z"
 principle: >
-  Les trois bras forment une échelle d'exposition, pas trois qualités de réponse.
-  L'énoncé du scénario est strictement identique dans les trois ; seule change la
+  Les bras forment une échelle d'exposition, pas des qualités de réponse.
+  L'énoncé du scénario est strictement identique dans tous ; seule change la
   matière M3C3 présente dans le contexte. Toute autre différence (formulation,
   outils, échantillonnage) casse la comparaison et rend l'essai non interprétable.
 binding: >
@@ -60,7 +60,38 @@ arms:
       le plafond atteignable en contexte — la référence supérieure contre
       laquelle toute distillation dans les poids devra se justifier
 
+  D_candidate:
+    label: Canon candidat (proposition non activée)
+    exposure_channels: [instruction, context]
+    artifacts:
+      - path: CLAUDE.md
+        role: adaptateur de transport
+      - path: continuum/weights/proposal/bench_informed_v2_2_0-candidate.yaml
+        role: document d'autorité candidat, à la place de master.yaml
+    system_material: >
+      L'adaptateur plus un canon CANDIDAT : master.yaml augmenté d'additions
+      opérationnelles, sans aucune valeur modifiée ni sélecteur gelé touché.
+      Le document n'est pas le canon et n'a reçu aucune activation de l'émetteur.
+    forbidden:
+      - fournir master.yaml en plus du candidat, ce qui mélangerait les deux autorités
+      - présenter le candidat comme activé ou comme le canon en vigueur
+    measures: >
+      Ce que des additions opérationnelles apportent au-delà du canon en vigueur.
+      L'écart D−C est le seul du dispositif à être contrôlé en volume : les deux
+      documents diffèrent de 1,6 %, donc un écart ne peut pas s'expliquer par la
+      masse de contexte comme C−A le peut.
+
 comparisons:
+  D_vs_C:
+    role: proposition
+    question: >
+      Des additions opérationnelles au canon changent-elles le comportement ?
+      Comparaison contrôlée en volume, contrairement à C_vs_A.
+    caveat: >
+      Le candidat a été rédigé après lecture des résultats d'une campagne
+      antérieure. L'écart mesuré sur les scénarios déjà joués est contaminé ;
+      seul celui mesuré sur des scénarios rédigés sans connaissance du candidat
+      est recevable.
   C_vs_A:
     role: primaire
     question: le cadre complet change-t-il la réponse par rapport à la disposition nue ?
@@ -110,6 +141,11 @@ known_confound:
     en C peut provenir du cadre M3C3 ou du simple volume de contexte structuré.
   mitigation_status: not_implemented
   mitigation_planned: >
-    Un bras D à volume apparié (texte structuré de longueur comparable, sans
+    Un bras E_volume_matched (texte structuré de longueur comparable, SANS aucun
     contenu M3C3) est nécessaire pour départager. Tant qu'il n'existe pas, aucun
     résultat C_vs_A ne peut être attribué au contenu du cadre plutôt qu'à sa masse.
+  do_not_confuse_with_D: >
+    D_candidate ne résout PAS ce confondant. C'est un canon candidat, donc de la
+    matière M3C3 : il contrôle le volume pour la seule comparaison D_vs_C, où les
+    deux documents ne diffèrent que de 1,6 %. Le bras de contrôle en volume reste
+    à écrire, et C_vs_A reste confondu.

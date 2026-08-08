@@ -37,9 +37,13 @@ EXPOSURE = {
     "A_placebo": {"channels": ["none"], "paths": []},
     "B_adapter": {"channels": ["instruction"], "paths": ["CLAUDE.md"]},
     "C_canonical": {"channels": ["instruction", "context"], "paths": ["CLAUDE.md", "master.yaml"]},
+    "D_candidate": {
+        "channels": ["instruction", "context"],
+        "paths": ["CLAUDE.md", "continuum/weights/proposal/bench_informed_v2_2_0-candidate.yaml"],
+    },
 }
 
-CELL_RE = re.compile(r"^(?P<scenario>.+)\.(?P<arm>A_placebo|B_adapter|C_canonical)\.r(?P<rep>\d+)$")
+CELL_RE = re.compile(r"^(?P<scenario>.+)\.(?P<arm>A_placebo|B_adapter|C_canonical|D_candidate)\.r(?P<rep>\d+)$")
 
 COMMON_LIMITATIONS = [
     "L'identité exacte du sujet n'est pas pleinement établie depuis l'intérieur du "
@@ -68,6 +72,15 @@ ARM_LIMITATIONS = {
     "C_canonical": [
         "master.yaml est injecté en tête de l'invite utilisateur, donc par canal de "
         "contexte, l'adaptateur restant sur le canal d'instruction."
+    ],
+    "D_candidate": [
+        "Le document d'autorité est un CANDIDAT non activé, pas le canon : "
+        "master.yaml reste l'autorité opérationnelle et l'activation appartient "
+        "à l'émetteur désigné.",
+        "Les additions du candidat ont été choisies après avoir vu les résultats "
+        "d'une campagne antérieure : l'écart D−C mesuré sur les scénarios déjà "
+        "joués est contaminé, seul celui mesuré sur des scénarios rédigés sans "
+        "connaissance du candidat est recevable.",
     ],
 }
 
