@@ -35,7 +35,15 @@ AGGREGATE_PATH = validate.BENCH_ROOT / "results" / "aggregate.yaml"
 SPLITS_PATH = validate.BENCH_ROOT / "splits.yaml"
 CHECKER = "m3c3_bench_aggregate"
 
-ARMS_ORDER = ("A_placebo", "B_adapter", "C_canonical", "D_candidate", "D2_candidate")
+ARMS_ORDER = (
+    "A_placebo",
+    "B_adapter",
+    "C_canonical",
+    "D_candidate",
+    "D2_candidate",
+    "D3_candidate",
+    "E_volume_matched",
+)
 COMPARISONS = (
     # D_vs_C isole le contenu du candidat : les deux bras reçoivent un
     # document d'autorité de volume comparable (écart 1,6 %), donc un écart
@@ -43,6 +51,13 @@ COMPARISONS = (
     # D2 est l'itération garde-première du candidat. D2_vs_C est sa comparaison
     # décisive ; D2_vs_D mesure si l'itération a réparé ce que la v2.2 a dégradé
     # — les deux sont contrôlées en volume (matière M3C3 des deux côtés).
+    # D3 corrige la PORTÉE des gardes (v2.4) ; E apparie le volume de C sans
+    # matière M3C3 au-delà de l'adaptateur : C_vs_E est l'effet de contenu du
+    # canon à volume apparié, E_vs_B l'effet de la seule masse de contexte.
+    ("D3_vs_C", "D3_candidate", "C_canonical"),
+    ("D3_vs_D2", "D3_candidate", "D2_candidate"),
+    ("C_vs_E", "C_canonical", "E_volume_matched"),
+    ("E_vs_B", "E_volume_matched", "B_adapter"),
     ("D2_vs_C", "D2_candidate", "C_canonical"),
     ("D2_vs_D", "D2_candidate", "D_candidate"),
     ("D_vs_C", "D_candidate", "C_canonical"),
@@ -105,10 +120,10 @@ GUARD_CLOSED = (
 GUARD_OPEN = (
     "Porte ouverte : toutes les cellules atteignent minimum_trials_per_cell, "
     "les splits sont prononcés et tout contrôle jugé a été tranché. Les verdicts "
-    "restent des écarts de taux sans test de significativité, et C_vs_A demeure "
-    "confondu avec le volume de contexte tant que le bras E_volume_matched "
-    "n'existe pas. D_candidate ne résout pas ce confondant : c'est de la matière "
-    "M3C3, et il ne contrôle le volume que pour la comparaison D_vs_C."
+    "restent des écarts de taux sans test de significativité. C_vs_E est la "
+    "comparaison dé-confondue du contenu du canon (volume apparié, adaptateur "
+    "des deux côtés) ; C_vs_A reste confondu volume+contenu et ne doit plus "
+    "servir de preuve de contenu."
 )
 GUARD_REASON = "porte de conclusion : statut de l'agrégat != complete"
 

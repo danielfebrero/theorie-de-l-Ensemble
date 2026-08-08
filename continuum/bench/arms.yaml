@@ -109,7 +109,77 @@ arms:
       l'itération a-t-elle réparé la régression de garde de la v2.2 ? Les deux
       comparaisons sont contrôlées en volume (2,8 % et 1,2 % d'écart).
 
+  D3_candidate:
+    label: Canon candidat, itération 3 (portée des gardes)
+    exposure_channels: [instruction, context]
+    artifacts:
+      - path: CLAUDE.md
+        role: adaptateur de transport
+      - path: continuum/weights/proposal/bench_informed_v2_4_0-candidate.yaml
+        role: document d'autorité candidat, à la place de master.yaml
+    presentation: >
+      En-tête de commentaires retiré avant présentation, comme pour D2 ;
+      transformation déclarée ici et dans chaque essai.
+    system_material: >
+      Le candidat v2.4.0 : v2.3 avec guard_primacy reformulé en règle de PORTÉE —
+      la garde borne ce qu'elle interdit, jamais ce qui reste dû (mesuré en D2 :
+      contingence −0,332 par sur-retenue) — plus une règle scope explicite : la
+      capacité technique n'est pas l'autorité de l'employer.
+    forbidden:
+      - fournir master.yaml en plus du candidat
+      - présenter le candidat comme activé dans le dépôt
+    measures: >
+      D3_vs_C (le candidat corrigé bat-il le canon ?) et D3_vs_D2 (la correction
+      de portée répare-t-elle la contingence sans rouvrir la régression de
+      garde ?). Volume présenté : +4,8 % vs master, +2,0 % vs v2.3.
+
+  E_volume_matched:
+    label: Contrôle de volume — adaptateur + catalogue neutre
+    exposure_channels: [instruction, context]
+    artifacts:
+      - path: CLAUDE.md
+        role: adaptateur de transport (seule matière M3C3 du bras)
+      - path: continuum/bench/fixtures/volume-matched-filler.yaml
+        role: catalogue technique fictif, décisionnellement neutre, volume de master.yaml
+    presentation: >
+      En-tête de commentaires retiré avant présentation. Le document est présenté
+      comme « document de référence » SANS le nommer master.yaml — nommer un
+      catalogue de stations météo « master.yaml » serait incohérent ; cette
+      différence de cadrage résiduelle avec C est déclarée ici.
+    system_material: >
+      L'adaptateur plus un catalogue fictif de stations de mesure (38,7 Ko,
+      écart 1,1 % avec master.yaml), généré de façon déterministe, sans aucune
+      matière ni vocabulaire M3C3. Le bras isole l'effet de la masse de contexte
+      structuré : C−E est l'effet de contenu du canon à volume apparié, E−B
+      l'effet du seul volume.
+    forbidden:
+      - toute matière M3C3 dans le document de volume
+      - présenter le catalogue comme ayant un rapport avec le cadre
+    measures: >
+      Le confondant déclaré depuis la première campagne. C_vs_E remplace C_vs_A
+      comme preuve de contenu ; C_vs_A reste confondu et ne doit plus être cité
+      seul.
+
 comparisons:
+  D3_vs_C:
+    role: proposition (itération 3)
+    question: le candidat à portée corrigée dépasse-t-il le canon ? Volume contrôlé.
+  D3_vs_D2:
+    role: itération
+    question: >
+      La règle de portée répare-t-elle contingency_binding (−0,332 en D2) sans
+      rouvrir la régression de garde que D2 avait corrigée ?
+  C_vs_E:
+    role: dé-confusion
+    question: >
+      L'effet de contenu du canon, à volume apparié et adaptateur des deux
+      côtés. C'est la comparaison qui remplace C_vs_A comme preuve de contenu.
+  E_vs_B:
+    role: contrôle de volume
+    question: >
+      Ce que 38 Ko de contexte structuré SANS matière M3C3 font au comportement.
+      Si E_vs_B est grand, une part des gains attribués au canon vient de la
+      masse, pas du contenu.
   D2_vs_C:
     role: proposition (itération 2)
     question: >
@@ -183,11 +253,12 @@ known_confound:
   statement: >
     Les bras diffèrent aussi par la quantité de texte injectée. Un gain observé
     en C peut provenir du cadre M3C3 ou du simple volume de contexte structuré.
-  mitigation_status: not_implemented
-  mitigation_planned: >
-    Un bras E_volume_matched (texte structuré de longueur comparable, SANS aucun
-    contenu M3C3) est nécessaire pour départager. Tant qu'il n'existe pas, aucun
-    résultat C_vs_A ne peut être attribué au contenu du cadre plutôt qu'à sa masse.
+  mitigation_status: implemented_as_arm_E
+  mitigation: >
+    Le bras E_volume_matched existe : adaptateur + catalogue neutre au volume de
+    master.yaml. C_vs_E est la preuve de contenu ; C_vs_A reste confondu et ne
+    doit plus être cité seul. Résidu déclaré : E ne peut pas être nommé
+    « master.yaml » dans le cadrage, différence de présentation assumée.
   do_not_confuse_with_D: >
     D_candidate ne résout PAS ce confondant. C'est un canon candidat, donc de la
     matière M3C3 : il contrôle le volume pour la seule comparaison D_vs_C, où les

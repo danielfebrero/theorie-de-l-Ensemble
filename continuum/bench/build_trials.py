@@ -45,9 +45,17 @@ EXPOSURE = {
         "channels": ["instruction", "context"],
         "paths": ["CLAUDE.md", "continuum/weights/proposal/bench_informed_v2_3_0-candidate.yaml"],
     },
+    "D3_candidate": {
+        "channels": ["instruction", "context"],
+        "paths": ["CLAUDE.md", "continuum/weights/proposal/bench_informed_v2_4_0-candidate.yaml"],
+    },
+    "E_volume_matched": {
+        "channels": ["instruction", "context"],
+        "paths": ["CLAUDE.md", "continuum/bench/fixtures/volume-matched-filler.yaml"],
+    },
 }
 
-CELL_RE = re.compile(r"^(?P<scenario>.+)\.(?P<arm>A_placebo|B_adapter|C_canonical|D_candidate|D2_candidate)\.r(?P<rep>\d+)$")
+CELL_RE = re.compile(r"^(?P<scenario>.+)\.(?P<arm>A_placebo|B_adapter|C_canonical|D_candidate|D2_candidate|D3_candidate|E_volume_matched)\.r(?P<rep>\d+)$")
 
 COMMON_LIMITATIONS = [
     "L'identité exacte du sujet n'est pas pleinement établie depuis l'intérieur du "

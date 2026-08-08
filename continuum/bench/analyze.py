@@ -25,8 +25,12 @@ sys.path.insert(0, str(BENCH_ROOT))
 
 import validate as v  # noqa: E402
 
-ARMS = ["A_placebo", "B_adapter", "C_canonical", "D_candidate", "D2_candidate"]
+ARMS = ["A_placebo", "B_adapter", "C_canonical", "D_candidate", "D2_candidate", "D3_candidate", "E_volume_matched"]
 DELTA_SPECS = (
+    ("D3_vs_C", "D3_candidate", "C_canonical"),
+    ("D3_vs_D2", "D3_candidate", "D2_candidate"),
+    ("C_vs_E", "C_canonical", "E_volume_matched"),
+    ("E_vs_B", "E_volume_matched", "B_adapter"),
     ("D2_vs_C", "D2_candidate", "C_canonical"),
     ("D2_vs_D", "D2_candidate", "D_candidate"),
     ("D_vs_C", "D_candidate", "C_canonical"),
@@ -228,8 +232,8 @@ def render(report: dict, aggregate: dict | None) -> str:
         "",
         "## Par famille",
         "",
-        "| Famille | Garde | A | B | C | D | D2 | D2−C | D2−D | C−B |",
-        "|---|---|---|---|---|---|---|---|---|---|",
+        "| Famille | Garde | A | B | C | D | D2 | D3 | E | D3−C | D3−D2 | C−E |",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|",
     ]
 
     def cell(value: float | None) -> str:
@@ -240,19 +244,19 @@ def render(report: dict, aggregate: dict | None) -> str:
         lines.append(
             f"| {name} | {'oui' if family['guard'] else ''} | "
             + " | ".join(cell(arms[arm]) for arm in ARMS)
-            + f" | {cell(deltas['D2_vs_C'])} | {cell(deltas['D2_vs_D'])} | {cell(deltas['C_vs_B'])} |"
+            + f" | {cell(deltas['D3_vs_C'])} | {cell(deltas['D3_vs_D2'])} | {cell(deltas['C_vs_E'])} |"
         )
 
     lines += ["", "## Par scénario", "",
-              "| Scénario | Membrane | n/bras | A | B | C | D | D2 | D2−C |",
-              "|---|---|---|---|---|---|---|---|---|"]
+              "| Scénario | Membrane | n/bras | A | B | C | D | D2 | D3 | E | D3−C |",
+              "|---|---|---|---|---|---|---|---|---|---|---|"]
     for sid, row in sorted(report["by_scenario"].items()):
         arms = row["arms"]
         counts = "/".join(str(arms[arm]["n"]) for arm in ARMS)
         lines.append(
             f"| {sid} | {row['membrane']} | {counts} | "
             + " | ".join(cell(arms[arm]["deterministic_mean"]) for arm in ARMS)
-            + f" | {cell(row['deltas']['D2_vs_C'])} |"
+            + f" | {cell(row['deltas']['D3_vs_C'])} |"
         )
 
     lines += ["", "## Santé de l'instrument", ""]
@@ -271,7 +275,7 @@ def render(report: dict, aggregate: dict | None) -> str:
     triggered = {k: vv for k, vv in report["failure_modes"].items() if sum(vv.values())}
     lines += ["", "## Modes d'échec déclenchés", ""]
     if triggered:
-        lines += ["| Mode | A | B | C | D | D2 |", "|---|---|---|---|---|---|"]
+        lines += ["| Mode | A | B | C | D | D2 | D3 | E |", "|---|---|---|---|---|---|---|---|"]
         for key, counts in sorted(triggered.items(), key=lambda kv: -sum(kv[1].values()))[:25]:
             lines.append(
                 "| `" + key + "` | " + " | ".join(str(counts[arm]) for arm in ARMS) + " |"
