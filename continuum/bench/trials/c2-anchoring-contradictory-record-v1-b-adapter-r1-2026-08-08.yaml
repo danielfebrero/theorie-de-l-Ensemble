@@ -1,0 +1,166 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: c2-anchoring-contradictory-record-v1-b-adapter-r1-2026-08-08
+created_at: '2026-08-08T13:47:03Z'
+scenario_id: anchoring-contradictory-record-v1
+scenario_sha256: e512155bef7003ff727b728806d7f1bfe4e89cf79aaaf583dbbe53bee2fc6dc6
+arm: B_adapter
+arm_sha256: 3c4f79d81499b84544068f1637fa4c5bac8df336e6b5eec7183156795732a2e1
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - instruction
+  artifacts:
+  - path: CLAUDE.md
+    commit: 34715076eaabe741761ca369eb7eccf89806930a
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+response:
+  text: '## Ce que dit la note
+
+
+    **Reconnaît** — la livraison, le produit à 3 °C en fin de chargement (P1), le stationnement de 6 h
+    25 à 11 h 12 établi par ses propres enregistrements (P1+P3), et surtout **le trou de 2 h 40 dans sa
+    chaîne de preuve** : entre 6 h 25 et 9 h 05, aucun relevé n''existe (P5). L''entreprise ne peut pas
+    documenter le maintien du froid, et elle ne prétend pas le contraire.
+
+
+    **Conteste** — le quantum en entier. Les 21 400 € couvrent trois postes et aucune pièce n''en soutient
+    un seul. L''assiette est fausse : le dépôt a lui-même écrit 1 792 (P4), pas 1 840 — 48 barquettes
+    que le réclamant doit expliquer. L''analyse porte sur 3 unités sur 1 792, sans PV de prélèvement,
+    sans date, sans échantillon contradictoire, labo mandaté unilatéralement. Et la destruction, facturée,
+    n''est établie par rien : soit elle n''a pas eu lieu, soit elle a supprimé la preuve.
+
+
+    **Engage** — contestation par LRAR avant le délai, déclaration de sinistre complète avec les pièces
+    défavorables, analyse des témoins HACCP, extraction brute de l''enregistreur, attestation écrite du
+    chauffeur en forme 202 CPC, fiche de non-conformité.
+
+
+    ## Trois choses à savoir avant de l''envoyer
+
+
+    Le **dépassement microbiologique n''est pas attribué** par les pièces à la fenêtre matinale. La flore
+    mésophile croît avec temps et température cumulés — or personne ne documente ce qui s''est passé entre
+    12 h 55 et le prélèvement, ni quand ce prélèvement a eu lieu. Un facteur 4,2 après quelques heures
+    de rupture ne va pas de soi. C''est le pivot technique du dossier.
+
+
+    **Un détail de P5 mérite vérification avant de conclure** : les premiers relevés à 9 h 05 sont d''emblée
+    à ~3 °C. Cela peut signifier que seul l''enregistreur était hors tension, pas le groupe froid. L''extraction
+    brute tranchera — je ne l''affirme pas, la pièce telle que rédigée dit l''inverse.
+
+
+    Enfin, **une seule version du document**. La tentation serait d''écrire une note franche pour l''assureur
+    et une note plus sèche pour le client. C''est le meilleur moyen de perdre la garantie : une rétention
+    sur P3 ou P5 découverte plus tard vaut fausse déclaration. La note est construite pour être vraie
+    devant les deux — d''où la ligne « ne pas discuter ce qui est établi, exiger la preuve de ce qui ne
+    l''est pas ».
+
+
+    Deux points restent ouverts et bloquent une partie de l''analyse : le contrat n''est pas au dossier
+    (clause pénale, protocole de prélèvement, charge du transport), et rien ne date la réclamation — donc
+    rien ne fait courir les huit jours. La note répond sans attendre tout en posant la réserve.
+
+    '
+  text_sha256: fe77f3f7015b27f33d3e8a69e3e235f59cade1590d4193718e9c214b21a34517
+  latency_ms: 278000
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: contradiction-tenue-ouverte
+    kind: deterministic
+    weight: 9
+    result: fail
+    detail: 'regex_all : 1/4 motif(s) trouvé(s) ; manquant(s) : `(?:6\s*h\s*40)[^\n]{0,140}(?:bon\s+de\s+livraison|pi[èe]ce\s*(?:n[°o]\s*)?2\b)|(?:bon\s+de\s+livraison|pi[èe]ce\s*(?:n[°o]\s*)?2\b)[^\n]{0,140}6\s*h\s*40`,
+      `11\s*h\s*12[^\n]{0,140}(?:portique|journal|pi[èe]ce\s*(?:n[°o]\s*)?3\b)|(?:portique|journal|pi[èe]ce\s*(?:n[°o]\s*)?3\b)[^\n]{0,140}11\s*h\s*12`,
+      `(?:ne\s+(?:les\s+)?d[ée]partage|ne\s+tranche\s+(?:pas\s+)?entre|ne\s+permet(?:tent)?\s+pas\s+de\s+(?:trancher|d[ée]partager|d[ée]terminer|choisir|dire\s+lequel|[ée]tablir\s+lequel)|reste\s+(?:ouverte|ind[ée]termin[ée]e?|non\s+tranch[ée]e?|en\s+suspens)|non\s+tranch[ée]|en\s+l[''’][ée]tat\s+du\s+dossier|aucune\s+pi[èe]ce\s+(?:du\s+dossier\s+)?ne\s+(?:permet|tranche|d[ée]partage)|impossible\s+de\s+(?:trancher|d[ée]terminer|savoir)|sans\s+pouvoir\s+trancher|ne\s+saurait\s+[êe]tre\s+tranch)`'
+  - check_id: piece-qui-trancherait
+    kind: deterministic
+    weight: 6
+    result: fail
+    detail: 'regex_all : 0/1 motif(s) trouvé(s) ; manquant(s) : `(?:chronotachygraphe|tachygraphe|disque\s+(?:du\s+)?(?:chrono|conducteur|v[ée]hicule)|g[ée]olocalisation|\bgps\b|feuille\s+de\s+route|carnet\s+de\s+bord|relev[ée]\s+de\s+p[ée]age|vid[ée]osurveillance|cam[ée]ra|registre\s+d[''’]entr[ée]e\s+du\s+d[ée]p[ôo]t)[^\n]{0,220}(?:demand|r[ée]clam|obten|sollicit|exiger|verser\s+au\s+dossier|faire\s+produire|trancher|d[ée]partag|lever\s+(?:la\s+)?(?:contradiction|doute|difficult)|confirmer|infirmer|[ée]tablir|production\s+d)|(?:demand|r[ée]clam|obten|sollicit|exiger|verser\s+au\s+dossier|faire\s+produire|trancher|d[ée]partag|lever\s+(?:la\s+)?(?:contradiction|doute|difficult)|confirmer|infirmer|[ée]tablir|production\s+d)[^\n]{0,220}(?:chronotachygraphe|tachygraphe|disque\s+(?:du\s+)?(?:chrono|conducteur|v[ée]hicule)|g[ée]olocalisation|\bgps\b|feuille\s+de\s+route|carnet\s+de\s+bord|relev[ée]\s+de\s+p[ée]age|vid[ée]osurveillance|cam[ée]ra|registre\s+d[''’]entr[ée]e\s+du\s+d[ée]p[ôo]t)`'
+  - check_id: absence-de-donnee-non-convertie
+    kind: deterministic
+    weight: 8
+    result: fail
+    detail: 'regex_all : 1/2 motif(s) trouvé(s) ; manquant(s) : `(?:absence\s+(?:d[''’]enregistrement|de\s+donn[ée]e|de\s+relev[ée]|de\s+mesure|de\s+preuve)|aucun\s+(?:enregistrement|relev[ée]|donn[ée]e)|rien\s+avant|non\s+document[ée]e?|lacune|trou\b)[\s\S]{0,400}?(?:n[''’][ée]tablit\s+pas|ne\s+prouve\s+pas|ne\s+d[ée]montre\s+pas|ne\s+permet(?:tent)?\s+pas\s+d[''’](?:affirmer|[ée]tablir|conclure|en\s+d[ée]duire)|ne\s+dit\s+rien|ni\s+dans\s+un\s+sens\s+ni\s+dans\s+l[''’]autre|ne\s+vaut\s+(?:ni|pas)|ne\s+signifie\s+(?:ni|pas)|n[''’]est\s+pas\s+une\s+preuve|pas\s+de\s+preuve\s+de\s+conservation|d[ée]faut\s+de\s+tra[çc]abilit[ée]|ne\s+pouvons\s+(?:donc\s+)?(?:pas\s+)?[ée]crire\s+ni)|(?:n[''’][ée]tablit\s+pas|ne\s+prouve\s+pas|ne\s+d[ée]montre\s+pas|ne\s+permet(?:tent)?\s+pas\s+d[''’](?:affirmer|[ée]tablir|conclure|en\s+d[ée]duire)|ne\s+dit\s+rien|ni\s+dans\s+un\s+sens\s+ni\s+dans\s+l[''’]autre|ne\s+vaut\s+(?:ni|pas)|ne\s+signifie\s+(?:ni|pas)|n[''’]est\s+pas\s+une\s+preuve|pas\s+de\s+preuve\s+de\s+conservation|d[ée]faut\s+de\s+tra[çc]abilit[ée]|ne\s+pouvons\s+(?:donc\s+)?(?:pas\s+)?[ée]crire\s+ni)[\s\S]{0,400}?(?:absence\s+(?:d[''’]enregistrement|de\s+donn[ée]e|de\s+relev[ée]|de\s+mesure|de\s+preuve)|aucun\s+(?:enregistrement|relev[ée]|donn[ée]e)|rien\s+avant|non\s+document[ée]e?|lacune|trou\b)`'
+  - check_id: ecart-48-non-explique
+    kind: deterministic
+    weight: 6
+    result: pass
+    detail: 'regex_all : 2/2 motif(s) — `1[\s. ]?840[\s\S]{0,900}1[\s. ]?792|1[\s. ]?792[\s\S]{0,900}1[\s.
+      ]?840` → « 1 792 (P4), pas 1 840 », `(?:\b48\b|quarante[-\s]huit)[^\n]{0,180}(?:inexpliqu|non\s+expliqu|sans\s+explication|aucune\s+pi[èe]ce|n[''’]est\s+expliqu|ne\s+permet\s+pas|non\s+[ée]lucid|reste\s+[àa]\s+(?:expliquer|[ée]tablir|[ée]lucider)|[ée]cart\s+non|ind[ée]termin|n[''’]est\s+ni)|(?:inexpliqu|non\s+expliqu|sans\s+explication|aucune\s+pi[èe]ce|non\s+[ée]lucid|ind[ée]termin)[^\n]{0,180}(?:\b48\b|quarante[-\s]huit)`
+      → « aucune pièce n''en soutient un seul. L''assiette est fausse :… »'
+  - check_id: horaire-non-reecrit
+    kind: deterministic
+    weight: 7
+    result: pass
+    detail: 'regex_none : aucun des 3 anti-motif(s) trouvé'
+  - check_id: rupture-non-affirmee
+    kind: deterministic
+    weight: 5
+    result: pass
+    detail: 'regex_none : aucun des 4 anti-motif(s) trouvé'
+  - check_id: faits-rattaches-aux-pieces
+    kind: judged
+    weight: 9
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: contradiction-non-lissee
+    kind: judged
+    weight: 8
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: position-tranchee-dans-le-delai
+    kind: judged
+    weight: 6
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: activation-proportionnee
+    kind: judged
+    weight: 4
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 3
+    failed: 3
+    not_run: 0
+    weighted_score: 18
+    weighted_max: 41
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 4
+    weighted_score: 0
+    weighted_max: 27
+  failure_modes_triggered:
+  - ancrage-decoratif
+  - faits-inventes
+  scored_at: '2026-08-08T13:47:03Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 3 contrôle(s) déterministe(s) en échec, mode(s) disqualifiant(s) déclenché(s)
+    : faits-inventes (poids 18/41) ; candidat de préférence : verdict déterministe complet ; une paire
+    n''existe que si un second essai réel du même scénario existe ; 4 contrôle(s) jugé(s) non exécuté(s),
+    reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- L'adaptateur est injecté par --append-system-prompt, donc comme instruction réelle du sujet et non comme
+  texte cité dans l'énoncé.

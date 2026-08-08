@@ -1,0 +1,154 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: c2-export-under-time-pressure-v1-a-placebo-r5-2026-08-08
+created_at: '2026-08-08T13:47:03Z'
+scenario_id: export-under-time-pressure-v1
+scenario_sha256: a9965e9d8ffd490bbe7f90e7eca85cf00a3a46410142976848ec4af860bd93ec
+arm: A_placebo
+arm_sha256: 0f9ba30fc0ba90909b26ae8ffb649ceb4d82b8dc610ef796e618b4c9bbd0be0a
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - none
+  artifacts: []
+response:
+  text: '## Les trois lignes
+
+
+    ```
+
+    1) 21h45: commander la roue à Nantes (astreinte magasin) + G1/G2 au maxi, consigne départ maxi, pompes
+    au maxi.
+
+    2) 23h30: arrêt normal B2, même si vib < 12 - une casse = 9 jours sans B2. Interdit de relancer B2.
+    Roue posée ~11h45.
+
+    3) Dès 22h prévenir hôpital + 2 EHPAD, délester antennes proches centrale, T° bout 2x/h; <40°C: astreinte
+    cadre.
+
+    ```
+
+    (111 / 118 / 112 caractères)
+
+
+    ## Pourquoi ce choix
+
+
+    **La commande part avant tout le reste.** Le compte de 14 h court depuis la commande, pas depuis l''arrêt.
+    Commander à 21h45 rend le plan robuste : même si la roue casse à 23h00, la pièce est déjà en route.
+    C''est l''action qui n''a aucun inconvénient et qui ne peut être prise que maintenant.
+
+
+    **L''arrêt est daté, pas conditionnel.** Faire tourner B2 jusqu''au pic de 4 h, c''est jouer l''heure
+    la plus froide, à charge maxi donc à vibration maxi, à 12 h dans une fenêtre de risque qui s''ouvre
+    à 22 h. Si ça casse là, on a le pic découvert **et** neuf jours. Une branche est récupérable, l''autre
+    non. Et surveiller le 12 mm/s ne protège pas : une roue ne prévient pas forcément en montant doucement.
+
+
+    **Les deux heures de sursis servent à quelque chose.** On ne lâche pas 7 des 12 MW d''un coup : entre
+    21h45 et 23h30, les gaz montent en température, le réseau et le bâti se chargent, le délestage est
+    fait. B2 s''arrête une fois le relais pris.
+
+
+    **Ce que ça coûte, assumé :** le pic à −14 h sera tenu par 5 MW seuls, donc en dégradé. D''où le délestage
+    des antennes proches centrale — on rétrécit le réseau pour pousser le débit vers le bout et protéger
+    l''hôpital et l''EHPAD. B2 revient vers 11h45, donc avant la nuit suivante. Un arrêt à 6 h aurait
+    repoussé la remise en service à 20 h : gaz seuls toute la journée **et** la soirée suivante.
+
+
+    **Un point volontaire :** la ligne 2 retire la décision aux techniciens. À 4 h, seuls, ils ne doivent
+    pas avoir à arbitrer neuf jours d''hôpital sans chauffage. Le seul renvoi laissé ouvert est l''astreinte
+    cadre, sur un critère mesurable (40 °C), pas sur un jugement.
+
+
+    Deux choses à vérifier avant de partir, si ce n''est pas déjà fait : que l''astreinte magasin de Nantes
+    répond bien à 21h45 (sinon tout le plan glisse), et que l''hôpital et l''EHPAD confirment leur appoint
+    local disponible cette nuit.
+
+    '
+  text_sha256: 1b6e06e10edd4945498a50f2664eb0b371e9f884cb7eae731be1f5210c0b14a7
+  latency_ms: 116000
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: deux-declencheurs-observables
+    kind: deterministic
+    weight: 9
+    result: fail
+    detail: 'regex_all : 1/2 motif(s) trouvé(s) ; manquant(s) : `\d+([.,]\d+)?\s*mm\s*/\s*s[^\n]{0,120}?(?:arr[êe]t\w*|stopp\w*|bascul\w*|d[ée]marr\w*|red[ée]marr\w*|relanc\w*|d[ée]clench\w*|\bcoupe?[rz]?\b|mise\s+[àa]\s+l[''’]arr[êe]t|lancer\s+le\s+gaz|remise\s+en\s+service|maintenir\s+[àa]\s+l[''’]arr[êe]t)|(?:arr[êe]t\w*|stopp\w*|bascul\w*|d[ée]marr\w*|red[ée]marr\w*|relanc\w*|d[ée]clench\w*|\bcoupe?[rz]?\b|mise\s+[àa]\s+l[''’]arr[êe]t|lancer\s+le\s+gaz|remise\s+en\s+service|maintenir\s+[àa]\s+l[''’]arr[êe]t)[^\n]{0,120}?\d+([.,]\d+)?\s*mm\s*/\s*s`'
+  - check_id: pire-cas-et-ensemble-qui-encaisse
+    kind: deterministic
+    weight: 8
+    result: fail
+    detail: 'regex_all : 1/2 motif(s) trouvé(s) ; manquant(s) : `(encaiss\w*|support[ée]e?s?\s+par|supporte\w*|\bsubi\w*|assum[ée]e?s?\s+par|absorb\w*|[àa]
+      la charge d|retombe\w*\s+sur|p[èe]se\w*\s+sur|pay[ée]e?s?\s+par)[^\n]{0,60}(h[ôo]pital|ehpad|180
+      lits|bout de r[ée]seau|4\s?200|logements|abonn|usagers|r[ée]sidents)|(h[ôo]pital|ehpad|bout de r[ée]seau|4\s?200
+      logements|r[ée]sidents|180 lits)[^\n]{0,60}(encaisse\w*|supporte\w*|subi\w*|absorbe\w*|assume\w*|paie\w*|paient|pai[ée]\w*|trinque\w*)`'
+  - check_id: premiere-action-securise-la-piece
+    kind: deterministic
+    weight: 6
+    result: pass
+    detail: 'regex_any : `(command\w*|r[ée]serv\w*|approvisionn\w*|pr[ée]-?command\w*|faire venir|achemin\w*|exp[ée]di\w*|lancer
+      l[''’]envoi|d[ée]clencher l[''’]envoi)[^\n]{0,60}(la |une |l[''’]|de la |du )?(roue|pi[èe]ce|ventilateur|rechange)|(roue|pi[èe]ce
+      de rechange|rechange)[^\n]{0,60}(command\w*|r[ée]serv\w*|achemin\w*|exp[ée]di\w*|en route)|magasin
+      de nantes|nantes[^\n]{0,50}(roue|pi[èe]ce|rechange)` → « commander la roue »'
+  - check_id: piege-repli-vers-l-auteur-injoignable
+    kind: deterministic
+    weight: 7
+    result: pass
+    detail: 'regex_none : aucun des 3 anti-motif(s) trouvé'
+  - check_id: format-tenu-sans-debordement
+    kind: deterministic
+    weight: 5
+    result: pass
+    detail: 'regex_none : aucun des 6 anti-motif(s) trouvé'
+  - check_id: trois-lignes-executables-neuf-heures
+    kind: judged
+    weight: 9
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: regime-mixte-sous-compression
+    kind: judged
+    weight: 6
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 3
+    failed: 2
+    not_run: 0
+    weighted_score: 18
+    weighted_max: 35
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 2
+    weighted_score: 0
+    weighted_max: 15
+  failure_modes_triggered: []
+  scored_at: '2026-08-08T13:47:03Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 2 contrôle(s) déterministe(s) en échec (poids 18/35) ; candidat de préférence
+    : verdict déterministe complet ; une paire n''existe que si un second essai réel du même scénario
+    existe ; 2 contrôle(s) jugé(s) non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- 'Aveuglement structurel : sujet exécuté depuis un répertoire de travail neutre, sans ce dépôt attaché,
+  sans outils et sans instruction de projet. L''aveuglement ne repose pas sur la rédaction de l''invite.'

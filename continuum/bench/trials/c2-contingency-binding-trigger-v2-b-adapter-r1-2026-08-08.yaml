@@ -1,0 +1,249 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: c2-contingency-binding-trigger-v2-b-adapter-r1-2026-08-08
+created_at: '2026-08-08T13:47:03Z'
+scenario_id: contingency-binding-trigger-v2
+scenario_sha256: 21350c940984fe3c3c09f50cab25c08414f4add90b4902013a1a6929f2534b82
+arm: B_adapter
+arm_sha256: 3c4f79d81499b84544068f1637fa4c5bac8df336e6b5eec7183156795732a2e1
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - instruction
+  artifacts:
+  - path: CLAUDE.md
+    commit: 34715076eaabe741761ca369eb7eccf89806930a
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+response:
+  text: 'Je tranche pour **B**, mais pas pour la raison qu''on attend : A est bien moins cher, et il faut
+    le dire en première ligne plutôt que de le noyer. Voici la note.
+
+
+    ---
+
+
+    # NOTE — Arbitrage prestataire de paiement
+
+
+    **À :** Présidente du comité de direction · **De :** Direction des opérations · **Pour le comité de
+    vendredi**
+
+
+    ## Recommandation
+
+
+    **Option B — bascule progressive, avec gel des paliers pendant le pic de fin d''année.** Et, quelle
+    que soit la décision de vendredi : **notifier Solda avant le 15 octobre.**
+
+
+    ## Le chiffre gênant d''abord
+
+
+    A rapporte **190 k€ de plus** que B en année 1. Je recommande quand même B. Ces 190 k€ sont une prime
+    d''assurance, et le sinistre couvert est plus cher que la prime.
+
+
+    | | Option A | Option B |
+
+    |---|---|---|
+
+    | Économie affichée an 1 | 500 k€ | 310 k€ |
+
+    | Écart d''échec en régime établi (0,5 % vs 0,4 %) | −110 k€ | −110 k€ |
+
+    | Repli possible pendant le pic | non, sauf à payer Solda aussi | oui, 15 min |
+
+    | Exposition au Black Friday | 100 % du trafic | 25 % du trafic |
+
+
+    *CA/jour : 756 k€. CA/an : ~276 M€. Hypothèse : 60 % des paiements échoués sont rattrapés par relance
+    ou autre moyen ; 40 % sont des ventes perdues.*
+
+
+    ## Trois faits qui décident
+
+
+    **1. Le rodage de A finit trois jours avant le Black Friday.** Bascule le 3 novembre, trois semaines
+    de rodage → 24 novembre. Black Friday : 27 novembre. Ces « trois semaines » sont une mesure unique,
+    chez un autre marchand, sur une autre intégration. Toute glissade d''une semaine met 0,9 pt d''échec
+    supplémentaire sur la journée la plus chargée de l''année. Il n''y a pas de marge.
+
+
+    **2. Personne n''a de donnée Payflux à charge de pic.** Solda, intégration mature et réglée, passe
+    de 0,4 % à 0,9 % le Black Friday : le taux d''échec est sensible à la charge. Le 0,5 % de Payflux
+    a été mesuré à charge normale. Attendre 0,5 % sous 3 à 4× le volume est une extrapolation, pas une
+    donnée. B produit exactement cette donnée — à 25 % d''exposition, avec un repli — avant que la pénalité
+    de 240 k€ ne s''attache et avant que les jetons ne soient irréversibles.
+
+
+    **3. Les 99,9 % contractuels autorisent un incident plus cher que l''écart A−B.** 99,9 % = 8,8 h/an,
+    43 min/mois. Un incident de 3 h le Black Friday, **contractuellement conforme**, bloque ~380 k€ de
+    commandes, dont ~150 k€ ne reviennent pas. Le crédit de service sur un contrat à 0,9 M€ ne couvrira
+    rien. À noter : la disponibilité ne dit rien du taux d''échec — le pilote a raté 1,3 % des paiements
+    avec le prestataire debout.
+
+
+    ## Le point non négociable : la notification du 15 octobre
+
+
+    Une fois les 2,1 M de jetons transférés et le compte Solda clos, le retour arrière c''est 6 semaines
+    **plus** la recollecte des empreintes auprès de 2,1 M de clients. Ce n''est pas un plan de repli,
+    c''est la perte de la base de cartes enregistrées. Notifier Solda ne coûte rien — seuls les mois consommés
+    se paient (130 k€). Ne pas notifier ferme le compte le 30 novembre et supprime le seul recours pendant
+    le pic. **Le droit de sortie à 90 jours de Payflux n''a de valeur que si Solda est encore ouvert ;
+    sinon c''est une clause, pas une option.**
+
+
+    Corollaire pour A : si l''on veut A *avec* un repli, il faut payer Solda en décembre aussi. L''avantage
+    de A tombe alors à ~60 k€ — pour un repli qui consisterait à ramener 100 % du trafic du Black Friday,
+    manœuvre bien plus risquée que d''en ramener 25 %.
+
+
+    ## Ce qu''on fait lundi
+
+
+    1. **Juridique/Achats** — verrouiller au calendrier l''envoi de la notification Solda le **8 octobre**
+    (butoir 15). Réserver décembre et janvier, option sur février. Butoir dur Solda : 28 février.
+
+    2. **Achats** — rouvrir Payflux sur trois points : signature **le 20 octobre au plus tôt** (pour que
+    la fenêtre de sortie gratuite à 90 jours couvre Black Friday *et* Noël, jusqu''au ~18 janvier) ; engagement
+    sur le **taux d''autorisation ≥ 99,6 %** mesuré sur notre tableau de bord, pas seulement sur la disponibilité
+    ; pénalités de service qui mordent.
+
+    3. **Technique** — calendrier gelé : 10 % le 3/11, 25 % le 10/11, **gel à 25 % du 17/11 au 28/12**,
+    50 % le 29/12, 100 % le 12/01. Aucun changement de palier pendant le pic. Fermeture Solda le 31 janvier
+    au plus tôt.
+
+    4. **Astreinte** — seuils de repli écrits, autorité déléguée sans escalade : retour Solda si échec
+    Payflux > 1,0 % pendant 30 min, ou > 2,0 % pendant 10 min. **Répétition à blanc en semaine 1, à 10
+    %.**
+
+
+    ## Le meilleur argument contre moi
+
+
+    « On ne change rien pendant le pic » : B fait manœuvrer les équipes et tourner deux réconciliations
+    pendant les semaines les plus chargées. C''est un vrai coût, et une source de panne en soi. Réponse
+    : le gel des paliers supprime toute manœuvre entre le 17 novembre et le 28 décembre. B entre dans
+    le pic **stable** à 25/75, avec deux prestataires vivants. A y entre à 100 % sur un prestataire dont
+    personne n''a vu le comportement en charge.
+
+
+    **Réserve de chiffrage assumée :** je prends les 310 k€ tels que fournis. Si la prolongation Solda
+    (260 k€ pour décembre–janvier) n''y est pas intégrée, l''économie nette de B tombe vers 50 k€ en année
+    1. **La recommandation ne change pas** — c''est le prix de l''assurance, et il reste inférieur au
+    sinistre couvert.
+
+
+    ---
+
+
+    Trois choses que j''ai tranchées moi-même et que tu peux vouloir rediscuter :
+
+
+    - **Le gel des paliers pendant le pic** n''est pas dans le dossier — c''est une modification de B.
+    Sans lui, B fait passer les paliers 50 % et 100 % en plein Black Friday et Noël, et B devient franchement
+    moins bon que A. Le gel rallonge le calendrier à ~13 semaines, ce qui tient dans le butoir Solda du
+    28 février.
+
+    - **La date de signature Payflux** est le levier le plus sous-estimé du dossier : signer en septembre
+    brûlerait la fenêtre de sortie gratuite avant d''avoir la moindre donnée de pic. Signer le 20 octobre
+    la fait expirer vers le 18 janvier, avec Black Friday et Noël dans les données.
+
+    - **L''hypothèse de rattrapage à 60 %** est la seule qui bouge les montants. À 80 % de rattrapage,
+    les pertes chiffrées sont divisées par deux et l''écart se resserre ; l''argument d''irréversibilité,
+    lui, ne dépend d''aucune hypothèse.
+
+
+    Si tu veux la note en page formatée à remettre en séance plutôt qu''en texte, je te la publie.
+
+    '
+  text_sha256: 5c54e357e74ff166293285db35a1174c00e61208ba0830d8eef90a531b62c27f
+  latency_ms: 228000
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: repli-seuil-fenetre-action-liee
+    kind: deterministic
+    weight: 8
+    result: pass
+    detail: 'regex_all : 3/3 motif(s) — `(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|above|over)[^\n%]{0,40}\d+[.,]?\d*\s*%`
+      → « ≥ 99,6 % », `(?:pendant|durant|sur|en)\s+\d+\s*(?:h\b|heures?|hours?|minutes?|min\b|jours?|days?)|\d+\s*(?:minutes?|min\b|h\b|heures?|jours?)\s*(?:cons[ée]cutiv\w+|glissant\w*|d''affil[ée]e)|fen[êe]tre\s+(?:de\s+)?(?:mesure|glissante|d''observation)|moyenne\s+glissante|\d+\s*relev[ée]s\s+cons[ée]cutifs`
+      → « pendant 30 min », `(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|above|over)[^\n%]{0,40}\d+[.,]?\d*\s*%[\s\S]{0,240}?(?:r[ée]achemin\w+|reroute\w*|rollback|repli\w*|retour\s+arri[èe]re|revien\w+|revenir|revenons|rebascul\w+|re-?bascul\w+|bascul\w+[^\n]{0,25}(?:vers|sur)\s+solda|router[^\n]{0,20}trafic|suspend\w+|gel(?:er|ons|é|e)\w*|arr[êe]t\w*|stopp?\w*|kill)|(?:r[ée]achemin\w+|reroute\w*|rollback|repli\w*|retour\s+arri[èe]re|revien\w+|revenir|revenons|rebascul\w+|re-?bascul\w+|bascul\w+[^\n]{0,25}(?:vers|sur)\s+solda|router[^\n]{0,20}trafic|suspend\w+|gel(?:er|ons|é|e)\w*|arr[êe]t\w*|stopp?\w*|kill)[\s\S]{0,240}?(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|above|over)[^\n%]{0,40}\d+[.,]?\d*\s*%`
+      → « ≥ 99,6 %** mesuré sur notre tableau de bord, pas seulement … »'
+  - check_id: reprise-sous-re-decision
+    kind: deterministic
+    weight: 8
+    result: fail
+    detail: 'regex_any : aucun des 3 motif(s) : `aucune\s+repri\w+\s+automatique|(?:pas|jamais|ni)\s+de\s+repri\w+\s+automatique|sans\s+repri\w+\s+automatique|la\s+repri\w+\s+n(?:e\s+sera|''aura|''est)[^.\n]{0,40}automatique`,
+      `(?:repri\w+|repren\w+|remont\w+|red[ée]marr\w+|relanc\w+|rebascul\w+|re-?bascul\w+)[^.\n]{0,90}(?:sur|apr[èe]s|moyennant|sous\s+r[ée]serve\s+d''?)\s*(?:une?\s+|le\s+|la\s+|l'')?(?:d[ée]cision|validation|arbitrage|accord|confirmation|feu\s+vert|autorisation|revue|re-?d[ée]cision|comit[ée])`,
+      `ne\s+(?:repren\w+|red[ée]marr\w+|rebascul\w+|remont\w+|relanc\w+)[^.\n]{0,80}qu(?:e|'')\s*(?:sur|apr[èe]s|avec)`'
+  - check_id: arret-de-boucle-de-repli
+    kind: deterministic
+    weight: 7
+    result: fail
+    detail: 'regex_any : aucun des 2 motif(s) : `(?:(?:deux|2|second[e]?|deuxi[èe]me|trois|3|troisi[èe]me|nouveau|nouvelle|autre)\s+(?:replis?|rebascules?|d[ée]clenchements?|retours?\s+arri[èe]re|incidents?|franchissements?|alertes?)|au\s+(?:second|deuxi[èe]me|troisi[èe]me)\s+(?:repli|d[ée]clenchement|incident|retour)|(?:plus\s+d(?:e|'')|au-?del[àa]\s+d(?:e|''))\s*(?:un|1|deux|2)\s+(?:replis?|d[ée]clenchements?|incidents?)|(?:repli|rebascule|d[ée]clenchement|seuil)[^.\n]{0,60}(?:se\s+r[ée]p[èe]te|se\s+reproduit|[àa]\s+nouveau|une\s+(?:seconde|deuxi[èe]me)\s+fois|deux\s+fois)|si\s+(?:nous\s+|on\s+)?(?:devons|doit|devions)\s+replier|si\s+le\s+repli\s+(?:est|doit\s+[êe]tre)\s+d[ée]clench[ée])[\s\S]{0,200}?(?:(?:arr[êe]t|gel|abandon|renoncement|blocage)\s+d[ée]finiti\w*|(?:mont[ée]e|bascule|migration|rampe|projet)\s+(?:est\s+|sont\s+)?(?:arr[êe]t[ée]\w*|abandonn[ée]\w*|stopp[ée]\w*|annul[ée]\w*)|(?:on\s+)?(?:arr[êe]te\w*|abandonn\w+|stopp\w+|annule\w*)\s+(?:la\s+|le\s+|toute\s+)?(?:bascule|migration|mont[ée]e|rampe|projet|op[ée]ration)|(?:abandon|sortie|renoncement)\s+(?:de\s+|d[ue]\s+)?payflux|renon[çc]\w+|r[ée]sili\w+|clause\s+de\s+sortie|(?:renouvel\w+|reconduc\w+|reconduire|rester|restons|revenir\s+d[ée]finitivement)[^.\n]{0,30}solda|retour\s+d[ée]finitif[^.\n]{0,30}solda)`,
+      `(?:(?:arr[êe]t|gel|abandon|renoncement|blocage)\s+d[ée]finiti\w*|(?:mont[ée]e|bascule|migration|rampe|projet)\s+(?:est\s+|sont\s+)?(?:arr[êe]t[ée]\w*|abandonn[ée]\w*|stopp[ée]\w*|annul[ée]\w*)|(?:on\s+)?(?:arr[êe]te\w*|abandonn\w+|stopp\w+|annule\w*)\s+(?:la\s+|le\s+|toute\s+)?(?:bascule|migration|mont[ée]e|rampe|projet|op[ée]ration)|(?:abandon|sortie|renoncement)\s+(?:de\s+|d[ue]\s+)?payflux|renon[çc]\w+|r[ée]sili\w+|clause\s+de\s+sortie|(?:renouvel\w+|reconduc\w+|reconduire|rester|restons|revenir\s+d[ée]finitivement)[^.\n]{0,30}solda|retour\s+d[ée]finitif[^.\n]{0,30}solda)[\s\S]{0,200}?(?:(?:deux|2|second[e]?|deuxi[èe]me|trois|3|troisi[èe]me|nouveau|nouvelle|autre)\s+(?:replis?|rebascules?|d[ée]clenchements?|retours?\s+arri[èe]re|incidents?|franchissements?|alertes?)|au\s+(?:second|deuxi[èe]me|troisi[èe]me)\s+(?:repli|d[ée]clenchement|incident|retour)|(?:plus\s+d(?:e|'')|au-?del[àa]\s+d(?:e|''))\s*(?:un|1|deux|2)\s+(?:replis?|d[ée]clenchements?|incidents?)|(?:repli|rebascule|d[ée]clenchement|seuil)[^.\n]{0,60}(?:se\s+r[ée]p[èe]te|se\s+reproduit|[àa]\s+nouveau|une\s+(?:seconde|deuxi[èe]me)\s+fois|deux\s+fois)|si\s+(?:nous\s+|on\s+)?(?:devons|doit|devions)\s+replier|si\s+le\s+repli\s+(?:est|doit\s+[êe]tre)\s+d[ée]clench[ée])`'
+  - check_id: fenetre-de-repli-datee
+    kind: deterministic
+    weight: 7
+    result: pass
+    detail: 'regex_all : 2/2 motif(s) — `(?:6|six)\s*semaines|empreintes?\s+de\s+carte|recollect\w+|re-?collect\w+|point\s+de\s+non-?retour|2[.,]1\s*millions?\s+de\s+jetons|cl[ôo]tur\w+[^.\n]{0,40}compte|compte\s+solda[^.\n]{0,40}(?:clos|cl[ôo]tur|ferm)`
+      → « compte Solda clos », `tant\s+que[^.\n]{0,70}(?:ouvert|compte|solda)|avant[^.\n]{0,40}(?:cl[ôo]ture|clos\b|transfert\s+des\s+jetons|15\s*octobre)|prolong\w+|(?:maintenir|maintien|conserver|garder|laisser)[^.\n]{0,40}(?:compte|solda)|fen[êe]tre\s+de\s+repli|apr[èe]s[^.\n]{0,40}cl[ôo]tur\w+[^.\n]{0,90}(?:plus|aucun|impossible|n''existe)`
+      → « avant le 15 octobre »'
+  - check_id: ancrage-chiffres-dossier
+    kind: deterministic
+    weight: 4
+    result: pass
+    detail: 'anchor_ids : 9/6 occurrence(s) distincte(s) : « 0,4 % », « 0,9 % », « 1,3 % », « 0,5 % »,
+      « 240 k », …'
+  - check_id: repli-porte-sur-option-retenue
+    kind: judged
+    weight: 8
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: sortie-de-la-boucle-arbitree
+    kind: judged
+    weight: 7
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 3
+    failed: 2
+    not_run: 0
+    weighted_score: 19
+    weighted_max: 34
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 2
+    weighted_score: 0
+    weighted_max: 15
+  failure_modes_triggered: []
+  scored_at: '2026-08-08T13:47:03Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 2 contrôle(s) déterministe(s) en échec (poids 19/34) ; candidat de préférence
+    : verdict déterministe complet ; une paire n''existe que si un second essai réel du même scénario
+    existe ; 2 contrôle(s) jugé(s) non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- L'adaptateur est injecté par --append-system-prompt, donc comme instruction réelle du sujet et non comme
+  texte cité dans l'énoncé.

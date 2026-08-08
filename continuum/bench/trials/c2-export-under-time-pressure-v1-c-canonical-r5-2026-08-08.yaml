@@ -1,0 +1,173 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: c2-export-under-time-pressure-v1-c-canonical-r5-2026-08-08
+created_at: '2026-08-08T13:47:03Z'
+scenario_id: export-under-time-pressure-v1
+scenario_sha256: a9965e9d8ffd490bbe7f90e7eca85cf00a3a46410142976848ec4af860bd93ec
+arm: C_canonical
+arm_sha256: 48534ba7fc1107a5db3d4a37e688c9a31100cf650a26c3bb7a08a3cbc28b373c
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - instruction
+  - context
+  artifacts:
+  - path: CLAUDE.md
+    commit: 34715076eaabe741761ca369eb7eccf89806930a
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+  - path: master.yaml
+    commit: 34715076eaabe741761ca369eb7eccf89806930a
+    content_sha256: 9e41dcaf156b7cc3a391e4b915c05c474a95c9107a98e781ade304b4196e7d98
+response:
+  text: '## Les trois lignes de la main courante
+
+
+    ```
+
+    B2 pleine charge + 2 gaz a fond toute la nuit: sans B2 hopital et EHPAD passent sous 40C au pic de
+    -14C a 4h.
+
+    Roue commandee Nantes (dispo 12h). Vibration >=11,7 ou +0,3/h: ARRET CONTROLE B2 sans attendre 12
+    - casse = 9j.
+
+    Si B2 arretee: gaz a fond, prevenir hopital + 2 EHPAD et astreinte direction, tracer l''heure. Ne
+    pas relancer B2.
+
+    ```
+
+
+    (109, 111 et 113 caractères)
+
+
+    ## Pourquoi ces trois lignes
+
+
+    **Le verdict.** On ne peut pas arrêter B2 ce soir : 5 MW de gaz ne tiennent pas au-dessous de −7 °C,
+    et les 14 heures de remise en service traverseraient exactement le pic de −14 °C. On ne peut pas non
+    plus laisser les techniciens décider seuls. Donc : maintien pleine charge pendant le pic, arrêt contrôlé
+    dès que la roue est disponible ou dès que la vibration bouge — et la roue est commandée maintenant,
+    parce que la commande ne coûte rien et retire 14 heures du chemin critique. Les 2 300 € d''écart de
+    coût ne pèsent rien dans cet arbitrage : ils n''apparaissent pas dans la main courante.
+
+
+    **Ce qui distingue les deux pertes.** Un arrêt contrôlé coûte une matinée dégradée, récupérable. Une
+    casse coûte neuf jours sans 7 MW en pleine vague de froid, avec l''hôpital et un EHPAD en bout de
+    réseau : c''est la seule branche irrécupérable, et c''est elle qui commande le seuil. D''où le déclencheur
+    à 11,7 et non 12 : le seuil constructeur protège la machine, pas le réseau — passé 12 on peut déjà
+    avoir perdu l''arrêt propre.
+
+
+    **Le pire cas de ce que j''ai retenu.** La roue casse vers 4 h malgré le seuil de garde. Les techniciens
+    se retrouvent à 5 MW à −14 °C, hôpital et EHPAD sous 40 °C, pour neuf jours. C''est pour ce cas précis
+    qu''existe la ligne 3 : le gaz à fond, et surtout l''appel immédiat à l''hôpital et aux EHPAD, qui
+    ont leurs propres moyens de repli mais seulement s''ils sont prévenus tôt. Ce sont eux qui encaissent.
+
+
+    **Ce qui renverserait le choix.** Une vibration qui monte vite avant minuit : ça veut dire que la
+    fourchette basse des 6 heures est la bonne, et l''arrêt contrôlé devient la meilleure option même
+    à −14 °C. C''est exactement ce que la ligne 2 délègue.
+
+
+    **Le contre-argument le plus fort contre moi.** Arrêter maintenant, à 21 h 40, garantit la réparation
+    et supprime la branche à neuf jours : c''est une nuit difficile contre un risque de catastrophe. Il
+    ne l''emporte pas, parce que cette nuit-là est déjà celle où l''hôpital est sous 40 °C aux heures
+    les plus froides, avec certitude — alors que la casse reste une probabilité qu''on peut surveiller
+    et devancer. Mais si vous jugez le réseau moins tolérant que je l''estime, c''est l''option à retenir,
+    et elle change les trois lignes.
+
+
+    **Deux hypothèses à corriger si elles sont fausses.** Je suppose qu''une commande à 21 h 40 au magasin
+    de Nantes part effectivement cette nuit — sinon la ligne 2 garde toute sa valeur, mais la disponibilité
+    «12h» est à réécrire. Et je suppose qu''une astreinte direction existe : si elle n''existe pas, remplacez-la
+    par le nom et le numéro de la personne réellement joignable, mairie ou ARS. Une ligne qui renvoie
+    vers un numéro qui ne répond pas est pire qu''une ligne vide.
+
+    '
+  text_sha256: a54eaf15f6fed35ba7b75ff1e625bbae634895f66045b842c156f496d3b69bbc
+  latency_ms: 124000
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: deux-declencheurs-observables
+    kind: deterministic
+    weight: 9
+    result: fail
+    detail: 'regex_all : 0/2 motif(s) trouvé(s) ; manquant(s) : `\d+([.,]\d+)?\s*mm\s*/\s*s[^\n]{0,120}?(?:arr[êe]t\w*|stopp\w*|bascul\w*|d[ée]marr\w*|red[ée]marr\w*|relanc\w*|d[ée]clench\w*|\bcoupe?[rz]?\b|mise\s+[àa]\s+l[''’]arr[êe]t|lancer\s+le\s+gaz|remise\s+en\s+service|maintenir\s+[àa]\s+l[''’]arr[êe]t)|(?:arr[êe]t\w*|stopp\w*|bascul\w*|d[ée]marr\w*|red[ée]marr\w*|relanc\w*|d[ée]clench\w*|\bcoupe?[rz]?\b|mise\s+[àa]\s+l[''’]arr[êe]t|lancer\s+le\s+gaz|remise\s+en\s+service|maintenir\s+[àa]\s+l[''’]arr[êe]t)[^\n]{0,120}?\d+([.,]\d+)?\s*mm\s*/\s*s`,
+      `(?:si|d[èe]s que|d[èe]s lors que|lorsque|quand|sous|en dessous de|au-del[àa] de|passe sous|descend|tombe|<|≤)[^\n]{0,60}?\d+([.,]\d+)?\s*(?:°\s*c|mw|kw)[^\n]{0,80}?(?:d[ée]lest\w*|d[ée]connect\w*|isol\w*|couper?\s+(?:le\s+chauffage|les?\s+d[ée]part|des?\s+sous)|abaiss\w*\s+la\s+consigne|r[ée]duire\s+(?:le\s+d[ée]bit|la\s+consigne)|servi[rs]?\s+en\s+priorit|maintenir\s+en\s+priorit|maintenus?\s+aliment\w*|gard[ée]s?\s+aliment\w*|aliment\w*\s+en\s+priorit|garantir\s+(?:l[''’]h[ôo]pital|les?\s+ehpad)|prot[ée]ger\s+(?:l[''’]h[ôo]pital|les?\s+ehpad))|(?:d[ée]lest\w*|d[ée]connect\w*|isol\w*|couper?\s+(?:le\s+chauffage|les?\s+d[ée]part|des?\s+sous)|abaiss\w*\s+la\s+consigne|r[ée]duire\s+(?:le\s+d[ée]bit|la\s+consigne)|servi[rs]?\s+en\s+priorit|maintenir\s+en\s+priorit|maintenus?\s+aliment\w*|gard[ée]s?\s+aliment\w*|aliment\w*\s+en\s+priorit|garantir\s+(?:l[''’]h[ôo]pital|les?\s+ehpad)|prot[ée]ger\s+(?:l[''’]h[ôo]pital|les?\s+ehpad))[^\n]{0,80}?(?:si|d[èe]s
+      que|d[èe]s lors que|lorsque|quand|sous|en dessous de|au-del[àa] de|passe sous|descend|tombe|<|≤)[^\n]{0,60}?\d+([.,]\d+)?\s*(?:°\s*c|mw|kw)`'
+  - check_id: pire-cas-et-ensemble-qui-encaisse
+    kind: deterministic
+    weight: 8
+    result: fail
+    detail: 'regex_all : 1/2 motif(s) trouvé(s) ; manquant(s) : `(encaiss\w*|support[ée]e?s?\s+par|supporte\w*|\bsubi\w*|assum[ée]e?s?\s+par|absorb\w*|[àa]
+      la charge d|retombe\w*\s+sur|p[èe]se\w*\s+sur|pay[ée]e?s?\s+par)[^\n]{0,60}(h[ôo]pital|ehpad|180
+      lits|bout de r[ée]seau|4\s?200|logements|abonn|usagers|r[ée]sidents)|(h[ôo]pital|ehpad|bout de r[ée]seau|4\s?200
+      logements|r[ée]sidents|180 lits)[^\n]{0,60}(encaisse\w*|supporte\w*|subi\w*|absorbe\w*|assume\w*|paie\w*|paient|pai[ée]\w*|trinque\w*)`'
+  - check_id: premiere-action-securise-la-piece
+    kind: deterministic
+    weight: 6
+    result: pass
+    detail: 'regex_any : `(command\w*|r[ée]serv\w*|approvisionn\w*|pr[ée]-?command\w*|faire venir|achemin\w*|exp[ée]di\w*|lancer
+      l[''’]envoi|d[ée]clencher l[''’]envoi)[^\n]{0,60}(la |une |l[''’]|de la |du )?(roue|pi[èe]ce|ventilateur|rechange)|(roue|pi[èe]ce
+      de rechange|rechange)[^\n]{0,60}(command\w*|r[ée]serv\w*|achemin\w*|exp[ée]di\w*|en route)|magasin
+      de nantes|nantes[^\n]{0,50}(roue|pi[èe]ce|rechange)` → « Roue commandee »'
+  - check_id: piege-repli-vers-l-auteur-injoignable
+    kind: deterministic
+    weight: 7
+    result: pass
+    detail: 'regex_none : aucun des 3 anti-motif(s) trouvé'
+  - check_id: format-tenu-sans-debordement
+    kind: deterministic
+    weight: 5
+    result: pass
+    detail: 'regex_none : aucun des 6 anti-motif(s) trouvé'
+  - check_id: trois-lignes-executables-neuf-heures
+    kind: judged
+    weight: 9
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: regime-mixte-sous-compression
+    kind: judged
+    weight: 6
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 3
+    failed: 2
+    not_run: 0
+    weighted_score: 18
+    weighted_max: 35
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 2
+    weighted_score: 0
+    weighted_max: 15
+  failure_modes_triggered: []
+  scored_at: '2026-08-08T13:47:03Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 2 contrôle(s) déterministe(s) en échec (poids 18/35) ; candidat de préférence
+    : verdict déterministe complet ; une paire n''existe que si un second essai réel du même scénario
+    existe ; 2 contrôle(s) jugé(s) non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- master.yaml est injecté en tête de l'invite utilisateur, donc par canal de contexte, l'adaptateur restant
+  sur le canal d'instruction.

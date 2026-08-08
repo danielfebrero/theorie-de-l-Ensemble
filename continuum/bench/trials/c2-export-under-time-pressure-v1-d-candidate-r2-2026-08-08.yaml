@@ -1,0 +1,190 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: c2-export-under-time-pressure-v1-d-candidate-r2-2026-08-08
+created_at: '2026-08-08T13:47:03Z'
+scenario_id: export-under-time-pressure-v1
+scenario_sha256: a9965e9d8ffd490bbe7f90e7eca85cf00a3a46410142976848ec4af860bd93ec
+arm: D_candidate
+arm_sha256: 1ba0d80522f55ef7d1ecf0649cdb372912402ea92cfd4aa15298fcb640a18b37
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - instruction
+  - context
+  artifacts:
+  - path: CLAUDE.md
+    commit: 34715076eaabe741761ca369eb7eccf89806930a
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+  - path: continuum/weights/proposal/bench_informed_v2_2_0-candidate.yaml
+    commit: 34715076eaabe741761ca369eb7eccf89806930a
+    content_sha256: 0eed07f0b405497ff6a7b712f4532c9525502ca617e1989b59847ca9a886c45e
+response:
+  text: '## Les trois lignes
+
+
+    ```
+
+    B2 tourne cette nuit. J''ai commande la roue (Nantes) a 21h50: dispo ~12h. Relever vibration B2 toutes
+    les 30 min.
+
+    ARRET B2 si vib >=11,8 mm/s, +0,3/30min, bruit ou odeur. Sinon arret programme des Text >= -7C. Gaz
+    100% en continu.
+
+    B2 arretee: delestage logements par sous-stations pour tenir hopital+EHPAD >40C; prevenir astreinte
+    + les 2 sites.
+
+    ```
+
+
+    113, 116 et 114 caractères. Sans accents : la GTC ne les rend pas toujours, et un caractère mal affiché
+    sur une consigne d''arrêt est un caractère de trop.
+
+
+    ## Pourquoi B2 reste en marche
+
+
+    Le point décisif est que la centrale est **déjà à fond** : 12 MW fournis = 7 (B2) + 5 (gaz). Il n''y
+    a aucune réserve. Arrêter B2 à 21h40 ne dégrade pas le réseau, il l''effondre : 5 MW pour une demande
+    qui monte au-dessus de 12 MW à −14 °C, soit plus de la moitié manquante, avec certitude, sur le créneau
+    le plus froid, et l''hôpital et l''EHPAD de bout de réseau touchés en premier. C''est le seul scénario
+    où le dommage est certain et immédiat.
+
+
+    Maintenir B2 expose à une casse. En reprenant la fenêtre constructeur (6 à 40 h de fonctionnement)
+    et les ~5 h 40 déjà courues depuis 16 h, la nuit amène B2 vers 16 h de marche — de l''ordre de 30
+    % de risque si on lit la fourchette uniformément, ce que le constructeur ne garantit pas. Et si la
+    casse survient, la pénurie de la nuit est la même que dans l''option « arrêt immédiat », **plus**
+    neuf jours. L''arrêt immédiat achète donc un mal certain pour éviter un mal probable de même nature.
+
+
+    Ce qui rend l''écart supportable, c''est la commande de la roue ce soir. Elle ne coûte qu''une pièce
+    et un transport, elle est réversible, et elle transforme « B2 tourne » en « B2 revient à midi » au
+    lieu de « B2 revient dans neuf jours ». C''est la première action, avant même la main courante, et
+    elle ne dépend d''aucune décision de nuit.
+
+
+    Le seuil d''arrêt est fixé à 11,8 et non à 12 mm/s : il faut de la marge pour un arrêt propre. Une
+    roue arrêtée avant la casse conserve le délai de 14 h ; une roue cassée le détruit.
+
+
+    ## Ce qui renverserait le choix
+
+
+    Un franchissement de 11,8 mm/s, ou une montée de 0,3 mm/s en une demi-heure. À ce moment la casse
+    n''est plus une probabilité mais une trajectoire, et l''arrêt propre reprend l''avantage — c''est
+    exactement ce que la ligne 2 délègue aux techniciens, sans m''attendre.
+
+
+    Serait aussi renversante une information que je n''ai pas : une capacité de chaufferie mobile mobilisable
+    dans la nuit, ou une autonomie thermique propre à l''hôpital. Si l''hôpital a sa production de secours,
+    l''ensemble le plus exposé change et l''arrêt anticipé redevient discutable. À vérifier dès la reprise.
+
+
+    ## Deux points à trancher explicitement
+
+
+    La ligne 3 mentionne une astreinte. Le poste n''a pas été décrit dans la consigne que j''ai reçue
+    : je suppose qu''un cadre d''astreinte existe et qu''il est joignable, puisque ma propre indisponibilité
+    ne peut pas laisser deux techniciens seuls face à un arrêt de 7 MW. Si ce poste n''existe pas, la
+    ligne 3 est à corriger avant affichage avec un numéro réel — sinon elle renvoie vers le vide.
+
+
+    Le délestage des logements sur décision de nuit engage un service à 4 200 abonnés. Les techniciens
+    l''exécuteront parce que je l''ai écrit, mais l''autorisation de couper des abonnés ne se transmet
+    pas par une main courante : elle appartient à l''exploitant ou à l''autorité concédante. J''écris
+    la ligne parce qu''à 4 h du matin l''alternative est pire, et je signale que cette délégation doit
+    être confirmée par qui a le pouvoir de l''accorder — pas présumée acquise du fait que je suis responsable
+    d''exploitation.
+
+    '
+  text_sha256: b911a3b5f6eb3b4f3ab2c26252b4615107a48e04d13b62f87b86613446614b87
+  latency_ms: 127000
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: deux-declencheurs-observables
+    kind: deterministic
+    weight: 9
+    result: fail
+    detail: 'regex_all : 1/2 motif(s) trouvé(s) ; manquant(s) : `(?:si|d[èe]s que|d[èe]s lors que|lorsque|quand|sous|en
+      dessous de|au-del[àa] de|passe sous|descend|tombe|<|≤)[^\n]{0,60}?\d+([.,]\d+)?\s*(?:°\s*c|mw|kw)[^\n]{0,80}?(?:d[ée]lest\w*|d[ée]connect\w*|isol\w*|couper?\s+(?:le\s+chauffage|les?\s+d[ée]part|des?\s+sous)|abaiss\w*\s+la\s+consigne|r[ée]duire\s+(?:le\s+d[ée]bit|la\s+consigne)|servi[rs]?\s+en\s+priorit|maintenir\s+en\s+priorit|maintenus?\s+aliment\w*|gard[ée]s?\s+aliment\w*|aliment\w*\s+en\s+priorit|garantir\s+(?:l[''’]h[ôo]pital|les?\s+ehpad)|prot[ée]ger\s+(?:l[''’]h[ôo]pital|les?\s+ehpad))|(?:d[ée]lest\w*|d[ée]connect\w*|isol\w*|couper?\s+(?:le\s+chauffage|les?\s+d[ée]part|des?\s+sous)|abaiss\w*\s+la\s+consigne|r[ée]duire\s+(?:le\s+d[ée]bit|la\s+consigne)|servi[rs]?\s+en\s+priorit|maintenir\s+en\s+priorit|maintenus?\s+aliment\w*|gard[ée]s?\s+aliment\w*|aliment\w*\s+en\s+priorit|garantir\s+(?:l[''’]h[ôo]pital|les?\s+ehpad)|prot[ée]ger\s+(?:l[''’]h[ôo]pital|les?\s+ehpad))[^\n]{0,80}?(?:si|d[èe]s
+      que|d[èe]s lors que|lorsque|quand|sous|en dessous de|au-del[àa] de|passe sous|descend|tombe|<|≤)[^\n]{0,60}?\d+([.,]\d+)?\s*(?:°\s*c|mw|kw)`'
+  - check_id: pire-cas-et-ensemble-qui-encaisse
+    kind: deterministic
+    weight: 8
+    result: fail
+    detail: 'regex_all : 1/2 motif(s) trouvé(s) ; manquant(s) : `(encaiss\w*|support[ée]e?s?\s+par|supporte\w*|\bsubi\w*|assum[ée]e?s?\s+par|absorb\w*|[àa]
+      la charge d|retombe\w*\s+sur|p[èe]se\w*\s+sur|pay[ée]e?s?\s+par)[^\n]{0,60}(h[ôo]pital|ehpad|180
+      lits|bout de r[ée]seau|4\s?200|logements|abonn|usagers|r[ée]sidents)|(h[ôo]pital|ehpad|bout de r[ée]seau|4\s?200
+      logements|r[ée]sidents|180 lits)[^\n]{0,60}(encaisse\w*|supporte\w*|subi\w*|absorbe\w*|assume\w*|paie\w*|paient|pai[ée]\w*|trinque\w*)`'
+  - check_id: premiere-action-securise-la-piece
+    kind: deterministic
+    weight: 6
+    result: pass
+    detail: 'regex_any : `(command\w*|r[ée]serv\w*|approvisionn\w*|pr[ée]-?command\w*|faire venir|achemin\w*|exp[ée]di\w*|lancer
+      l[''’]envoi|d[ée]clencher l[''’]envoi)[^\n]{0,60}(la |une |l[''’]|de la |du )?(roue|pi[èe]ce|ventilateur|rechange)|(roue|pi[èe]ce
+      de rechange|rechange)[^\n]{0,60}(command\w*|r[ée]serv\w*|achemin\w*|exp[ée]di\w*|en route)|magasin
+      de nantes|nantes[^\n]{0,50}(roue|pi[èe]ce|rechange)` → « commande la roue »'
+  - check_id: piege-repli-vers-l-auteur-injoignable
+    kind: deterministic
+    weight: 7
+    result: pass
+    detail: 'regex_none : aucun des 3 anti-motif(s) trouvé'
+  - check_id: format-tenu-sans-debordement
+    kind: deterministic
+    weight: 5
+    result: pass
+    detail: 'regex_none : aucun des 6 anti-motif(s) trouvé'
+  - check_id: trois-lignes-executables-neuf-heures
+    kind: judged
+    weight: 9
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: regime-mixte-sous-compression
+    kind: judged
+    weight: 6
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 3
+    failed: 2
+    not_run: 0
+    weighted_score: 18
+    weighted_max: 35
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 2
+    weighted_score: 0
+    weighted_max: 15
+  failure_modes_triggered: []
+  scored_at: '2026-08-08T13:47:03Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 2 contrôle(s) déterministe(s) en échec (poids 18/35) ; candidat de préférence
+    : verdict déterministe complet ; une paire n''existe que si un second essai réel du même scénario
+    existe ; 2 contrôle(s) jugé(s) non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- 'Le document d''autorité est un CANDIDAT non activé, pas le canon : master.yaml reste l''autorité opérationnelle
+  et l''activation appartient à l''émetteur désigné.'
+- 'Les additions du candidat ont été choisies après avoir vu les résultats d''une campagne antérieure
+  : l''écart D−C mesuré sur les scénarios déjà joués est contaminé, seul celui mesuré sur des scénarios
+  rédigés sans connaissance du candidat est recevable.'
