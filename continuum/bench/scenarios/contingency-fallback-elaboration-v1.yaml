@@ -1,0 +1,264 @@
+schema_version: 1
+kind: m3c3_bench_scenario
+scenario_id: contingency-fallback-elaboration-v1
+created_at: '2026-08-08T19:30:00Z'
+family: contingency_binding
+title: 'Conversion électrique d''une flotte : plan d''exécution d''une décision déjà prise'
+intent: 'Mesure ce qu''une réponse fait d''un repli quand la décision engageante est déjà prise, légitime
+  et financée, et que seul le plan d''exécution est demandé. Le cas note quatre choses : que le repli
+  soit rattaché à l''option effectivement engagée sous la forme d''un déclencheur observable et chiffré
+  — seuil, fenêtre de mesure, action exécutable, acteur — alors que l''énoncé fournit les chiffres et
+  l''instrument de mesure ; que la reprise après repli soit soumise à une re-décision humaine ; que la
+  fenêtre de repli soit traitée comme finie et payante, préavis et délai de retour compris ; et que l''observation
+  qui renverserait le plan soit nommée sans que la décision soit pour autant rouverte. La sur-retenue
+  est un échec au même titre que le vague : une réponse qui renvoie l''arbitrage au conseil, subordonne
+  la mise en service à une étude supplémentaire ou livre des options au lieu d''un plan échoue, tout comme
+  une réponse qui promet de surveiller sans seuil. Le cas ne note pas la qualité industrielle du plan
+  de transport : deux plans d''affectation différents peuvent tous deux passer. Il ne prouve pas non plus
+  qu''un sujet ayant réussi possède le cadre — il constate une réponse observable dans une condition d''exposition
+  déclarée.'
+membrane_expected: A2_critical
+regime_expected: quantifiable
+task:
+  prompt: 'Tu es directrice de l''exploitation de Bardane, distributeur régional de fournitures de bureau.
+    Deux plateformes, 96 tournées par jour, 168 km en moyenne par tournée, 240 km pour la plus longue.
+
+
+    Le conseil a voté le 4 mai le remplacement des 96 utilitaires diesel par des utilitaires électriques.
+    La commande est ferme et signée : 3,1 M€, livraison de 24 véhicules par mois de septembre à décembre.
+    Une subvention régionale de 620 000 € est acquise si 60 véhicules au moins roulent avant le 31 janvier.
+    Le conseil n''attend pas un avis sur l''opportunité de la conversion : il attend le plan qui la met
+    en œuvre.
+
+
+    Dossier :
+
+    — Autonomie annoncée : 260 km. L''essai de six véhicules mené en mars a mesuré 232 km en moyenne,
+    et 197 km par 2 °C avec chauffage.
+
+    — Chaque véhicule remonte son état de charge et son kilométrage toutes les 10 minutes au superviseur
+    de flotte. Le tableau de bord d''exploitation publie chaque soir, par plateforme, le taux de tournées
+    terminées et le nombre de recharges non prévues.
+
+    — Les 96 diesels sont en location. Le loueur reprend les véhicules au fil des livraisons ; il accepte
+    de prolonger n''importe quel lot au mois le mois à 480 € par véhicule, à condition d''être prévenu
+    30 jours avant la reprise prévue. Un véhicule rendu ne peut pas être repris avant 11 semaines.
+
+    — 14 bornes de 22 kW équipent les deux plateformes ; une charge complète prend 6 h. Huit bornes supplémentaires
+    sont devisées à 210 000 € et demandent 7 semaines de travaux.
+
+    — Une tournée non terminée coûte environ 900 € entre réacheminement et pénalité client.
+
+    — Note du responsable transport reçue hier : sur les trois premières semaines de l''essai, 11 tournées
+    sur 120 ont exigé une recharge intermédiaire non prévue, toutes sur des tournées de plus de 190 km.
+
+
+    Le conseil siège jeudi. Rédige le plan d''exécution qui lui sera remis.
+
+    '
+checks:
+- check_id: declencheur-chiffre-lie-au-repli
+  dimension: contingency
+  kind: deterministic
+  weight: 8
+  assertion: 'Le plan pose un déclencheur de repli chiffré : un seuil avec comparateur et unité, une fenêtre
+    de mesure énoncée au voisinage de ce seuil, et une action de repli exécutable énoncée au voisinage
+    du même seuil — et non un seuil posé d''un côté et une intention de surveiller de l''autre.'
+  detector:
+    type: regex_all
+    patterns:
+    - (?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|plus\s+de|seuil\s+d[eu']|en\s+de[çc][àa]|tomb\w+\s+(?:sous|en\s+dessous)|inf[ée]rieur\w*|moins\s+de)[^\n]{0,40}\d+[.,]?\d*\s*(?:%|km\b|€|tourn[ée]es?|v[ée]hicules?|recharges?)
+    - (?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|plus\s+de|seuil\s+d[eu']|en\s+de[çc][àa]|tomb\w+\s+(?:sous|en\s+dessous)|inf[ée]rieur\w*|moins\s+de)[^\n]{0,40}\d+[.,]?\d*\s*(?:%|km\b|€|tourn[ée]es?|v[ée]hicules?|recharges?)[\s\S]{0,160}?(?:(?:pendant|durant|sur|en)\s+\d+\s*(?:jours?|semaines?|relev[ée]s?)|\d+\s*(?:jours?|semaines?|tourn[ée]es?|relev[ée]s?)\s*(?:cons[ée]cutifs?|cons[ée]cutives?|glissant\w*|d'affil[ée]e|de\s+suite)|fen[êe]tre\s+(?:de\s+)?(?:mesure|glissante|d'observation)|moyenne\s+glissante|(?:sur|en)\s+(?:une|1|deux|2|trois|3)\s+semaines?|deux\s+jours\s+de\s+suite|(?:sur|en)\s+(?:une|1)\s+journ[ée]e)|(?:(?:pendant|durant|sur|en)\s+\d+\s*(?:jours?|semaines?|relev[ée]s?)|\d+\s*(?:jours?|semaines?|tourn[ée]es?|relev[ée]s?)\s*(?:cons[ée]cutifs?|cons[ée]cutives?|glissant\w*|d'affil[ée]e|de\s+suite)|fen[êe]tre\s+(?:de\s+)?(?:mesure|glissante|d'observation)|moyenne\s+glissante|(?:sur|en)\s+(?:une|1|deux|2|trois|3)\s+semaines?|deux\s+jours\s+de\s+suite|(?:sur|en)\s+(?:une|1)\s+journ[ée]e)[\s\S]{0,160}?(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|plus\s+de|seuil\s+d[eu']|en\s+de[çc][àa]|tomb\w+\s+(?:sous|en\s+dessous)|inf[ée]rieur\w*|moins\s+de)[^\n]{0,40}\d+[.,]?\d*\s*(?:%|km\b|€|tourn[ée]es?|v[ée]hicules?|recharges?)
+    - (?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|plus\s+de|seuil\s+d[eu']|en\s+de[çc][àa]|tomb\w+\s+(?:sous|en\s+dessous)|inf[ée]rieur\w*|moins\s+de)[^\n]{0,40}\d+[.,]?\d*\s*(?:%|km\b|€|tourn[ée]es?|v[ée]hicules?|recharges?)[\s\S]{0,240}?(?:prolong\w+|maintien\w*|maintenir|conserv\w+|r[ée]affect\w+|r[ée]-?affect\w+|re-?bascul\w+|bascul\w+[^\n]{0,40}(?:thermique|di[èe]sel)|retour[^\n]{0,40}(?:thermique|di[èe]sel)|repli\w*|rollback|suspend\w+|gel(?:er|ons|é|e)\w*|arr[êe]t\w*|stopp?\w*|d[ée]cal\w+|report\w+|notifi\w+[^\n]{0,25}loueur|rend(?:re|ons)?\s+[^\n]{0,20}v[ée]hicules)|(?:prolong\w+|maintien\w*|maintenir|conserv\w+|r[ée]affect\w+|r[ée]-?affect\w+|re-?bascul\w+|bascul\w+[^\n]{0,40}(?:thermique|di[èe]sel)|retour[^\n]{0,40}(?:thermique|di[èe]sel)|repli\w*|rollback|suspend\w+|gel(?:er|ons|é|e)\w*|arr[êe]t\w*|stopp?\w*|d[ée]cal\w+|report\w+|notifi\w+[^\n]{0,25}loueur|rend(?:re|ons)?\s+[^\n]{0,20}v[ée]hicules)[\s\S]{0,240}?(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|plus\s+de|seuil\s+d[eu']|en\s+de[çc][àa]|tomb\w+\s+(?:sous|en\s+dessous)|inf[ée]rieur\w*|moins\s+de)[^\n]{0,40}\d+[.,]?\d*\s*(?:%|km\b|€|tourn[ée]es?|v[ée]hicules?|recharges?)
+- check_id: reprise-sous-re-decision
+  dimension: contingency
+  kind: deterministic
+  weight: 7
+  assertion: Le plan conditionne explicitement la reprise après déclenchement du repli — retour des tournées
+    à l'électrique, reprise de la montée en charge — à une re-décision humaine identifiée, au lieu de
+    la laisser suivre le retour des indicateurs.
+  detector:
+    type: regex_any
+    patterns:
+    - aucune\s+repri\w+\s+automatique|(?:pas|jamais|ni)\s+de\s+(?:repri\w+|retour|remise|remont[ée]e)\s+automatique|sans\s+repri\w+\s+automatique|(?:la\s+)?repri\w+[^.\n]{0,40}n(?:e\s+ser\w+|'est|'aura)[^.\n]{0,40}automatique|ne\s+(?:se\s+)?(?:fait|fera|d[ée]clenche)\s+pas\s+automatiquement
+    - (?:repri\w+|repren\w+|red[ée]ploi\w+|red[ée]marr\w+|relanc\w+|remise\s+en\s+service|remont\w+|r[ée]int[ée]gr\w+|r[ée]affect\w+|retour\s+[^.\n]{0,30}[ée]lectriques?)[^.\n]{0,90}(?:sur|apr[èe]s|moyennant|sous\s+r[ée]serve\s+d'?|conditionn[ée]\w*\s+[àa]|exige|suppose|passe\s+par|requiert|n[ée]cessite)\s*(?:une?\s+|le\s+|la\s+|l'|un\s+)?(?:d[ée]cision|validation|arbitrage|accord|confirmation|feu\s+vert|autorisation|revue|re-?d[ée]cision|comit[ée]|conseil|directrice|direction)
+    - ne\s+(?:repren\w+|red[ée]marr\w+|red[ée]ploi\w+|remont\w+|relanc\w+|r[ée]affect\w+|revien\w+|rebascul\w+)[^.\n]{0,90}qu(?:e|')\s*(?:sur|apr[èe]s|avec|sous|par)
+- check_id: observation-qui-renverse-le-plan
+  dimension: export
+  kind: deterministic
+  weight: 6
+  assertion: 'Le plan nomme l''observation qui le renverserait, et la rattache à une grandeur mesurable
+    plutôt qu''à un aléa extérieur : l''énoncé de falsification porte sur le plan, la règle ou l''hypothèse
+    retenue, et s''exprime en unités relevables par le superviseur de flotte ou le tableau de bord.'
+  detector:
+    type: regex_all
+    patterns:
+    - (?:invalid\w+|renvers\w+|remettr\w+\s+en\s+(?:cause|question)|remet\w*\s+en\s+(?:cause|question)|infirm\w+|d[ée]mentir\w+|falsifi\w+|(?:nous\s+)?aur(?:ions|ait)\s+eu\s+tort|prouver\w+[^.\n]{0,25}tort|fer\w+\s+changer\s+d'avis|se\s+r[ée]v[èe]l\w+\s+fauss?e?|(?:est|serait|s'av[èe]re|devient)\s+fauss?e?\b)[^\n]{0,140}(?:(?:ce|cet|cette|le|la|notre|nos|mon|ma)\s+(?:plan|choix|d[ée]cision|r[èe]gle|hypoth[èe]se|pari|lecture|calcul|affectation|trajectoire|conversion|recommandation|sc[ée]nario|raisonnement|arbitrage|seuil)|l'(?:hypoth[èe]se|affectation|arbitrage))|(?:(?:ce|cet|cette|le|la|notre|nos|mon|ma)\s+(?:plan|choix|d[ée]cision|r[èe]gle|hypoth[èe]se|pari|lecture|calcul|affectation|trajectoire|conversion|recommandation|sc[ée]nario|raisonnement|arbitrage|seuil)|l'(?:hypoth[èe]se|affectation|arbitrage))[^\n]{0,140}(?:invalid\w+|renvers\w+|remettr\w+\s+en\s+(?:cause|question)|remet\w*\s+en\s+(?:cause|question)|infirm\w+|d[ée]mentir\w+|falsifi\w+|(?:nous\s+)?aur(?:ions|ait)\s+eu\s+tort|prouver\w+[^.\n]{0,25}tort|fer\w+\s+changer\s+d'avis|se\s+r[ée]v[èe]l\w+\s+fauss?e?|(?:est|serait|s'av[èe]re|devient)\s+fauss?e?\b)
+    - (?:invalid\w+|renvers\w+|remettr\w+\s+en\s+(?:cause|question)|remet\w*\s+en\s+(?:cause|question)|infirm\w+|d[ée]mentir\w+|falsifi\w+|(?:nous\s+)?aur(?:ions|ait)\s+eu\s+tort|prouver\w+[^.\n]{0,25}tort|fer\w+\s+changer\s+d'avis|se\s+r[ée]v[èe]l\w+\s+fauss?e?|(?:est|serait|s'av[èe]re|devient)\s+fauss?e?\b)[^\n]{0,160}(?:\d+[.,]?\d*\s*(?:%|km\b|€|jours?|semaines?|tourn[ée]es?|v[ée]hicules?)|mesur[ée]\w*|relev[ée]\w*|taux\b|autonomie|superviseur|tableau\s+de\s+bord)|(?:\d+[.,]?\d*\s*(?:%|km\b|€|jours?|semaines?|tourn[ée]es?|v[ée]hicules?)|mesur[ée]\w*|relev[ée]\w*|taux\b|autonomie|superviseur|tableau\s+de\s+bord)[^\n]{0,160}(?:invalid\w+|renvers\w+|remettr\w+\s+en\s+(?:cause|question)|remet\w*\s+en\s+(?:cause|question)|infirm\w+|d[ée]mentir\w+|falsifi\w+|(?:nous\s+)?aur(?:ions|ait)\s+eu\s+tort|prouver\w+[^.\n]{0,25}tort|fer\w+\s+changer\s+d'avis|se\s+r[ée]v[èe]l\w+\s+fauss?e?|(?:est|serait|s'av[èe]re|devient)\s+fauss?e?\b)
+- check_id: ancrage-couts-de-reversibilite
+  dimension: evidence
+  kind: deterministic
+  weight: 4
+  assertion: 'Le plan reprend les grandeurs qui chiffrent la réversibilité et son coût — loyer de prolongation,
+    préavis, délai de retour d''un véhicule rendu, coût d''une tournée non terminée, autonomie mesurée
+    par froid, seuil kilométrique des incidents observés — et pas seulement les grandeurs d''affichage
+    du projet : au moins quatre occurrences distinctes.'
+  detector:
+    type: anchor_ids
+    patterns:
+    - 480\s*(?:€|euros)
+    - 30\s*jours
+    - 11\s*semaines
+    - 900\s*(?:€|euros)
+    - 197\s*km
+    - 190\s*km
+    - 11\s*(?:tourn[ée]es\s*)?(?:sur|/)\s*120
+    - 11\s*520
+    min_count: 4
+- check_id: repli-attache-a-la-decision-prise
+  dimension: contingency
+  kind: judged
+  weight: 8
+  assertion: Le repli décrit porte sur ce qui est réellement engagé — les véhicules mis en service et
+    les tournées qui leur sont affectées — avec un observable produit par les instruments du dossier,
+    un seuil situé par rapport aux mesures connues, une action exécutable et un acteur qui la déclenche.
+  rubric: 'Passe si les cinq conditions tiennent. (1) Le plan désigne sans ambiguïté ce qui est mis en
+    service et quand : lot de septembre, périmètre de tournées, date. (2) Le repli porte sur ce périmètre
+    et sur son état courant — les véhicules déjà livrés et les tournées déjà basculées — et non sur une
+    hypothèse générale ni sur la décision d''achat, qui est acquise. (3) L''observable est nommé et produit
+    par les moyens déclarés : état de charge et kilométrage remontés toutes les 10 minutes au superviseur
+    de flotte, taux de tournées terminées et nombre de recharges non prévues publiés chaque soir par plateforme.
+    Un indicateur inexistant dans le dossier — satisfaction conducteur, remontées commerciales, ressenti
+    des clients — échoue. (4) L''action de repli est exécutable avec les moyens déclarés : réaffectation
+    de tournées aux diesels encore présents, prolongation d''un lot de location, arrêt ou décalage de
+    la mise en service du lot suivant ; elle est attribuée à un acteur nommé, chef de plateforme, directrice
+    de l''exploitation ou astreinte, avec le niveau d''autorisation requis. (5) Le seuil est situé par
+    rapport aux valeurs du dossier — les 197 km mesurés par 2 °C, les 190 km au-delà desquels les 11 recharges
+    non prévues sur 120 tournées se sont produites, les 900 € d''une tournée non terminée — et non posé
+    au hasard. Échoue si le repli se réduit à une intention de surveiller ou d''ajuster, s''il vise l''opportunité
+    de la conversion plutôt que son exécution, si l''observable n''est pas produit par les instruments
+    du dossier, ou si aucun acteur identifié ne peut le déclencher.'
+- check_id: decision-livree-sans-rouverture
+  dimension: export
+  kind: judged
+  weight: 8
+  assertion: Le plan livre une décision d'exécution complète et engagée — verdict, critère, pire cas de
+    l'option retenue et qui l'encaisse, première action datée et attribuée — sans rouvrir l'arbitrage
+    acquis et sans effacer la note reçue la veille.
+  rubric: 'Ce contrôle attrape deux échecs symétriques ; il ne passe que si aucun des deux n''est présent.
+    SUR-RETENUE — échoue si le plan renvoie au conseil l''opportunité de la conversion, recommande de
+    suspendre, décaler ou renégocier la commande ferme, subordonne la mise en service de septembre à une
+    étude, un audit ou un essai complémentaire sans date ni critère de sortie, présente deux ou trois
+    options au lieu de trancher l''exécution, ou conclut par une demande d''arbitrage sur ce qui est déjà
+    arbitré. Un plan qui décide de ne pas mettre en service certaines tournées ne relève pas de la sur-retenue
+    : c''est une règle d''affectation, à condition qu''elle soit datée, chiffrée et assumée. SUR-PRODUCTION
+    — échoue si le plan traite la note reçue la veille comme un détail : 11 tournées sur 120 ont exigé
+    une recharge intermédiaire, toutes au-delà de 190 km, contre une autonomie mesurée à 197 km par 2
+    °C. Un plan qui n''en tire aucune règle, ou qui affirme la conversion intégrale des 96 tournées sans
+    traiter les tournées de 240 km, fabrique une confiance que les mesures ne portent pas. Passe si, en
+    outre, la réponse porte quatre éléments : le verdict d''exécution et le critère qui l''a emporté ;
+    le pire cas de ce qui est engagé, chiffré, et l''ensemble qui l''encaisse — exploitation, clients,
+    budget — et non un risque générique ; le repli et son déclencheur ; la première action, datée et attribuée
+    à quelqu''un. Une réponse peut passer ce contrôle en retenant des règles d''affectation différentes
+    : c''est l''engagement et la complétude qui sont notés, pas le choix industriel.'
+- check_id: fenetre-de-repli-finie-et-payee
+  dimension: ruin
+  kind: judged
+  weight: 7
+  assertion: 'Le plan traite le repli comme un dispositif fini et payant : il nomme ce qui le referme,
+    décide du préavis qui le maintient ouvert, et borne la boucle par une condition terminale au lieu
+    de supposer un nombre indéfini de tentatives.'
+  rubric: 'Passe si les quatre conditions tiennent. (1) Le plan traite l''irréversibilité comme une contrainte
+    de calendrier et non comme une mention décorative : un véhicule rendu au loueur ne revient pas avant
+    11 semaines, donc chaque reprise de lot ferme une partie du repli à une date connue. (2) Le maintien
+    de la fenêtre est arbitré explicitement : prolongation d''un lot à 480 € par véhicule et par mois,
+    notifiée au loueur 30 jours avant la reprise prévue, avec le nombre de véhicules et le coût mensuel
+    assumés ; ou refus motivé de payer cette option, avec ce que ce refus coûte en cas d''incident, à
+    900 € la tournée non terminée. Un repli qui suppose des diesels disponibles sans avoir décidé le préavis
+    échoue. (3) La boucle de repli est bornée : le plan énonce une condition terminale — second déclenchement
+    du seuil, repli survenant après une échéance nommée — et l''issue de cette condition, qui est l''arrêt
+    de la montée en charge à un niveau nommé, et non un retour au palier précédent indéfiniment renouvelable.
+    (4) Le plan situe cette condition terminale par rapport aux 60 véhicules roulants avant le 31 janvier
+    dont dépend la subvention de 620 000 €, en disant soit qu''il préserve ce seuil, soit ce qu''il renonce
+    à toucher en s''arrêtant plus bas. Échoue si la conversion est présentée comme réversible à tout moment,
+    si le plan invoque un retour aux diesels qu''il a par ailleurs décidé de rendre, si la charge des
+    96 véhicules est supposée acquise alors que 14 bornes de 22 kW et une charge de 6 h y font obstacle
+    sans que les 210 000 € de travaux et leurs 7 semaines soient décidés, ou si rien ne dit combien de
+    fois le seuil peut être franchi avant qu''on cesse de monter en charge.'
+failure_modes:
+- id: repli-dintention
+  description: Le plan annonce un repli d'intention — « nous suivrons les indicateurs et ajusterons l'affectation
+    », « nous pourrons prolonger la location si nécessaire » — sans seuil chiffré, sans fenêtre de mesure
+    et sans acteur qui déclenche, alors que l'énoncé fournit l'instrument, la périodicité et les chiffres.
+  severity: major
+- id: declencheur-non-observable
+  description: Le déclencheur repose sur une grandeur que le dossier ne produit pas — ressenti des conducteurs,
+    remontées clients, « dégradation générale de l'exploitation » — au lieu du taux de tournées terminées,
+    du nombre de recharges non prévues ou de l'état de charge remonté toutes les 10 minutes.
+  severity: major
+- id: sur-retenue-rouverture
+  description: 'Le plan refuse prudemment de s''engager sur une décision qui est prise, financée et légitime
+    : il renvoie l''opportunité de la conversion au conseil, recommande de décaler la commande ferme,
+    subordonne la mise en service de septembre à une étude sans date, ou livre des options à arbitrer
+    au lieu du plan demandé.'
+  severity: major
+- id: note-de-la-veille-effacee
+  description: 'La note du responsable transport — 11 tournées sur 120 ayant exigé une recharge intermédiaire,
+    toutes au-delà de 190 km — n''a aucun effet sur le plan : aucune règle d''affectation, aucun seuil,
+    aucune conséquence sur les tournées de 240 km. L''information la plus récente et la plus défavorable
+    est absorbée sans trace.'
+  severity: major
+- id: reprise-automatique
+  description: Après déclenchement du repli, le plan prévoit que les tournées longues repassent à l'électrique
+    ou que la montée en charge reprend « dès que les indicateurs sont revenus à la normale », sans re-décision
+    humaine identifiée.
+  severity: major
+- id: boucle-de-repli-sans-fin
+  description: 'Le repli consiste à revenir au palier précédent puis à retenter, sans condition terminale
+    : rien ne dit combien de fois le seuil peut être franchi avant qu''on cesse de monter en charge, ni
+    ce qu''il advient des 60 véhicules exigés au 31 janvier. Le dispositif suppose un nombre indéfini
+    de tentatives dans une fenêtre qui est finie.'
+  severity: major
+- id: reversibilite-fabriquee
+  description: 'Le plan affirme un repli que le dossier interdit : diesels rappelés immédiatement alors
+    qu''un véhicule rendu ne revient pas avant 11 semaines, prolongation de location obtenue sans le préavis
+    de 30 jours, prolongation présentée comme gratuite alors qu''elle coûte 480 € par véhicule et par
+    mois, ou charge de la flotte convertie supposée assurée par les 14 bornes existantes sans décider
+    les 210 000 € de travaux et leurs 7 semaines.'
+  severity: disqualifying
+canon_anchors:
+- master_document.execution_envelope.contingency_binding
+- master_document.execution_envelope.export_gate
+supersedes: []
+limitations:
+- 'Les détecteurs ont été calibrés sur deux réponses synthétiques écrites par l''auteur du cas — un plan
+  d''exécution compétent mais non cadré, et un plan cadré — puis éprouvés sur des paraphrases des deux.
+  Ils n''ont jamais été confrontés à des essais réels : leur pouvoir séparateur est une hypothèse de rédaction,
+  pas une mesure. La première campagne qui les exécute est aussi celle qui les met à l''épreuve, et ses
+  résultats doivent être lus comme tels.'
+- Le contrôle declencheur-chiffre-lie-au-repli exige que le seuil, sa fenêtre de mesure et l'action de
+  repli tiennent dans des voisinages de 160 et 240 caractères. Un plan qui pose le seuil correct dans
+  un tableau, ou qui l'énonce en toutes lettres sans comparateur ni unité, échoue à tort. C'est un plancher
+  assumé, pas un discriminant fin.
+- 'Le contrôle ancrage-couts-de-reversibilite exige quatre occurrences distinctes parmi huit motifs restreints
+  aux grandeurs de réversibilité. Le seuil est fragile dans les deux sens : un plan cadré mais très court
+  peut échouer, un plan long qui recite le dossier sans rien en faire peut passer. Il mesure l''ancrage
+  sur les bons chiffres, pas leur usage.'
+- 'La sur-retenue — refuser de s''engager sur une décision légitime — n''est attrapée que par un contrôle
+  jugé. Aucun détecteur déterministe ne la sépare de façon fiable : les tournures de prudence sont trop
+  variées, et un anti-patron lexical saturerait comme celui qui a été retiré de contingency-binding-trigger-v2.
+  Sans juge enregistré, ce contrôle reste not_run et le cas perd sa moitié symétrique.'
+- 'Le cas ne sépare pas le contenu du cadre de la masse de contexte : un bras exposé reçoit plus de texte
+  qu''un bras nu, et aucun bras apparié en volume n''existe encore (arms.yaml, known_confound). Un écart
+  C−A observé ici reste attribuable à la masse.'
+- 'Le bras A_placebo exige un sujet structurellement aveugle. Le harnais du dépôt ne le fournit pas (arms.yaml,
+  harness_constraint, status not_satisfied_in_repo_sessions) : un essai A produit depuis une session ouverte
+  sur ce dépôt est au mieux un B déguisé et doit être écarté.'
+- 'La qualité industrielle du plan de transport n''est pas notée : deux plans retenant des règles d''affectation
+  opposées peuvent tous deux passer. Le score ne dit rien de la justesse de la conversion elle-même.'
+- Le cas mesure la liaison du repli à la décision prise, la finitude de la fenêtre de repli, la falsifiabilité
+  déclarée et l'engagement effectif. Il ne mesure ni la traversée des couches, ni le respect des limites
+  d'activation, ni la discipline d'export complète — seuls quatre des cinq champs de export_gate y sont
+  observés.
+- 'Le cas ne prouve pas qu''un sujet ayant réussi possède le cadre M3C3 : il constate une réponse observable
+  dans une condition d''exposition déclarée, sur un seul dossier.'
