@@ -119,6 +119,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--judge-name", default=None, help="défaut : le modèle du juge")
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--write", action="store_true", help="écrire les jugements")
+    parser.add_argument(
+        "--retry-unruled",
+        action="store_true",
+        help="rejouer les verdicts non rendus en publiant un jugement qui les remplace",
+    )
     parser.add_argument("--format", choices=("text", "json"), default="text")
     args = parser.parse_args(argv or sys.argv[1:])
 
@@ -133,19 +138,37 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     by_id = {scenario["scenario_id"]: scenario for scenario in scenarios}
 
-    existing = set()
+    existing: set[tuple] = set()
+    unruled: dict[tuple, str] = {}
+    superseded: set[str] = set()
     if JUDGEMENTS_DIR.is_dir():
-        for path in v.record_paths(JUDGEMENTS_DIR):
-            document = v.load_path(path)
-            existing.add((document.get("trial_id"), document.get("check_id"), (document.get("judge") or {}).get("name")))
+        documents = [v.load_path(path) for path in v.record_paths(JUDGEMENTS_DIR)]
+        for document in documents:
+            superseded.update(document.get("supersedes") or [])
+        for document in documents:
+            key = (
+                document.get("trial_id"),
+                document.get("check_id"),
+                (document.get("judge") or {}).get("name"),
+            )
+            existing.add(key)
+            if document.get("verdict") == "not_run" and document["judgement_id"] not in superseded:
+                unruled[key] = document["judgement_id"]
 
     work = []
     for trial in sorted(trials, key=lambda item: item["trial_id"]):
         scenario = by_id[trial["scenario_id"]]
         for check in judged_checks(scenario):
-            if (trial["trial_id"], check["check_id"], judge_name) in existing:
+            key = (trial["trial_id"], check["check_id"], judge_name)
+            if key in existing:
+                # Un verdict non rendu (appel en échec, sortie inexploitable) est
+                # rejouable : la reprise publie un NOUVEAU jugement qui remplace
+                # la tentative, laquelle reste au dossier. On ne réécrit jamais un
+                # enregistrement pour effacer la trace d'un échec.
+                if args.retry_unruled and key in unruled:
+                    work.append((trial, scenario, check, unruled[key]))
                 continue
-            work.append((trial, scenario, check))
+            work.append((trial, scenario, check, None))
 
     if not work:
         print("aucun contrôle jugé en attente")
@@ -155,18 +178,19 @@ def main(argv: list[str] | None = None) -> int:
     print(f"{len(work)} contrôle(s) à juger · juge {judge_name} · aveugle au bras et au sujet")
 
     def judge_one(item):
-        trial, scenario, check = item
+        trial, scenario, check, replaces = item
         prompt = build_prompt(scenario["task"]["prompt"], trial["response"]["text"], check)
         verdict, rationale = call_judge(prompt, args.judge_model, workdir)
-        return trial, scenario, check, verdict, rationale
+        return trial, scenario, check, verdict, rationale, replaces
 
     results = list(ThreadPoolExecutor(max_workers=args.workers).map(judge_one, work))
 
     JUDGEMENTS_DIR.mkdir(parents=True, exist_ok=True)
     written = []
-    for trial, scenario, check, verdict, rationale in results:
-        short = trial["trial_id"].replace("pilot-", "").replace(f"-{stamp}", "")
-        judgement_id = f"j-{short}-{check['check_id']}-{stamp}"[:128]
+    for trial, scenario, check, verdict, rationale, replaces in results:
+        short = trial["trial_id"].replace("pilot-", "").replace("full-", "").replace(f"-{stamp}", "")
+        suffix = "-bis" if replaces else ""
+        judgement_id = f"j-{short}-{check['check_id']}{suffix}-{stamp}"[:128]
         document = {
             "schema_version": 1,
             "kind": "m3c3_bench_judgement",
@@ -191,6 +215,7 @@ def main(argv: list[str] | None = None) -> int:
             },
             "verdict": verdict,
             "rationale": rationale[:2000],
+            **({"supersedes": [replaces]} if replaces else {}),
             "limitations": [
                 "Juge modèle, non humain : il reproduit une lecture de grille, il ne la garantit pas.",
                 "Juge unique par contrôle : aucun accord inter-juges n'est mesuré, donc la fiabilité "
