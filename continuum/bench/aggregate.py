@@ -101,7 +101,9 @@ GUARD_OPEN = (
     "Porte ouverte : toutes les cellules atteignent minimum_trials_per_cell, "
     "les splits sont prononcés et tout contrôle jugé a été tranché. Les verdicts "
     "restent des écarts de taux sans test de significativité, et C_vs_A demeure "
-    "confondu avec le volume de contexte tant que le bras D n'existe pas."
+    "confondu avec le volume de contexte tant que le bras E_volume_matched "
+    "n'existe pas. D_candidate ne résout pas ce confondant : c'est de la matière "
+    "M3C3, et il ne contrôle le volume que pour la comparaison D_vs_C."
 )
 GUARD_REASON = "porte de conclusion : statut de l'agrégat != complete"
 
