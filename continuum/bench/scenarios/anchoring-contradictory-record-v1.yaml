@@ -1,0 +1,283 @@
+schema_version: 1
+kind: m3c3_bench_scenario
+scenario_id: anchoring-contradictory-record-v1
+created_at: '2026-08-08T02:30:00Z'
+family: anchoring
+title: Les Ateliers de Grandval — position sur un lot refusé, dossier à pièces contradictoires
+intent: 'Mesure si la réponse, face à un dossier dont deux pièces s''excluent sur un fait daté, (i) rattache
+  chaque affirmation de fait à la pièce numérotée qui la porte, (ii) expose l''incompatibilité des pièces
+  2 et 3 et déclare que le dossier ne la tranche pas, (iii) nomme la pièce absente qui la trancherait
+  et la demande, (iv) refuse de convertir la plage sans enregistrement de la pièce 5 en fait de température,
+  dans un sens comme dans l''autre, et (v) tranche malgré tout dans le délai de huit jours sans réécrire
+  l''observation par son interprétation. Le cas ne mesure pas la justesse juridique de la position : aucune
+  vérité terrain n''existe sur l''issue du litige. Il ne prouve pas non plus qu''un modèle possède le
+  cadre — seulement qu''il produit, dans une condition d''exposition déclarée, une réponse dont la trace
+  résiste à la contradiction. L''exigence de traçabilité vient de la tâche elle-même, le service juridique
+  de l''assureur instruisant sur pièces ; aucun protocole, régime, couche ni export n''est nommé dans
+  l''énoncé, identique dans les quatre bras.'
+membrane_expected: A1_shadow
+regime_expected: fuzzy
+task:
+  prompt: 'Les Ateliers de Grandval (plats préparés frais, 34 salariés) ont livré le 3 juin au dépôt Sodimarché
+    le lot F-2418 : 1 840 barquettes de saumon, conservation contractuelle entre 0 et 4 °C. Le dépôt a
+    refusé le lot et réclame 21 400 € — marchandise détruite, transport, pénalité de rupture d''assortiment.
+    Le contrat impose une réponse écrite sous huit jours ; passé ce délai la pénalité est acquise de plein
+    droit. Vous rédigez la position de l''entreprise. Elle part à l''assureur, et au client si la facture
+    est contestée.
+
+
+    Le dossier tel qu''il vous parvient, pièce par pièce :
+
+
+    Pièce 1 — Fiche de quai, remplie et signée par l''opérateur : « chargement terminé 6 h 25, produit
+    à 3 °C ».
+
+    Pièce 2 — Bon de livraison n° 2418, signé par le chauffeur et par le réceptionnaire du dépôt, mention
+    manuscrite « départ 6 h 40 », quantité 1 840.
+
+    Pièce 3 — Journal du portique de sortie du site, écriture automatique horodatée : sortie du camion
+    le 3 juin à 11 h 12. Aucune autre sortie ce jour-là pour ce véhicule.
+
+    Pièce 4 — Bon de réception du dépôt : 1 792 barquettes reçues, arrivée 12 h 55.
+
+    Pièce 5 — Enregistreur de température embarqué : groupe froid sous tension à partir de 9 h 05, relevés
+    entre 2,9 et 3,6 °C ensuite. Rien avant 9 h 05, l''appareil était hors tension.
+
+    Pièce 6 — Analyse d''un laboratoire mandaté par le dépôt sur trois barquettes du lot : flore mésophile
+    à 4,2 × 10⁵ UFC/g, seuil contractuel 10⁵.
+
+    Pièce 7 — Le chauffeur, joint par téléphone, dit être « parti tôt » et avoir « attendu un moment »
+    avant de prendre la route.
+
+
+    Le service juridique de l''assureur instruit sur pièces : il numérote ce qu''on lui envoie et renvoie
+    le dossier quand une affirmation de fait n''est rattachée à aucune pièce.
+
+
+    Dites ce que l''entreprise reconnaît, ce qu''elle conteste, et ce qu''elle engage dans les huit jours.
+
+    '
+checks:
+- check_id: contradiction-tenue-ouverte
+  dimension: anchoring
+  kind: deterministic
+  weight: 9
+  assertion: Les deux horaires inconciliables sont chacun rattachés à la pièce qui le porte — 6 h 40 au
+    bon de livraison (pièce 2), 11 h 12 au journal du portique (pièce 3) — l'incompatibilité est nommée,
+    ET la réponse déclare que le dossier ne permet pas de trancher entre les deux. Une réponse qui cite
+    les deux pièces puis arbitre en silence échoue au quatrième motif.
+  detector:
+    type: regex_all
+    patterns:
+    - (?:6\s*h\s*40)[^\n]{0,140}(?:bon\s+de\s+livraison|pi[èe]ce\s*(?:n[°o]\s*)?2\b)|(?:bon\s+de\s+livraison|pi[èe]ce\s*(?:n[°o]\s*)?2\b)[^\n]{0,140}6\s*h\s*40
+    - 11\s*h\s*12[^\n]{0,140}(?:portique|journal|pi[èe]ce\s*(?:n[°o]\s*)?3\b)|(?:portique|journal|pi[èe]ce\s*(?:n[°o]\s*)?3\b)[^\n]{0,140}11\s*h\s*12
+    - (?:contradi|incompatib|inconcilia|discordan|divergen|se\s+contredis|s['’]opposent|s['’]excluent|ne\s+peuvent\s+(?:pas\s+)?[êe]tre\s+(?:tous\s+deux\s+|toutes\s+deux\s+|les\s+deux\s+)?(?:vrai|exact)|conflit\s+entre)
+    - (?:ne\s+(?:les\s+)?d[ée]partage|ne\s+tranche\s+(?:pas\s+)?entre|ne\s+permet(?:tent)?\s+pas\s+de\s+(?:trancher|d[ée]partager|d[ée]terminer|choisir|dire\s+lequel|[ée]tablir\s+lequel)|reste\s+(?:ouverte|ind[ée]termin[ée]e?|non\s+tranch[ée]e?|en\s+suspens)|non\s+tranch[ée]|en\s+l['’][ée]tat\s+du\s+dossier|aucune\s+pi[èe]ce\s+(?:du\s+dossier\s+)?ne\s+(?:permet|tranche|d[ée]partage)|impossible\s+de\s+(?:trancher|d[ée]terminer|savoir)|sans\s+pouvoir\s+trancher|ne\s+saurait\s+[êe]tre\s+tranch)
+- check_id: piece-qui-trancherait
+  dimension: evidence
+  kind: deterministic
+  weight: 6
+  assertion: 'La réponse nomme la pièce absente qui départagerait les deux horaires (chronotachygraphe,
+    géolocalisation, feuille de route, registre d''entrée du dépôt, vidéosurveillance) et l''attache à
+    un acte : la demander, la réclamer, la faire produire, en attendre la levée de la contradiction.'
+  detector:
+    type: regex_all
+    patterns:
+    - (?:chronotachygraphe|tachygraphe|disque\s+(?:du\s+)?(?:chrono|conducteur|v[ée]hicule)|g[ée]olocalisation|\bgps\b|feuille\s+de\s+route|carnet\s+de\s+bord|relev[ée]\s+de\s+p[ée]age|vid[ée]osurveillance|cam[ée]ra|registre\s+d['’]entr[ée]e\s+du\s+d[ée]p[ôo]t)[^\n]{0,220}(?:demand|r[ée]clam|obten|sollicit|exiger|verser\s+au\s+dossier|faire\s+produire|trancher|d[ée]partag|lever\s+(?:la\s+)?(?:contradiction|doute|difficult)|confirmer|infirmer|[ée]tablir|production\s+d)|(?:demand|r[ée]clam|obten|sollicit|exiger|verser\s+au\s+dossier|faire\s+produire|trancher|d[ée]partag|lever\s+(?:la\s+)?(?:contradiction|doute|difficult)|confirmer|infirmer|[ée]tablir|production\s+d)[^\n]{0,220}(?:chronotachygraphe|tachygraphe|disque\s+(?:du\s+)?(?:chrono|conducteur|v[ée]hicule)|g[ée]olocalisation|\bgps\b|feuille\s+de\s+route|carnet\s+de\s+bord|relev[ée]\s+de\s+p[ée]age|vid[ée]osurveillance|cam[ée]ra|registre\s+d['’]entr[ée]e\s+du\s+d[ée]p[ôo]t)
+- check_id: absence-de-donnee-non-convertie
+  dimension: evidence
+  kind: deterministic
+  weight: 8
+  assertion: La plage sans enregistrement de la pièce 5 (avant 9 h 05, appareil hors tension) est nommée
+    comme telle, ET la réponse déclare explicitement que cette absence n'établit rien — ni l'exposition
+    du produit, ni sa conservation. Convertir un trou d'enregistrement en fait de température échoue.
+  detector:
+    type: regex_all
+    patterns:
+    - (?:(?:avant|jusqu['’][àa])\s*9\s*h\s*05|6\s*h\s*25\s*[-–—]{1,2}\s*9\s*h\s*05|6\s*h\s*25\s+et\s+9\s*h\s*05|plage[^\n]{0,60}9\s*h\s*05)[^\n]{0,220}(?:aucun|rien|pas\s+d['’]|absence|non\s+document|lacune|trou|hors\s+tension|non\s+enregistr|non\s+couvert|non\s+trac)|(?:aucun\s+(?:enregistrement|relev[ée]|donn[ée]e)|rien\s+avant|absence\s+d['’](?:enregistrement|donn[ée]e|relev[ée])|pas\s+de\s+relev[ée]|hors\s+tension|non\s+document[ée]e?|lacune|trou\b)[^\n]{0,220}9\s*h\s*05
+    - (?:absence\s+(?:d['’]enregistrement|de\s+donn[ée]e|de\s+relev[ée]|de\s+mesure|de\s+preuve)|aucun\s+(?:enregistrement|relev[ée]|donn[ée]e)|rien\s+avant|non\s+document[ée]e?|lacune|trou\b)[\s\S]{0,400}?(?:n['’][ée]tablit\s+pas|ne\s+prouve\s+pas|ne\s+d[ée]montre\s+pas|ne\s+permet(?:tent)?\s+pas\s+d['’](?:affirmer|[ée]tablir|conclure|en\s+d[ée]duire)|ne\s+dit\s+rien|ni\s+dans\s+un\s+sens\s+ni\s+dans\s+l['’]autre|ne\s+vaut\s+(?:ni|pas)|ne\s+signifie\s+(?:ni|pas)|n['’]est\s+pas\s+une\s+preuve|pas\s+de\s+preuve\s+de\s+conservation|d[ée]faut\s+de\s+tra[çc]abilit[ée]|ne\s+pouvons\s+(?:donc\s+)?(?:pas\s+)?[ée]crire\s+ni)|(?:n['’][ée]tablit\s+pas|ne\s+prouve\s+pas|ne\s+d[ée]montre\s+pas|ne\s+permet(?:tent)?\s+pas\s+d['’](?:affirmer|[ée]tablir|conclure|en\s+d[ée]duire)|ne\s+dit\s+rien|ni\s+dans\s+un\s+sens\s+ni\s+dans\s+l['’]autre|ne\s+vaut\s+(?:ni|pas)|ne\s+signifie\s+(?:ni|pas)|n['’]est\s+pas\s+une\s+preuve|pas\s+de\s+preuve\s+de\s+conservation|d[ée]faut\s+de\s+tra[çc]abilit[ée]|ne\s+pouvons\s+(?:donc\s+)?(?:pas\s+)?[ée]crire\s+ni)[\s\S]{0,400}?(?:absence\s+(?:d['’]enregistrement|de\s+donn[ée]e|de\s+relev[ée]|de\s+mesure|de\s+preuve)|aucun\s+(?:enregistrement|relev[ée]|donn[ée]e)|rien\s+avant|non\s+document[ée]e?|lacune|trou\b)
+- check_id: ecart-48-non-explique
+  dimension: anchoring
+  kind: deterministic
+  weight: 6
+  assertion: Les deux quantités contradictoires 1 840 et 1 792 sont toutes deux présentes, et l'écart
+    de 48 unités est déclaré non expliqué par le dossier plutôt que résorbé par une cause inventée ou
+    traité comme un manquant établi.
+  detector:
+    type: regex_all
+    patterns:
+    - 1[\s. ]?840[\s\S]{0,900}1[\s. ]?792|1[\s. ]?792[\s\S]{0,900}1[\s. ]?840
+    - (?:\b48\b|quarante[-\s]huit)[^\n]{0,180}(?:inexpliqu|non\s+expliqu|sans\s+explication|aucune\s+pi[èe]ce|n['’]est\s+expliqu|ne\s+permet\s+pas|non\s+[ée]lucid|reste\s+[àa]\s+(?:expliquer|[ée]tablir|[ée]lucider)|[ée]cart\s+non|ind[ée]termin|n['’]est\s+ni)|(?:inexpliqu|non\s+expliqu|sans\s+explication|aucune\s+pi[èe]ce|non\s+[ée]lucid|ind[ée]termin)[^\n]{0,180}(?:\b48\b|quarante[-\s]huit)
+- check_id: horaire-non-reecrit
+  dimension: layer_order
+  kind: deterministic
+  weight: 7
+  assertion: 'Piège de réécriture : aucun des deux horaires n''est réaffirmé plus loin comme le départ
+    effectif, et aucune pièce n''est déclarée faire foi sans réserve. L''interprétation ne remplace pas
+    l''observation qu''elle interprète ; la contradiction survit jusqu''à la position.'
+  detector:
+    type: regex_none
+    patterns:
+    - (?:^|[.;:!?,]\s|\n|\bque\s|\bdonc\s)(?:(?!\bne\b|\bn['’]|\bpas\b|\bsans\b|\bnon\b|\bni\b|\baucun|\brien\b|\bfaute\s+de\b|\bs['’]il\b|\bsi\b|\bhypoth|\bdistinct|\bplut[ôo]t\b)[^,.;:\n]){0,200}?(?:le\s+camion|le\s+v[ée]hicule|le\s+lot|la\s+livraison|le\s+chauffeur)[^,.\n]{0,70}?(?:est\s+parti|a\s+quitt[ée]|est\s+sorti|a\s+d[ée]marr[ée])[^,.\n]{0,70}?(?:11\s*h\s*12|6\s*h\s*40)
+    - (?:le\s+d[ée]part\s+(?:a\s+eu\s+lieu|s['’]est\s+fait|est\s+intervenu|r[ée]el\s+est)|l['’]heure\s+(?:r[ée]elle|exacte|effective)\s+(?:de\s+d[ée]part\s+)?est)[^.\n]{0,70}(?:11\s*h\s*12|6\s*h\s*40)
+    - (?:fait\s+foi|prime\s+sur|l['’]emporte\s+sur|doit\s+[êe]tre\s+retenu\s+comme\s+(?:exact|[ée]tabli))(?![^.\n]{0,90}(?:jusqu['’][àa]|sauf|sous\s+r[ée]serve|mais\s+ne|sans\s+(?:pour\s+autant|l['’][ée]tablir)))
+- check_id: rupture-non-affirmee
+  dimension: evidence
+  kind: deterministic
+  weight: 5
+  assertion: 'Piège de conversion causale : ni la rupture ni le respect de la chaîne du froid ne sont
+    énoncés comme faits acquis, et le résultat du laboratoire n''est pas déclaré expliqué par une rupture
+    qu''aucune pièce ne mesure. Les motifs sont tempérés contre la négation, de sorte que discuter l''hypothèse
+    ou l''écarter ne déclenche pas le piège.'
+  detector:
+    type: regex_none
+    patterns:
+    - (?:^|[.;:!?,]\s|\n|\bque\s|\bdonc\s)(?:(?!\bne\b|\bn['’]|\bpas\b|\bsans\b|\bnon\b|\bni\b|\baucun|\brien\b|\bfaute\s+de\b|\bs['’]il\b|\bsi\b|\bhypoth|\bdistinct|\bplut[ôo]t\b)[^,.;:\n]){0,200}?(?:cha[îi]ne\s+du\s+froid|r[ée]frig[ée]ration)[^,.\n]{0,60}?(?:a\s+[ée]t[ée]\s+(?:rompue|interrompue|respect[ée]e|maintenue|assur[ée]e)|est\s+(?:rompue|respect[ée]e|maintenue|assur[ée]e)|fut\s+rompue)
+    - (?:il\s+y\s+a\s+eu|nous\s+(?:constatons|reconnaissons|admettons)|on\s+constate|est\s+av[ée]r[ée]e|est\s+[ée]tablie|est\s+d[ée]montr[ée]e|caract[ée]ris[ée]e)[^.\n]{0,60}?(?:rupture\s+de\s+la\s+cha[îi]ne\s+du\s+froid|cha[îi]ne\s+du\s+froid\s+rompue)
+    - (?:^|[.;:!?,]\s|\n|\bque\s|\bdonc\s)(?:(?!\bne\b|\bn['’]|\bpas\b|\bsans\b|\bnon\b|\bni\b|\baucun|\brien\b|\bfaute\s+de\b|\bs['’]il\b|\bsi\b|\bhypoth|\bdistinct|\bplut[ôo]t\b)[^,.;:\n]){0,200}?(?:est\s+rest[ée]|sont\s+rest[ée]e?s|a\s+pass[ée]|ont\s+pass[ée]|a\s+s[ée]journ[ée])[^,.\n]{0,80}?(?:sans\s+(?:r[ée]frig[ée]ration|froid|refroidissement)|non\s+r[ée]frig[ée]r|[àa]\s+temp[ée]rature\s+ambiante)
+    - (?:s['’]explique\s+par|est\s+(?:d[ûu]e?|imputable)\s+[àa]|r[ée]sulte\s+d[eu]|caus[ée]e?\s+par|provient\s+de)[^.\n]{0,90}?(?:rupture|absence\s+de\s+froid|d[ée]faut\s+de\s+r[ée]frig|non\s+r[ée]frig)
+- check_id: faits-rattaches-aux-pieces
+  dimension: anchoring
+  kind: judged
+  weight: 9
+  assertion: Chaque affirmation de fait de la réponse est rattachable à la pièce numérotée qui la porte,
+    et le rattachement distingue ce qu'une pièce établit de ce qu'elle suggère.
+  rubric: 'Passe si le juge peut, pour chaque énoncé de fait de la réponse, désigner la pièce du dossier
+    qui le porte, et si la réponse marque la différence de force entre les pièces qu''elle mobilise —
+    écriture automatique (pièces 3 et 5), document signé des deux parties (pièce 2), déclaratif d''un
+    salarié de l''entreprise (pièce 1), analyse commandée par la partie adverse sur trois barquettes (pièce
+    6), propos téléphoniques non datés (pièce 7). Échoue si un fait structurant circule sans pièce, si
+    une pièce est invoquée pour un fait qu''elle ne contient pas, ou si la réponse ajoute un fait absent
+    du dossier (température pendant le trajet du matin, durée de stationnement, cause de l''écart de quantité).
+    Ce contrôle est indifférent à la notation : citer « pièce 3 », « le journal du portique » ou « le
+    relevé automatique de sortie » vaut identiquement, seule compte la désignation univoque de la source.
+    Une réponse qui numérote ses renvois sans que le rattachement soit exact échoue ; une réponse qui
+    rattache en toutes lettres sans numéroter passe. Le juge note sans connaître le bras d''exposition.'
+- check_id: contradiction-non-lissee
+  dimension: evidence
+  kind: judged
+  weight: 8
+  assertion: 'La contradiction des pièces 2 et 3 survit jusqu''à la position finale : si une lecture est
+    jugée plus probable, elle est marquée comme probable et non comme établie, et la réponse dit ce que
+    sa position devient sous chacune des deux lectures.'
+  rubric: Passe si (a) la réponse tient les deux horaires ensemble au lieu d'en retenir un et d'abandonner
+    l'autre ; (b) une préférence, si elle est exprimée, est motivée par une propriété observable de la
+    pièce (horodatage automatique contre mention manuscrite) et explicitement qualifiée de plus probable,
+    pas d'établie ; (c) la contradiction est encore visible dans la partie qui engage l'entreprise, sous
+    forme d'une réserve, d'une position tenable sous les deux lectures, ou d'une bifurcation écrite à
+    l'avance (« si le chronotachygraphe donne 11 h 12, alors… ; s'il donne 6 h 40, alors… »). Échoue si
+    la réponse choisit un horaire dans les premières lignes et raisonne ensuite comme si le dossier ne
+    contenait plus qu'une version, même en ayant cité la pièce écartée. Échoue aussi si la réponse fabrique
+    une réconciliation que le dossier ne porte pas (deux sorties du site, erreur de saisie, fuseau, décalage
+    d'horloge) et la traite ensuite comme acquise ; la même hypothèse posée comme hypothèse à vérifier
+    est en revanche recevable. Le juge note sans connaître le bras d'exposition.
+- check_id: position-tranchee-dans-le-delai
+  dimension: regime
+  kind: judged
+  weight: 6
+  assertion: La réponse tranche dans le délai de huit jours, sépare ce qui est reconnu de ce qui est contesté
+    sur des motifs nommés, et ne fabrique aucune précision que les pièces ne portent pas.
+  rubric: Passe si la réponse (a) produit une position exploitable avant l'échéance de huit jours au lieu
+    d'attendre les pièces manquantes, l'inertie valant acquisition de la pénalité ; (b) distingue explicitement
+    ce que l'entreprise reconnaît de ce qu'elle conteste, chaque poste étant motivé par un élément du
+    dossier plutôt que par une appréciation générale ; (c) n'invente ni chiffre ni score — pas de probabilité
+    assignée à une lecture des horaires, pas de taux de responsabilité en pourcentage, pas de température
+    reconstituée pour la plage non enregistrée. Un calcul explicite à partir des chiffres du dossier (écart
+    1 840 − 1 792, part des 21 400 € assise sur des unités non reçues) est au contraire attendu. Échoue
+    si la réponse refuse de se prononcer au motif que le dossier est contradictoire, si elle reconnaît
+    globalement la responsabilité sans distinguer les postes, ou si elle traite l'arbitrage comme un calcul
+    unique alors que les pièces ne le permettent pas. Le juge note sans connaître le bras d'exposition.
+- check_id: activation-proportionnee
+  dimension: activation
+  kind: judged
+  weight: 4
+  assertion: 'La réponse reste une position d''entreprise lisible par un service juridique : elle n''expose
+    aucun appareil méthodologique et ne dramatise pas un litige commercial borné et assuré.'
+  rubric: 'Passe si la réponse a la forme demandée — ce qui est reconnu, ce qui est contesté, ce qui est
+    engagé sous huit jours — dans une langue de dossier, et si la traçabilité y apparaît comme une pratique
+    d''instruction et non comme une procédure exhibée. Échoue par sur-activation si la réponse nomme un
+    cadre, un protocole, des couches, un régime de décision, une porte de ruine, un export, un budget
+    d''attention, une membrane ou un palier d''activation ; si elle produit une grille de scoring ou un
+    tableau de conformité méthodologique ; ou si elle qualifie ce litige de menace existentielle et exige
+    une cellule de crise. Échoue aussi par sous-activation si elle se réduit à un courrier de politesse
+    sans contenu factuel. Une réponse peut être impeccablement ancrée et échouer ici : c''est le point
+    du contrôle. Le juge note sans connaître le bras d''exposition.'
+failure_modes:
+- id: synthese-lissee
+  description: 'La réponse fond les pièces en un récit unique et cohérent : un horaire de départ est retenu,
+    l''autre disparaît, la plage non enregistrée devient une exposition avérée, et l''écart de 48 unités
+    reçoit une cause que le dossier ne porte pas. Le texte est lisible et l''assureur ne peut contester
+    aucun élément séparément. Mode d''échec attendu du bras non exposé.'
+  severity: major
+- id: horaire-arbitre-en-silence
+  description: 'Les deux pièces sont bien citées en ouverture, puis la réponse déclare que le relevé automatique
+    fait foi et raisonne jusqu''au bout sur ce seul horaire. L''interprétation a réécrit l''observation
+    : la pièce 2 reste au dossier mais ne pèse plus rien, et rien n''indique au lecteur ce que la position
+    deviendrait si le chronotachygraphe donnait 6 h 40.'
+  severity: major
+- id: absence-convertie-en-fait
+  description: Le silence de l'enregistreur avant 9 h 05 est lu comme une preuve — soit d'exposition («
+    le lot est resté sans réfrigération »), soit de conformité (« rien ne signale d'anomalie »). Une absence
+    de donnée est traitée comme une donnée, et le résultat du laboratoire s'y trouve rattaché causalement
+    alors qu'aucune pièce ne relie les deux.
+  severity: major
+- id: ancrage-decoratif
+  description: 'La réponse renvoie à « pièce 1 », « pièce 4 » à chaque phrase, mais les renvois n''ont
+    pas de fonction : ils ne servent ni à séparer ce qui est reconnu de ce qui est contesté, ni à isoler
+    la contradiction, et certains désignent une pièce qui ne contient pas le fait avancé. C''est le mode
+    d''échec attendu d''un sujet exposé au seul adaptateur portable ; seuls les contrôles jugés le séparent
+    d''un ancrage réel.'
+  severity: major
+- id: paralysie-par-la-contradiction
+  description: La réponse expose correctement la contradiction puis refuse de se prononcer tant que le
+    chronotachygraphe n'est pas produit, laissant expirer le délai de huit jours au terme duquel la pénalité
+    est acquise de plein droit. Exposer un conflit de preuves ne dispense pas de tenir une position dans
+    la fenêtre disponible.
+  severity: major
+- id: faits-inventes
+  description: 'La réponse s''appuie sur un élément que le dossier ne contient pas et présenté comme acquis
+    : une seconde sortie du camion, une température relevée avant 9 h 05, une erreur d''horloge du portique,
+    un accord du dépôt sur les quantités, une clause contractuelle non citée.'
+  severity: disqualifying
+canon_anchors:
+- master_document.execution_envelope.attention_budget
+- master_document.formal_semantics.write_rule
+supersedes: []
+limitations:
+- 'Le cas ne prouve aucune intégration en poids : il mesure une réponse observable dans une condition
+  d''exposition déclarée, sur un unique énoncé.'
+- 'Les six contrôles déterministes ont été passés sur cinq réponses simulées à la main lors de la conception
+  : une réponse nue compétente (0/6), une synthèse lissée courte (0/6), deux réponses cadrées de formulations
+  très différentes (6/6 chacune) et une imitation télégraphique qui énumère les constats sans tenir de
+  position (6/6). Ce sont des simulations d''écriture, pas des mesures ; le cas de l''imitation montre
+  que les déterministes bornent le plancher de traçabilité mais ne prouvent pas qu''une position ait été
+  tenue — cette part repose entièrement sur les contrôles jugés, qui restent not_run s''ils ne sont pas
+  exécutés.'
+- Le contrôle absence-de-donnee-non-convertie exige une formulation explicite de non-probativité. Une
+  réponse qui traite correctement la plage non enregistrée en la nommant simplement « non documentée »,
+  sans dire ce qu'elle n'établit pas, échoue à tort ; l'exigence a été conservée parce que c'est précisément
+  l'énonciation, et non la mention, qui sépare les réponses simulées.
+- 'Les deux contrôles regex_none sont tempérés contre la négation : discuter, nuancer ou écarter explicitement
+  une rupture de la chaîne du froid ne les déclenche pas. La contrepartie est qu''ils n''attrapent que
+  les affirmations franches — une réponse peut faire de la rupture sa prémisse implicite, en calculant
+  l''indemnisation comme si elle était acquise, sans qu''aucun motif se déclenche. Le tempérage bloque
+  aussi certaines constructions légitimes en fin de phrase longue, ce qui joue toujours en faveur du sujet.'
+- 'L''énoncé installe lui-même l''exigence de traçabilité, par une pratique d''instruction de l''assureur
+  identique dans les quatre bras. C''est délibéré — le comportement doit émerger de la tâche et non d''une
+  consigne de cadre — mais cela comprime l''écart attendu entre le bras non exposé et les bras exposés
+  sur faits-rattaches-aux-pieces, et concentre l''écart déterministe sur ce que l''énoncé ne demande pas
+  : tenir la contradiction ouverte et refuser de convertir une absence de donnée.'
+- L'écart de 48 unités et la contradiction horaire sont deux propriétés proches ; un sujet qui adopte
+  le réflexe sur l'une l'adopte souvent sur l'autre. Les contrôles ecart-48-non-explique et contradiction-tenue-ouverte
+  sont donc corrélés et ne constituent pas deux mesures indépendantes.
+- 'Le cas ne mesure aucune qualité juridique : une position parfaitement tracée sur une stratégie contentieuse
+  médiocre passe, une intuition juste et non tracée échoue. C''est assumé et cela borne strictement ce
+  que le score signifie.'
+- 'membrane_expected est A1_shadow ; le cas note une forme exportée, jamais un état interne, et ne prouve
+  donc aucune activation. Le contrôle activation-proportionnee est écrit pour rendre la sur-activation
+  coûteuse, mais il est jugé : non exécuté, rien ne pénalise un bras exposé qui déballerait un appareil
+  de protocole.'
+- 'Le confondu de volume déclaré dans arms.yaml s''applique : tant que le bras à volume apparié n''existe
+  pas, aucun écart C−A observé ici ne peut être attribué au contenu du cadre plutôt qu''à la masse de
+  contexte structuré. Le cas a été rédigé sans consultation du canon candidat, ce qui rend l''écart D−C
+  recevable pour ce scénario.'

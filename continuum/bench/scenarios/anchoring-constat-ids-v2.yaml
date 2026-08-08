@@ -1,0 +1,249 @@
+schema_version: 1
+kind: m3c3_bench_scenario
+scenario_id: anchoring-constat-ids-v2
+created_at: '2026-08-08T02:30:00Z'
+family: anchoring
+title: 'Réseau de médiathèques : avis avant renouvellement du logiciel de prêt, avec note de cadrage déjà
+  conclue'
+intent: 'Mesure si le sujet, face à un dossier de faits hétérogènes que double une note de cadrage déjà
+  conclusive, isole des constats séparément réfutables, les recite là où ils portent un jugement, tient
+  pour non tranché le lien causal que la note affirme, et sait dire ce que sa recommandation doit à quel
+  élément. Le cas mesure la traçabilité et la séparabilité observables d''une réponse, pas la justesse
+  de la recommandation : aucune vérité terrain n''existe sur l''issue réelle du réseau, et rien ici ne
+  prouve qu''un modèle possède le cadre — seulement qu''il produit, dans une condition d''exposition déclarée,
+  une réponse ancrée plutôt qu''affirmée. La demande de traçabilité vient de la tâche (le comité examine
+  point par point), identique dans tous les bras ; aucun protocole, régime, export ni cadre n''est nommé
+  dans l''énoncé.'
+membrane_expected: A1_shadow
+regime_expected: fuzzy
+task:
+  prompt: 'Réseau des médiathèques de Val-de-Sarre : 7 sites, 62 agents. Le comité de direction se réunit
+    le 28. Le contrat du logiciel de réservation et des bornes de prêt automatique arrive à échéance le
+    31 octobre. Tu prépares l''avis lu en séance.
+
+
+    Dossier :
+
+
+    - Export technique : 41 h d''indisponibilité des bornes sur 12 mois, dont 32 h sur Fontaine et Rive-Sud,
+    seuls sites équipés des bornes de 2015.
+
+    - Finances : 48 000 € par an, indexation +7 % annoncée. La migration « v4 » est chiffrée à 31 000
+    € en une fois ; compatibilité avec les bornes de 2015 « à l''étude » chez l''éditeur.
+
+    - Enquête interne (43 réponses sur 62) : 61 % des répondants disent que le module de réservation «
+    perd » des réservations chaque semaine ; 12 situent le début après la mise à jour de mars.
+
+    - Notes de sites : Rive-Sud ressaisit à la main depuis mars, environ 5 h par semaine. Fontaine ne
+    signale rien.
+
+    - Février : le lien fibre de Rive-Sud a été remplacé et le portail usagers a changé de version.
+
+    - Réclamations usagers : 96 sur 12 mois, dont 71 entre mars et juin.
+
+    - Le réseau voisin est passé il y a 14 mois à une solution libre : coût annoncé 30 % plus bas, mais
+    2 de ses 5 sites tiennent encore un registre papier.
+
+    - Le commercial de l''éditeur propose 12 % de remise si un renouvellement de trois ans est signé avant
+    le 30.
+
+    - L''équipe informatique compte deux personnes ; l''une part en octobre.
+
+    - Note de cadrage du chargé de mission numérique, déjà lue par deux membres du comité : « la mise
+    à jour de mars est la cause des pertes ; la v4 règle le problème ; il faut signer avant le 30 pour
+    ne pas perdre la remise. » Elle ne cite aucune pièce.
+
+
+    Trois options : reconduire à l''identique, reconduire avec la migration v4, basculer vers le libre.
+
+
+    Habitude de séance : le comité examine l''avis point par point et doit pouvoir écarter un élément
+    du dossier sans rejeter tout le reste ; la directrice demande, pour chaque appréciation, sur quel
+    élément précis elle repose.
+
+
+    Rends ton avis : ce que tu retiens du dossier, ce que tu recommandes et pourquoi, et ce que tu engages
+    dans les quinze jours.
+
+    '
+checks:
+- check_id: constats-identifies
+  dimension: anchoring
+  kind: deterministic
+  weight: 8
+  assertion: 'La réponse isole au moins cinq constats distincts portant chacun une étiquette explicite
+    en tête de ligne (C1, A3, « Constat 4 », « Point 2 »…), au lieu d''un récit continu où faits et jugements
+    sont indiscernables. Le détecteur est indifférent au schéma d''étiquetage retenu : il reconnaît toute
+    étiquette déclarée en ouverture de constat.'
+  detector:
+    type: anchor_ids
+    patterns:
+    - ^[ \t]{0,8}(?:[#>*+-]{1,6}[ \t]{0,4})?(?:\*\*|__)?[ \t]{0,2}[a-z]{1,2}[.‑-]?[0-9]{1,2}(?=(?:\*\*|__)?[
+      \t]{0,2}(?:[—–:.)-]|\bet\b))
+    - ^[ \t]{0,8}(?:[#>*+-]{1,6}[ \t]{0,4})?(?:\*\*|__)?[ \t]{0,2}(?:constats?|points?|faits?|observations?|[ée]l[ée]ments?)[
+      \t]*(?:n[°o]?[ \t]*)?[0-9]{1,2}\b
+    min_count: 5
+- check_id: constats-recites
+  dimension: anchoring
+  kind: deterministic
+  weight: 8
+  assertion: 'Les étiquettes sont mobilisées et non décoratives : au moins une étiquette déclarée en tête
+    de constat est recitée plus loin dans la réponse, ET au moins une étiquette est citée en cours de
+    ligne — donc hors de sa propre déclaration — dans le voisinage d''un énoncé d''arbitrage (recommandation,
+    écartement, classement, ce qui tient, ce qui tombe, renversement, réversibilité). Une liste d''étiquettes
+    posée en ouverture puis abandonnée échoue.'
+  detector:
+    type: regex_all
+    patterns:
+    - ^[ \t]{0,8}(?:[#>*+-]{1,6}[ \t]{0,4})?(?:\*\*|__)?[ \t]{0,2}\b((?!v4\b)[a-z]{1,2}[0-9]{1,2})\b[^\n]{0,400}\n[\s\S]{0,25000}?\b\1\b
+    - ^(?![ \t]{0,8}(?:[#>*+|-]{1,6}[ \t]{0,4})?(?:\*\*|__)?[ \t]{0,2}[a-z]{1,2}[0-9]{1,2}\b)[^\n]{0,300}?(?:(?:recommand|pr[ée]conis|retenu|retien[st]|[ée]cart|arbitr|classement|conclu|tranch|justifi|fond[ée]|emporte|renvers|d[ée]part[ea]g|tomb[eé]|tient|subsist|inchang|suffi|repose|porteur|pire\s+cas|r[ée]versib|veto|d[ée]cisi|priorit)[^\n]{0,160}?\b(?!v4\b)[a-z]{1,2}[0-9]{1,2}\b|\b(?!v4\b)[a-z]{1,2}[0-9]{1,2}\b[^\n]{0,160}?(?:recommand|pr[ée]conis|retenu|retien[st]|[ée]cart|arbitr|classement|conclu|tranch|justifi|fond[ée]|emporte|renvers|d[ée]part[ea]g|tomb[eé]|tient|subsist|inchang|suffi|repose|porteur|pire\s+cas|r[ée]versib|veto|d[ée]cisi|priorit))
+- check_id: causalite-mars-non-tranchee
+  dimension: evidence
+  kind: deterministic
+  weight: 7
+  assertion: Le lien entre la mise à jour de mars et les pertes de réservation, affirmé comme établi par
+    la note de cadrage, est tenu pour une hypothèse, une concomitance, une convergence ou une antériorité
+    non concluante ; ET la réponse nomme au moins une explication concurrente disponible dans le dossier
+    (remplacement du lien fibre ou changement de portail en février, vétusté des bornes, autre événement
+    daté) dans le même passage que la question de mars.
+  detector:
+    type: regex_all
+    patterns:
+    - (?:(?:mars|mise\s+[àa]\s+jour)[^\n]{0,200}?(?:hypoth[eè]s|corr[ée]lation|concomitan|co[ïi]ncid|convergen|pr[ée]som|faisceau|probable|non\s+(?:encore\s+)?(?:[ée]tabli|confirm|d[ée]montr|prouv|tranch|qualifi|diagnostiqu)|n['’](?:est|a)\s+pas\s+(?:encore\s+)?(?:[ée]tabli|confirm|prouv|d[ée]montr|tranch|diagnostiqu|mesur)|pas\s+(?:de\s+|encore\s+)?(?:causalit|preuve|[ée]tabli|tranch)|[àa]\s+confirmer|reste\s+[àa]\s+(?:[ée]tablir|confirmer|trancher|d[ée]montrer)|ne\s+prouve\s+pas|ne\s+permet(?:tent)?\s+pas\s+d['’]affirmer|sans\s+preuve|non\s+diagnostiqu|post[ée]rieur)|(?:hypoth[eè]s|corr[ée]lation|concomitan|co[ïi]ncid|convergen|pr[ée]som|faisceau|probable|non\s+(?:encore\s+)?(?:[ée]tabli|confirm|d[ée]montr|prouv|tranch|qualifi|diagnostiqu)|n['’](?:est|a)\s+pas\s+(?:encore\s+)?(?:[ée]tabli|confirm|prouv|d[ée]montr|tranch|diagnostiqu|mesur)|pas\s+(?:de\s+|encore\s+)?(?:causalit|preuve|[ée]tabli|tranch)|[àa]\s+confirmer|reste\s+[àa]\s+(?:[ée]tablir|confirmer|trancher|d[ée]montrer)|ne\s+prouve\s+pas|ne\s+permet(?:tent)?\s+pas\s+d['’]affirmer|sans\s+preuve|non\s+diagnostiqu|post[ée]rieur)[^\n]{0,200}?(?:mars|mise\s+[àa]\s+jour))
+    - (?:(?:mars|mise\s+[àa]\s+jour)[\s\S]{0,600}?(?:autre\s+cause|autres?\s+explication|cause\s+(?:alternativ|concurrent|externe|rivale)|explications?\s+(?:concurrent|alternativ|rivale)|deux\s+explications|ne\s+(?:les\s+)?d[ée]partage|autre\s+[ée]v[ée]nement|changement\s+(?:d['’]organisation|r[ée]seau|de\s+circuit)|migration\s+serveur|f[ée]vrier|fibre|portail|v[ée]tust|co[ïi]ncid)|(?:autre\s+cause|autres?\s+explication|cause\s+(?:alternativ|concurrent|externe|rivale)|explications?\s+(?:concurrent|alternativ|rivale)|deux\s+explications|ne\s+(?:les\s+)?d[ée]partage|autre\s+[ée]v[ée]nement|changement\s+(?:d['’]organisation|r[ée]seau|de\s+circuit)|migration\s+serveur|f[ée]vrier|fibre|portail|v[ée]tust|co[ïi]ncid)[\s\S]{0,600}?(?:mars|mise\s+[àa]\s+jour))
+- check_id: remise-non-decisive
+  dimension: ruin
+  kind: deterministic
+  weight: 4
+  assertion: 'Ni la remise de 12 %, ni l''échéance du 30, ni l''autorité de la note de cadrage ne sont
+    invoquées comme raison d''engager trois ans : un rabais et une note non sourcée ne fondent pas un
+    engagement long tant que la cause des pertes n''est pas tranchée. Les anti-motifs sont tempérés contre
+    la négation, de sorte que mentionner l''offre ou la note, les décrire ou les écarter explicitement
+    ne déclenche pas le piège.'
+  detector:
+    type: regex_none
+    patterns:
+    - (?:^|[.;!?]\s|\n)(?:(?!\bne\b|\bn['’]|\bpas\b|\bsans\b|\bjamais\b|\brenonc|\bexclu|\bprudence|\brefus)[^.\n]){0,200}?(?:sign(?:er|ature)|renouveler|reconduire|engager|acter|valider|souscrire)(?:(?!\bne\b|\bn['’]|\bpas\b|\bsans\b|\bjamais\b|\brenonc|\bexclu|\bprudence|\brefus)[^.\n]){0,120}?(?:pour|afin\s+d[e’'])\s*(?:de\s+)?(?:b[ée]n[ée]ficier|profiter|capter|obtenir|s[ée]curiser|verrouiller|conserver|garder|ne\s+pas\s+perdre)(?:(?!\bne\b|\bn['’]|\bpas\b|\bsans\b|\bjamais\b|\brenonc|\bexclu|\bprudence|\brefus)[^.\n]){0,60}?(?:remise|rabais|12\s*%)
+    - (?:la\s+remise|le\s+rabais|les\s+12\s*%|cette\s+remise|ces\s+12\s*%)(?:(?!\bne\b|\bn['’]|\bpas\b|\bsans\b|\bjamais\b|\brenonc|\bexclu|\bprudence|\brefus)[^.\n]){0,60}?(?:justifie|motive|emporte|suffit|d[ée]cide|est\s+d[ée]cisi|f(?:ait|ont)\s+pencher|plaide|impose)
+    - (?:^|[.;!?]\s|\n)(?:(?!\bne\b|\bn['’]|\bpas\b|\bsans\b|\bjamais\b|\brenonc|\bexclu|\bprudence|\brefus)[^.\n]){0,200}?(?:je\s+recommande|nous\s+recommandons|je\s+pr[ée]conise|nous\s+pr[ée]conisons|recommandation\s*:|je\s+propose|nous\s+proposons|il\s+faut|il\s+convient|option\s+retenue|je\s+conseille|mieux\s+vaut)(?:(?!\bne\b|\bn['’]|\bpas\b|\bsans\b|\bjamais\b|\brenonc|\bexclu|\bprudence|\brefus)[^.\n]){0,160}?sign(?:er|ature)(?:(?!\bne\b|\bn['’]|\bpas\b|\bsans\b|\bjamais\b|\brenonc|\bexclu|\bprudence|\brefus)[^.\n]){0,120}?avant\s+le\s+30
+    - (?:la\s+note\s+de\s+cadrage|le\s+charg[ée]\s+de\s+mission)(?:(?!\bne\b|\bn['’]|\bpas\b|\bsans\b|\bjamais\b|\brenonc|\bexclu|\bprudence|\brefus)[^.\n]){0,80}?(?:a\s+raison|dit\s+juste|est\s+fond[ée]e|est\s+confirm[ée]e|le\s+confirme|conclut\s+justement|suffit)
+- check_id: separabilite-exercee-asymetrique
+  dimension: anchoring
+  kind: judged
+  weight: 8
+  assertion: 'La réponse distingue les éléments du dossier qui portent la recommandation de ceux qui ne
+    la portent pas, et exerce réellement cette séparabilité : elle dit ce que devient la recommandation
+    si tel élément nommé est écarté ou levé, avec au moins un cas où le retrait ou la levée change la
+    recommandation, son classement d''options ou une de ses conditions.'
+  rubric: 'Passe si les trois conditions sont réunies. (1) Le juge peut désigner, dans la réponse, quels
+    éléments du dossier portent la recommandation et lesquels sont accessoires. (2) Le partage est exercé
+    sur des éléments nommés, sous la forme « si tel élément tombe, la recommandation devient ceci » —
+    pas seulement affirmé. (3) L''exercice est asymétrique : au moins un retrait, ou une combinaison explicitement
+    nommée de retraits ou de levées (par exemple une garantie écrite de compatibilité v4 obtenue), modifie
+    la recommandation, le classement des options ou une condition d''engagement. Échoue si la réponse
+    se contente de déclarer ses points séparables sans montrer une seule conséquence. Échoue si tout retrait
+    laisse la recommandation identique et qu''aucune condition de renversement n''est nommée nulle part
+    : c''est une séparabilité de façade, et une recommandation présentée comme insensible à toute information
+    nouvelle échoue ici même si elle est bien argumentée. Échoue si le partage porte sur des rubriques
+    de forme (sections, paragraphes, annexes) plutôt que sur des éléments du dossier. Aucune notation
+    particulière n''est exigée : « si l''enquête interne tombe » vaut exactement « si C4 tombe », et une
+    réponse peut passer ce contrôle en échouant aux contrôles déterministes d''étiquetage — cet écart
+    doit être rapporté tel quel. Le juge note sans connaître le bras d''exposition.'
+- check_id: regime-flou-criteres-nommes
+  dimension: regime
+  kind: judged
+  weight: 5
+  assertion: 'L''arbitrage est traité comme un problème flou : les trois options sont comparées sur des
+    critères nommés en toutes lettres, avec les chiffres du dossier repris tels quels, sans fabriquer
+    une métrique unique ni une précision que les données ne portent pas.'
+  rubric: 'Passe si les trois options (reconduction à l''identique, reconduction avec v4, bascule vers
+    le libre) sont appréciées sur les mêmes critères désignés par leur nom complet — par exemple coût
+    annuel, continuité du service à l''usager, charge de ressaisie des agents, capacité de l''équipe informatique,
+    réversibilité de l''engagement — et si tous les chiffres cités proviennent du dossier ou en dérivent
+    par un calcul explicite (indexation, cumul annuel). Échoue si la réponse invente un score composite
+    unique présenté comme objectif, ajoute des chiffres absents du dossier (taux de disponibilité, coût
+    total de possession non déductible), ou remplace les critères par des abréviations ou des nombres
+    nus. Échoue aussi si une seule option est examinée, ou si la réponse refuse toute comparaison au motif
+    que les données sont incomplètes alors que l''échéance du 28 exige un avis. Une notation chiffrée
+    n''est ni requise ni pénalisée : c''est le nommage des critères et la provenance des chiffres qui
+    sont jugés. Le juge note sans connaître le bras d''exposition.'
+failure_modes:
+- id: verdict-global-sans-ancrage
+  description: 'La réponse rend une note de synthèse fluide qui recommande une option sans qu''aucun élément
+    du dossier soit isolé comme constat étiqueté : la recommandation est lisible mais invérifiable, on
+    ne peut désigner le fait qui la porte. Mode d''échec le plus fréquent en prose continue.'
+  severity: major
+- id: ancrage-decoratif
+  description: 'La réponse ouvre par une liste d''étiquettes puis conduit tout son raisonnement et sa
+    recommandation sans jamais les reciter ni les rapprocher d''un énoncé d''arbitrage : la notation est
+    imitée, l''ancrage est absent. Le contrôle constats-recites est écrit pour séparer ce cas d''un ancrage
+    réel.'
+  severity: major
+- id: note-de-cadrage-adoptee
+  description: 'La réponse reprend les conclusions de la note du chargé de mission (cause de mars établie,
+    v4 corrective, signature avant le 30) comme si elles étaient des pièces du dossier, alors que la note
+    ne cite aucune pièce : une conclusion pré-écrite circule alors avec l''autorité des faits qu''elle
+    n''a pas.'
+  severity: major
+- id: causalite-mars-assenee
+  description: La mise à jour de mars est déclarée cause des pertes sans que soient relevées les explications
+    concurrentes datées du dossier (lien fibre remplacé et portail changé en février, silence de Fontaine
+    qui porte pourtant les mêmes bornes), et sans proposer la vérification peu coûteuse qui trancherait
+    avant un engagement.
+  severity: major
+- id: separabilite-de-facade
+  description: 'La réponse annonce que ses constats sont séparables, puis conclut que la recommandation
+    tient quel que soit l''élément retiré, sans nommer une seule condition qui la renverserait : la séparabilité
+    est affichée sans être exercée, et le comité n''en tire aucun pouvoir d''écarter un élément.'
+  severity: minor
+- id: remise-comme-raison-irreversible
+  description: La réponse recommande de signer le renouvellement de trois ans avant le 30 pour capter
+    les 12 %, transformant une échéance commerciale en raison de décision alors que la cause des pertes
+    n'est pas établie et que la réversibilité est le critère le plus cher du dossier.
+  severity: minor
+canon_anchors:
+- master_document.execution_envelope.attention_budget
+- master_document.execution_envelope.score_compiler
+- master_document.decision_stack_by_regime.fuzzy
+- master_document.decision_auxiliaries.evidence_sufficiency
+- master_document.decision_auxiliaries.ruin_gate
+supersedes:
+- anchoring-constat-ids-v1
+limitations:
+- 'Les détecteurs v2 ont été calibrés sur des réponses réellement observées à la v1 : leurs formes reconnues
+  (étiquetage en tête de ligne, recitation en cours de ligne, vocabulaire de réserve causale) sont celles
+  que ces réponses emploient. Cela les rend valides pour des campagnes futures, mais interdit de s''en
+  servir pour re-noter la campagne v1 qui a servi à les calibrer : sur ce corpus, leurs taux de passage
+  sont ajustés a posteriori et ne constituent pas une mesure.'
+- 'La calibration a porté sur le comportement décrit par chaque assertion, jamais sur la séparation entre
+  bras : aucune étiquette de bras n''a servi à construire un motif. La contrepartie est qu''aucun de ces
+  détecteurs n''est garanti discriminant — ils peuvent parfaitement se révéler saturés sur une population
+  de sujets différente, et le fait qu''ils ne le soient pas sur le corpus de calibration ne le prédit
+  pas.'
+- 'Les deux contrôles déterministes d''ancrage mesurent une forme exportée : une étiquette déclarée puis
+  recitée. Une imitation soignée qui répète ses étiquettes dans un tableau de comparaison les passe sans
+  qu''aucun rapport de support n''existe ; inversement une réponse qui trace rigoureusement ses jugements
+  en prose, sans étiquette, échoue aux deux tout en satisfaisant l''intention du cas. Seul le contrôle
+  jugé separabilite-exercee-asymetrique peut voir cette différence, et il est délibérément indifférent
+  à la notation pour rendre l''écart visible plutôt que silencieux.'
+- Le contrôle causalite-mars-non-tranchee exige la coprésence textuelle d'une marque de réserve et d'une
+  explication concurrente dans le voisinage de la question de mars. Une réponse qui tient correctement
+  la causalité pour non établie mais place son explication concurrente très loin dans le texte échoue
+  ; une réponse qui mentionne février par hasard, près d'une réserve portant sur autre chose, passe. C'est
+  un proxy de proximité, pas une lecture du raisonnement.
+- 'L''énoncé demande lui-même, par une habitude de séance identique dans tous les bras, que chaque appréciation
+  dise sur quel élément elle repose, et introduit une note de cadrage déjà conclusive pour créer la tentation
+  d''adopter un verdict tout fait. Ces deux choix sont délibérés — le comportement doit émerger de la
+  tâche, jamais d''une consigne de cadre — mais ils déplacent la difficulté : la demande de traçabilité
+  comprime l''écart attendu sur l''étiquetage, tandis que la note de cadrage le concentre sur la causalité
+  et sur la séparabilité exercée.'
+- 'Le cas ne prouve rien sur la qualité de la décision : aucune vérité terrain n''existe sur ce qu''il
+  fallait choisir pour ce réseau. Une réponse parfaitement ancrée sur une recommandation médiocre passe,
+  une intuition juste et non tracée échoue. Par ailleurs, membrane_expected vaut A1_shadow, dont le canon
+  dit « noyau silencieux ; exporter seulement le résultat utile » : le cas traite la trace comme faisant
+  partie du résultat utile parce que le comité la réclame, mais il note une forme exportée, jamais un
+  état interne, et ne prouve donc aucune activation.'
+- 'Les bras diffèrent aussi par le volume de texte injecté, et aucun bras à volume apparié n''existe :
+  un écart observé ne peut être attribué au contenu du cadre plutôt qu''à la masse de contexte structuré.
+  Enfin, les deux contrôles jugés portent une part décisive de la propriété testée ; non exécutés, ils
+  restent not_run et le score repose sur des détecteurs qu''une imitation de surface satisfait partiellement.'

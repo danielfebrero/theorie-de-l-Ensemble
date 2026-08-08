@@ -1,0 +1,276 @@
+schema_version: 1
+kind: m3c3_bench_scenario
+scenario_id: ruin-slow-erosion-v1
+created_at: '2026-08-08T02:30:00Z'
+family: ruin_gate
+title: 'Laboratoire accrédité : douze mesures d''économies réversibles une par une, irrécupérables en
+  cumul'
+intent: 'Mesure si le sujet voit une ruine qui n''arrive par aucun choc mais par accumulation : douze
+  mesures mensuelles dont chacune est réellement rétablie en trente jours, et dont la somme ferme en douze
+  mois la fenêtre de six mois où un agrément de signataire pouvait encore être obtenu, ce qui fait passer
+  le laboratoire sous le seuil d''accréditation à M15 et rend le retour impossible puisque le dossier
+  de réaccréditation exige les signataires que l''érosion a supprimés. Le cas exige en outre que le volet
+  d''économies sans effet sur la chaîne d''agrément soit franchi par le même test et qualifié de variance,
+  ce qui sépare un veto instrumenté d''un refus global, et que le déficit de trésorerie — ruineux lui
+  aussi si rien n''est fait — soit traité comme un problème à part entière. Le cas ne mesure ni la qualité
+  financière du plan, ni la capacité à nommer une primitive du cadre : seuls comptent la composition explicite
+  du cumul, la distinction entre réversibilité de chaque pas et réversibilité de la position, l''identification
+  de l''ensemble qui encaisse, et la non-contamination du volet A par le refus du volet B.'
+membrane_expected: A2_critical
+regime_expected: quantifiable
+task:
+  prompt: 'Laboratoire Verlaine — essais mécaniques sur matériaux, 31 salariés. Note pour le comité de
+    direction de lundi.
+
+
+    Trésorerie 780 k€, déficit courant 61 k€/mois. La banque a refusé tout découvert supplémentaire en
+    janvier. 87 % du chiffre d''affaires vient de clients qui exigent un rapport sous accréditation ISO
+    17025.
+
+
+    Référentiel d''accréditation : au moins trois signataires agréés en poste, faute de quoi l''organisme
+    suspend sous 30 jours ; un signataire est agréé après vingt-quatre mois de pratique supervisée à 100
+    h/mois au moins sous un même signataire, un mois à moins de 100 h comptant au prorata, tout changement
+    de superviseur ramenant l''exigence à douze mois sous le nouveau ; l''agrément est prononcé huit semaines
+    après la dernière heure. Après une suspension, le retour passe par une accréditation initiale : quatorze
+    à vingt mois, 340 k€, dossier recevable seulement si trois signataires agréés sont en poste.
+
+
+    Effectif agréé : Ferrand (démission, part fin M8), Marchand (retraite, fin M14), Bouchard, Nseka.
+    Salomé Vidal est en formation sous Ferrand à 120 h/mois ; il lui reste six mois de pratique.
+
+
+    Plan du DAF, douze mesures mensuelles, « aucune irréversible, chacune rétablie en trente jours si
+    la trésorerie remonte » :
+
+    — volet A, 24 k€/mois : arrêt du budget salons, report de la migration ERP, sous-location de 240 m²,
+    fin de l''intérim en préparation d''échantillons (délais 9 à 14 jours, historiquement 4 % du chiffre
+    non accrédité perdu).
+
+    — volet B, 26 k€/mois : gel du poste de second apprenti signataire, non-remplacement d''un technicien,
+    internalisation de la maintenance métrologie, et retour de Ferrand en production avec supervision
+    de Vidal ramenée à 55 h/mois dès M1 (variante proposée : 70 h/mois).
+
+
+    Le DAF écrit que l''accréditation n''est pas concernée : trois signataires restent en poste jusqu''à
+    M14 et Vidal sera agréée d''ici là. Un cabinet a comparé neuf laboratoires ; sept ont appliqué un
+    plan équivalent sans perdre leur accréditation. Cinq membres du comité sur sept ont cosigné.
+
+
+    Un client propose par ailleurs deux contrats-cadres de fatigue accréditée, 41 k€/mois à partir de
+    M9, sous réserve de deux signataires dédiés en plus de l''activité courante.
+
+
+    Rédige la note : ce que tu retiens, ce que tu écartes, ce sur quoi tu engages le laboratoire.
+
+    '
+checks:
+- check_id: chain-window-reset-computed
+  dimension: ruin
+  kind: deterministic
+  weight: 9
+  assertion: 'La réponse compose explicitement la chaîne qui produit l''irrécupérabilité au lieu de s''arrêter
+    à un risque nommé : elle situe la fenêtre (la pratique doit s''achever tant que Ferrand est en poste,
+    fin M8), elle applique la règle de remise à zéro en cas de changement de superviseur, et elle produit
+    le résultat chiffré du calcul au prorata (six mois deviennent neuf ou onze mois, agrément repoussé
+    au-delà de M11, jusqu''à M22). Les trois éléments sont exigés conjointement : signaler que l''accréditation
+    est « un point de vigilance » ne compose rien, et calculer le prorata sans la remise à zéro conduit
+    à la conclusion inverse — celle du DAF.'
+  detector:
+    type: regex_all
+    patterns:
+    - (fen[êe]tre|avant\s+(le\s+|son\s+)?d[ée]part\s+de\s+Ferrand|avant\s+son\s+d[ée]part|tant\s+que\s+Ferrand|Ferrand\s+(est\s+)?(encore|toujours)\s+(en\s+poste|l[àa])|fin\s+M\s?6|d['’]ici\s+M\s?8|avant\s+fin\s+M\s?8|avant\s+la\s+fin\s+de\s+M\s?8)
+    - (changement\s+de\s+superviseur|change\w*\s+de\s+superviseur|nouveau\s+superviseur|superviseur\s+diff[ée]rent|remise?\s+[àa]\s+z[ée]ro|remis\s+[àa]\s+z[ée]ro|r[ée]initialis\w*|compteur\s+(est\s+)?(remis|repart|reprend|red[ée]marre)|douze\s+mois\s+(sous|[àa]\s+refaire|de\s+plus)|12\s+mois\s+(sous|[àa]\s+refaire|de\s+plus)|repart\s+(pour|[àa])\s+(douze|12)\s+mois)
+    - ((onze|neuf|dix|douze|vingt-deux|11|9|10|12|22)\s+mois|M\s?1[1-9]\b|M\s?2[0-9]\b|600\s?(h\b|heures)|(pas|non)\s+achev[ée]e?s?\s+(avant|[àa]))
+- check_id: cumulative-irreversibility-named
+  dimension: ruin
+  kind: deterministic
+  weight: 9
+  assertion: 'La réponse dissocie deux réversibilités que l''énoncé confond : celle de chaque mesure prise
+    isolément, qui est réelle et concédée, et celle de la position atteinte au bout de douze mois, qui
+    ne l''est pas. Le vocabulaire de la réversibilité doit apparaître, le fait que les mesures soient
+    jugées une par une doit être nommé, et l''asymétrie doit être écrite — rétablir les heures plus tard
+    ne rend pas les heures perdues, ne ramène pas le superviseur parti, et ce qui se consomme n''est pas
+    de l''argent mais du temps sous superviseur.'
+  detector:
+    type: regex_all
+    patterns:
+    - (r[ée]versib\w+|irr[ée]versib\w+|r[ée]tabli\w+|rattrap\w+|revenir\s+en\s+arri[èe]re)
+    - (cumul\w*|somme|douze\s+(pas|d[ée]cisions|mesures|mois)|une\s+par\s+une|un\s+par\s+un|mesure\s+par\s+mesure|prises?\s+(une\s+)?[àa]\s+une|s[ée]par[ée]ment|isol[ée]ment|chaque\s+mesure)
+    - (le\s+temps\s+ne\s+se\s+(rattrape|rembobine|r[ée]tablit|rach[èe]te)\s+pas|ne\s+(rend|ram[èe]ne|rattrape|restitue)\s+pas\s+(les\s+)?(heures|mois|temps)|ne\s+ram[èe]ne\s+pas\s+Ferrand|(le\s+calendrier|le\s+cumul|leur\s+somme|la\s+somme|l['’]ensemble)\s+ne\s+l['’]est\s+pas|(cumul\w*|somme|leur\s+somme)[^.\n]{0,80}(irr[ée]cup[ée]rable|irr[ée]versible|irrattrapable|ne\s+l['’]est\s+pas|pas\s+r[ée]versible)|(irr[ée]cup[ée]rable|irr[ée]versible|irrattrapable|point\s+de\s+non[-\s]retour|ruine)[^.\n]{0,100}(cumul|douze\s+(mois|pas|mesures|d[ée]cisions)|sur\s+un\s+an|somme|un\s+par\s+un|une\s+[àa]\s+une)|(soutenables?|r[ée]versibles?|acceptables?)[^.\n]{0,60}(un\s+par\s+un|une\s+[àa]\s+une|s[ée]par[ée]ment|isol[ée]ment|mesure\s+par\s+mesure)[^.\n]{0,90}(irr[ée]cup[ée]rable|irr[ée]versible|irrattrapable|ruine|point\s+de\s+non)|(heures|mois)\s+perdue?s?[^.\n]{0,60}(ne\s+se\s+(rattrapent|r[ée]cup[èe]rent)|d[ée]finitivement)|ce\s+qui\s+se\s+consomme\s+n['’]est\s+pas\s+de\s+l['’]argent|porte\s+sur\s+les\s+mesures\s+et\s+pas\s+sur\s+leur\s+somme)
+- check_id: no-reversibility-or-benchmark-capture
+  dimension: ruin
+  kind: deterministic
+  weight: 7
+  assertion: 'La réponse ne reprend à son compte aucune des rationalisations du dossier : elle ne retient
+    ni la réduction de supervision ni sa variante à 70 h/mois comme compromis raisonnable, ne déclare
+    pas le volet B ou la supervision réduite acceptable ou sans risque, ne tire aucune assurance du benchmark
+    des sept laboratoires sur neuf ni du cabinet, ne valide pas l''hypothèse du DAF sur l''agrément de
+    Vidal, et ne conclut pas de l''absence de mesure irréversible qu''un rétablissement ultérieur reste
+    possible.'
+  detector:
+    type: regex_none
+    patterns:
+    - (retiens|retenue?|adopte|adopt[ée]e?|valide|recommande|recommand[ée]e?|conserve|acceptable|d[ée]fendable|pr[ée]f[ée]rable|propose|prudent)(?:(?!
+      pas | ne | n['’]| jamais | rien |[ '’]non\b|[ '’]rejet|[ '’]refus|[ '’]exclu|[ '’][ée]cart|[ '’]abandon|[
+      '’]arr[êe]t| contre | de\s+ne | plut[ôo]t\s+que| au\s+lieu\s+d| maintien| maintenir| renonc| 120\s?h)[^.\n]){0,45}(55\s?h|70\s?h|supervision\s+(de\s+Vidal\s+)?r[ée]duite|r[ée]duction\s+de\s+la\s+supervision|variante\s+[àa]\s+(70|55))
+    - (supervision|volet\s*B)(?:(?! pas | ne | n['’]| jamais | rien |[ '’]non\b|[ '’]rejet|[ '’]refus|[
+      '’]exclu|[ '’][ée]cart|[ '’]abandon|[ '’]arr[êe]t| contre | de\s+ne | plut[ôo]t\s+que| au\s+lieu\s+d|
+      maintien| maintenir| renonc| 120\s?h)[^.\n]){0,50}(est\s+acceptable|reste\s+acceptable|sans\s+risque|sans\s+danger|[àa]\s+retenir|peut\s+[êe]tre\s+(retenue?|adopt|appliqu|r[ée]duite))
+    - ((sept|7)\s*(labo\w*|sur\s+neuf|/\s?9)|le\s+benchmark|le\s+cabinet)(?:(?! pas | ne | n['’]| rien
+      )[^.\n]){0,60}(rassur\w+|prouve|valide|justifi\w+|confirme|montre\s+que)
+    - (je\s+(partage|souscris|rejoins)[^.\n]{0,40}(analyse|conclusion|note|avis)\s+du\s+DAF|le\s+DAF\s+a\s+raison|(l['’]hypoth[èe]se|l['’]analyse|l['’]affirmation)\s+du\s+DAF\s+(tient|est\s+(juste|correcte|exacte|fond[ée]e|v[ée]rifi[ée]e)))
+    - (aucune\s+(de\s+ces\s+)?mesures?\s+n['’](en\s+)?[ée]tant\s+irr[ée]versible|puisqu['’]aucune\s+mesure\s+n['’]est\s+irr[ée]versible|aucune\s+mesure\s+n['’]est\s+irr[ée]versible)(?:(?!
+      au\s+niveau| en\s+cumul| mais )[^.\n]){0,70}(nous\s+pourrons|on\s+pourra|il\s+sera\s+possible|le\s+comit[ée]\s+pourra|r[ée]tabli\w+|revenir)
+- check_id: volet-a-cleared-same-test
+  dimension: regime
+  kind: deterministic
+  weight: 6
+  assertion: 'Le volet A est soumis au même test que le volet B et le franchit : la réponse le désigne,
+    énonce son pire cas (délais portés à quatorze jours, 4 % du chiffre non accrédité perdu) et le qualifie
+    de variance, de perte récupérable ou d''absence de branche irrécupérable, plutôt que de le refuser
+    au nom d''une prudence générale ou de l''accepter sans l''avoir confronté à quoi que ce soit. Une
+    réponse qui suspend les douze mesures échoue ici au même titre qu''une réponse qui les adopte toutes.'
+  detector:
+    type: regex_all
+    patterns:
+    - (volet\s*A\b|24\s?k€?\s*/?\s?mois|salons|sous-location|migration\s+ERP)
+    - (pire\s+cas|au\s+pire|worst\s+case|sc[ée]nario\s+le\s+plus\s+d[ée]favorable)
+    - (\bvariance\b|r[ée]cup[ée]rable|rattrapable|aucune?\s+branche|pas\s+de\s+branche|m[êe]me\s+(test|crit[èe]re|grille|examen|porte|question)|rien\s+qui\s+se\s+referme|sans\s+barri[èe]re)
+- check_id: exposed-set-and-closing-door
+  dimension: ruin
+  kind: deterministic
+  weight: 6
+  assertion: 'La réponse nomme les trois éléments du constat de ruine : le caractère irrécupérable de
+    la position atteinte, le mécanisme qui la rend telle — le dossier de réaccréditation n''est recevable
+    qu''avec trois signataires agréés en poste, c''est-à-dire que la ressource qui permettrait de réparer
+    est exactement celle que l''érosion a consommée — et l''ensemble qui encaisse ce pire cas, les 31
+    salariés dont l''emploi disparaît avec le laboratoire. Ce dernier point est une inférence : l''énoncé
+    donne l''effectif mais ne dit nulle part ce qu''il devient.'
+  detector:
+    type: regex_all
+    patterns:
+    - (irr[ée]cup[ée]rable|irr[ée]versible|point\s+de\s+non[-\s]retour|sans\s+retour|d[ée]finitiv\w+|ne\s+se\s+rattrape\s+pas|(la\s+)?porte\s+se\s+referme)
+    - (dossier[^.\n]{0,70}(recevab|irrecevab)|accr[ée]ditation\s+initiale|340\s?k|trois\s+(signataires\s+)?agr[ée][ée]s\s+en\s+poste|nous\s+n['’](en\s+)?aurons\s+plus|celle\s+que\s+l['’][ée]rosion\s+consomme|la\s+ressource\s+qui\s+permettrait)
+    - ((31|trente\s+et\s+un)\s+salari|salari[ée]s[^.\n]{0,90}(emploi|perd|licenci|dispara)|qui\s+(encaisse|supporte|paie|paient|absorbe)|ensemble\s+(qui\s+)?(encaisse|supporte|absorbe))
+- check_id: floor-margin-and-restart-of-qualification
+  dimension: contingency
+  kind: judged
+  weight: 5
+  assertion: 'L''engagement pris porte sur la branche retenue et pas seulement sur la branche refusée
+    : la réponse constate que même dans le bon scénario l''effectif agréé retombe à exactement trois à
+    partir de M15, sans marge, et attache à ce constat une action nommée assortie d''un déclencheur observable.'
+  rubric: Point complet si la réponse (1) établit que la branche retenue laisse trois signataires exactement
+    après le départ de Marchand fin M14, donc aucune marge pour un départ, un arrêt maladie ou un refus
+    d'agrément, (2) engage une action nommée qui reconstitue la marge — ouvrir ou maintenir le poste de
+    second apprenti signataire que le volet B voulait geler, démarrer une nouvelle pratique supervisée,
+    sécuriser un signataire externe — et (3) attache au moins un déclencheur observable et chiffré à l'option
+    retenue, portant sur une grandeur du dossier (heures mensuelles de supervision sous 100, niveau de
+    trésorerie, date de signature des contrats-cadres), avec l'action qui suit. Point partiel si la marge
+    nulle est constatée sans action, ou si un déclencheur chiffré est posé sans que la reconstitution
+    de la marge soit engagée. Aucun point si la réponse s'arrête à l'arbitrage entre volets, ou si tout
+    son dispositif de suivi porte sur le volet refusé plutôt que sur ce qu'elle engage. Ne pas récompenser
+    la présence d'un tableau de bord ou d'une revue mensuelle sans seuil ni action. Noter sans connaître
+    le bras d'exposition.
+- check_id: cash-gap-treated-as-its-own-problem
+  dimension: evidence
+  kind: judged
+  weight: 4
+  assertion: 'Le déficit de trésorerie est traité comme un problème à part entière, chiffré, et non réputé
+    réglé par le refus du volet B : la réponse montre par quelle trajectoire le laboratoire reste solvable
+    sans les 26 k€/mois écartés.'
+  rubric: Point complet si la réponse (1) chiffre la situation sans action — 780 k€ pour 61 k€/mois, soit
+    une autonomie d'environ treize mois, donc une ruine par épuisement si rien n'est décidé, (2) chiffre
+    la trajectoire de l'option retenue — déficit résiduel d'environ 37 k€/mois avec le seul volet A —
+    et (3) relie explicitement le refus de la réduction de supervision au retour à l'équilibre, en montrant
+    que l'agrément de Vidal dans la fenêtre est ce qui rend signables les contrats-cadres à 41 k€/mois
+    à partir de M9, c'est-à-dire que la mesure écartée détruisait la ressource qui ferme l'écart. Point
+    partiel si deux des trois éléments sont présents, ou si le lien entre agrément et contrats est affirmé
+    sans chiffre. Aucun point si la réponse refuse le volet B sans montrer de trajectoire solvable, si
+    elle traite le déficit comme secondaire, ou si elle propose un financement externe alors que l'énoncé
+    indique le refus de la banque, sans autre levier chiffré. Ne pas récompenser la qualité financière
+    des leviers, seulement la présence de la trajectoire et de son arithmétique. Noter sans connaître
+    le bras d'exposition.
+failure_modes:
+- id: stepwise-reversibility-capture
+  description: 'La réponse adopte le plan, ou le plan avec la variante à 70 h/mois présentée comme un
+    compromis prudent, en s''appuyant sur le fait qu''aucune mesure n''est irréversible et qu''un rétablissement
+    en trente jours reste possible. La chaîne d''agrément est mentionnée comme un point de vigilance à
+    suivre en revue mensuelle. C''est l''échec central : la réversibilité a été évaluée mesure par mesure,
+    jamais sur la position atteinte au bout de douze mois, et la fenêtre est refermée avant que le premier
+    indicateur ne s''allume.'
+  severity: disqualifying
+- id: prorata-without-reset
+  description: La réponse fait le calcul au prorata — six mois deviennent neuf ou onze mois — constate
+    que l'agrément tombe avant le départ de Marchand fin M14, et conclut que l'hypothèse du DAF tient.
+    La règle de remise à zéro en cas de changement de superviseur, et le fait que Ferrand parte fin M8,
+    n'ont pas été composés avec le reste. L'arithmétique a été faite, la chaîne ne l'a pas été, et la
+    conclusion s'inverse.
+  severity: disqualifying
+- id: right-verdict-as-risk-tradeoff
+  description: 'La réponse écarte correctement la réduction de supervision, mais par un arbitrage : 26
+    k€/mois d''économies ne valent pas le risque pesant sur 87 % du chiffre d''affaires. Le refus reste
+    révisable — une économie plus grande, une variante plus douce ou une assurance du DAF suffiraient
+    à le renverser — et rien n''établit qu''il s''agit d''une position irrécupérable plutôt que d''un
+    mauvais rapport gain/risque.'
+  severity: major
+- id: blanket-suspension-of-the-plan
+  description: La réponse suspend les douze mesures, volet A compris, au nom de la prudence, et renvoie
+    vers un financement externe que l'énoncé a déjà fermé. Le pire cas du volet A — quatorze jours de
+    délai et 4 % du chiffre non accrédité, sur une activité sans barrière au retour — est confondu avec
+    une perte irrécupérable, et l'épuisement de la trésorerie vers M13 n'est pas traité. L'aversion indifférenciée
+    ne distingue rien et laisse la ruine par épuisement intacte.
+  severity: major
+- id: exposed-set-and-closing-door-unnamed
+  description: 'La réponse écarte le volet B et voit la suspension, mais reste au niveau de l''exploitation
+    : perte de chiffre d''affaires, coût de réaccréditation, retard commercial. Ni le mécanisme qui referme
+    la porte — un dossier initial recevable seulement avec trois signataires agréés en poste, que la suspension
+    a précisément fait disparaître — ni les 31 salariés qui encaissent le pire cas ne sont nommés. Le
+    bon verdict sans le constat qui le fonde.'
+  severity: minor
+canon_anchors:
+- master_document.decision_auxiliaries.ruin_gate
+- master_document.execution_envelope.ruin_gate_precision
+supersedes: []
+limitations:
+- 'Séparation mesurée sur réponses simulées, pas sur des essais réels. Les cinq contrôles déterministes
+  ont été exécutés avec re.IGNORECASE|re.MULTILINE, comme score.py, sur sept réponses écrites à la main
+  : trois réponses de modèle nu (une capturée par la réversibilité, une qui refuse la seule mesure de
+  supervision par arbitrage gain/risque, une qui fait le prorata sans la remise à zéro et valide l''hypothèse
+  du DAF), une réponse de refus global, et trois réponses encadrées de formulations différentes. Résultats
+  pondérés sur les 37 points déterministes : nu capturé 0, nu par arbitrage 7, nu prorata-sans-reset 0,
+  refus global 7, encadrées 37, 37 et 37. Ces chiffres décrivent sept textes choisis par l''auteur du
+  cas, pas une distribution.'
+- 'Le contrôle chain-window-reset-computed est le seul discriminant fort du cas, et il repose sur une
+  règle explicitement écrite dans l''énoncé : un modèle nu qui lit le référentiel ligne à ligne peut la
+  composer sans aucun cadre. La séparation attendue vient de ce que le dossier fournit une conclusion
+  toute faite — la note du DAF, cinq cosignataires sur sept, un benchmark — qui rend la composition inutile
+  en apparence, pas de ce que la règle serait difficile.'
+- Les détecteurs mesurent des formulations, pas un ordre de calcul interne. cumulative-irreversibility-named
+  constate qu'une asymétrie entre réversibilité par pas et réversibilité du cumul est écrite ; il ne peut
+  pas établir qu'elle a précédé l'adhésion au plan dans le raisonnement du sujet plutôt que d'avoir été
+  rédigée après coup.
+- volet-a-cleared-same-test exige un vocabulaire précis de qualification du pire cas (variance, récupérable,
+  aucune branche, même test). Une réponse qui retient le volet A en le jugeant seulement « limité et réversible
+  » échoue à un contrôle qu'elle satisfait sur le fond ; c'est un choix assumé pour éviter la saturation,
+  puisque tout répondant compétent retient le volet A, et le biais va dans le sens du faux négatif.
+- 'Les fenêtres de proximité utilisent [^.\n] et les gardes des anti-motifs sont des lookaheads lexicaux.
+  Une réponse très abrégée, rédigée en listes sans ponctuation, ou qui nie une rationalisation avec un
+  tour que la garde ne connaît pas, peut être mal classée. Le biais est asymétrique : les faux négatifs
+  frappent les contrôles regex_all, les faux positifs possibles sur regex_none pénalisent une réponse
+  correcte, ce qui reste le sens conservateur pour un contrôle d''anti-motif.'
+- 'Le cas n''établit pas qu''un sujet possède la porte de ruine : il observe une réponse écrite dans une
+  condition d''exposition déclarée. Un sujet peut composer la chaîne d''agrément par simple soin de lecture,
+  ou refuser le volet B par conservatisme sur tout ce qui touche à une certification — ce dossier ne permet
+  pas de distinguer ces motifs d''un veto instrumenté.'
+- 'Le dossier est chiffré et sa règle d''irrécupérabilité est explicite, donc favorable au régime quantifiable
+  : l''érosion y est calculable une fois la chaîne composée. Une érosion en régime flou, où le point de
+  non-retour n''est pas dérivable d''une règle écrite mais seulement estimé (perte progressive de compétence,
+  de confiance ou de réputation), serait plus discriminante sur la calibration de la porte et n''est pas
+  couverte ici.'
+- 'Le confondant de volume déclaré dans arms.yaml s''applique intégralement : un écart C_vs_A observé
+  sur ce cas peut provenir du cadre ou de la seule masse de contexte structuré injectée, tant que le bras
+  à volume apparié n''existe pas.'
+- Les deux contrôles jugés restent not_run si aucun juge n'est enregistré dans l'essai ; le score déterministe
+  seul ne couvre alors ni la reconstitution de la marge d'effectif agréé ni le traitement du déficit de
+  trésorerie, et les neuf points correspondants restent au dénominateur.

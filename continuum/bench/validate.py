@@ -1441,6 +1441,22 @@ def validate_judgement_document(
     return judgement, errors
 
 
+def superseded_ids(records: Iterable[dict[str, Any]], id_key: str) -> set[str]:
+    """Identifiants remplacés par un enregistrement plus récent.
+
+    Un scénario remplacé est retiré du dispositif : il ne doit plus compter dans
+    la complétude d'une grille, sinon publier une correction rendrait la campagne
+    définitivement incomplète et la porte de conclusion ne se rouvrirait jamais.
+    Ses essais restent valides et lisibles — c'est la retraite, pas l'effacement.
+    """
+    targets: set[str] = set()
+    for record in records:
+        for target in record.get("supersedes") or []:
+            if isinstance(target, str) and target != record.get(id_key):
+                targets.add(target)
+    return targets
+
+
 def _superseded_ids(judgements: Iterable[dict[str, Any]]) -> set[str]:
     targets: set[str] = set()
     for judgement in judgements:

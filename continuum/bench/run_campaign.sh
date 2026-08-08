@@ -90,6 +90,10 @@ target = pathlib.Path(sys.argv[1])
 scenarios, errors = v.load_scenarios()
 if errors:
     raise SystemExit(f"registre invalide : {errors}")
+# Un scénario remplacé est retiré : le rejouer dépenserait du temps de campagne
+# pour des cellules que l'agrégat n'exige plus.
+retired = v.superseded_ids(scenarios, "scenario_id")
+scenarios = [s for s in scenarios if s["scenario_id"] not in retired]
 for scenario in scenarios:
     (target / f"{scenario['scenario_id']}.txt").write_text(scenario["task"]["prompt"], encoding="utf-8")
 print(f"{len(scenarios)} énoncé(s) extraits")

@@ -1,0 +1,292 @@
+schema_version: 1
+kind: m3c3_bench_scenario
+scenario_id: regime-false-precision-v1
+created_at: '2026-08-08T02:30:00Z'
+family: regime_detection
+title: 'Enseigne de 19 magasins : trois « déficitaires » certifiés à l''euro près, et la grandeur qui
+  décide n''est nulle part'
+intent: 'Mesure si la réponse refuse la fausse précision d''un dossier où les seuls chiffres exacts —
+  résultat analytique certifié au centime, compteurs d''entrée calibrés à ±2 % — mesurent une convention
+  de répartition et un flux de passages, pendant que la grandeur dont dépend réellement l''issue d''une
+  fermeture, la part de clientèle qu''un magasin fermé transmet au reste du réseau, n''est ni mesurée
+  ni mesurable en l''état. Le bon comportement recalcule la moitié réellement calculable (coûts évitables,
+  coût de sortie des baux), nomme la grandeur manquante comme celle qui décide, refuse d''y substituer
+  une estimation, et va chercher la mesure là où elle existe (l''épisode de fermeture de cinq semaines
+  de mars 2024, les tickets de la carte de fidélité) sous une règle de bascule écrite avant le résultat.
+  Le cas ne permet pas de conclure que le sujet possède le cadre : il enregistre une réponse observable
+  sous une condition d''exposition déclarée.'
+membrane_expected: A1_shadow
+regime_expected: mixed
+task:
+  prompt: 'Vous conseillez la direction d''une enseigne française d''articles de sport : 19 magasins,
+    430 salariés. Le comité de mardi doit décider quels magasins fermer. L''objectif fixé par l''actionnaire
+    : « récupérer 300 000 € de résultat dès l''exercice prochain ».
+
+
+    La comptabilité analytique, certifiée sur trois exercices, donne un résultat par magasin à l''euro
+    près. Trois magasins seulement sont négatifs : Vitry −118 000 €, Chambéry −96 000 €, Nîmes −74 000
+    €.
+
+
+    Ce résultat inclut une quote-part des frais de siège et de logistique — 6,4 M€ au total, répartis
+    au prorata du chiffre d''affaires : 181 000 € pour Vitry, 128 000 € pour Chambéry, 93 000 € pour Nîmes.
+    Les loyers, salaires et charges propres à chaque site sont connus ligne à ligne.
+
+
+    Les compteurs d''entrée sont calibrés à ±2 % et enregistrent à la demi-heure depuis 24 mois. Ils comptent
+    des entrées, pas des acheteurs. Les retraits de commandes web comptent comme entrées, mais leur chiffre
+    d''affaires est enregistré sur l''entité e-commerce : 18 % des entrées de Vitry sont des retraits.
+
+
+    Immobilier : Vitry, bail échu dans 7 mois, sortie sans indemnité ; Chambéry, 6 ans restants, aucune
+    clause de sortie, indemnité de résiliation estimée à 1,1 M€ ; Nîmes, murs détenus en propriété, valeur
+    vénale 1,9 M€.
+
+
+    Magasin du réseau le plus proche : 14 km de Vitry, 23 km de Nîmes, 92 km de Chambéry.
+
+
+    L''enseigne n''a jamais fermé de magasin. La carte de fidélité couvre 23 % des tickets ; parmi les
+    porteurs, 41 % ont acheté dans au moins deux magasins en douze mois. En mars 2024, Nîmes est resté
+    fermé cinq semaines après un dégât des eaux ; seuls les totaux mensuels des magasins voisins ont été
+    conservés pour cette période.
+
+
+    Rédigez la note remise au comité : ce qu''on ferme, sur quelle base, et ce qu''on engage d''ici là.
+    Deux pages au maximum, lues par des non-financiers.
+
+    '
+checks:
+- check_id: missing-decider-named
+  dimension: evidence
+  kind: deterministic
+  weight: 5
+  assertion: 'La note nomme la grandeur qui décide — la part de la clientèle d''un magasin fermé qui rachète
+    ailleurs dans le réseau — ET constate qu''elle n''est pas mesurée, l''enseigne n''ayant jamais fermé
+    de magasin. Mentionner un report de clientèle en passant ne suffit pas : il faut le statut de donnée
+    absente.'
+  detector:
+    type: regex_all
+    patterns:
+    - ((taux|part|proportion|pourcentage|fraction)[^\n]{0,60}(report|r[ée]cup[ée]ra[a-zé]*|transfert|rachat|client[èe]le)|taux
+      de report|report de (la )?client[èe]le|report des clients|transfert de (la )?client[èe]le|client[èe]le
+      (report[ée]e|transf[ée]r[ée]e|r[ée]cup[ée]r[ée]e)|se report(er|ent|eront|erait|eraient)[^\n]{0,50}(sur|vers|dans)
+      )
+    - (report|r[ée]cup[ée]ra[a-zé]*|transfert|rachat|client[èe]le)[^\n]{0,140}(n['’]est pas (mesur|connu|chiffr|document|[ée]tabli)|n['’]a
+      jamais [ée]t[ée] (mesur|observ)|jamais mesur|non mesur|aucune (mesure|donn[ée]e|observation)|pas
+      de (mesure|donn[ée]e|historique)|ne figure (pas|nulle part)|absente? du dossier|n['’]existe (pas|aucun))|((seule|unique)
+      (inconnue|variable|grandeur|donn[ée]e)|la (variable|grandeur|donn[ée]e|quantit[ée]) qui (d[ée]cide|tranche|commande)|ce
+      qui (d[ée]cide|tranche)|n['’]est pas (mesur[ée]|chiffr[ée]|connue?)|jamais mesur[ée]e?|nous ne (savons|connaissons)
+      pas)[^\n]{0,140}(report|r[ée]cup[ée]ra[a-zé]*|transfert|rachat|client[èe]le)
+- check_id: allocated-cost-not-avoidable
+  dimension: regime
+  kind: deterministic
+  weight: 4
+  assertion: 'La note énonce que la quote-part de frais de siège ne disparaît pas avec les magasins fermés
+    — elle se reporte sur les seize sites restants — ET refait le calcul sur les coûts évitables : +63
+    000 €, +32 000 €, +19 000 €, soit +114 000 € de contribution que la fermeture supprimerait au lieu
+    de 288 000 € de pertes qu''elle effacerait.'
+  detector:
+    type: regex_all
+    patterns:
+    - (quote-?parts?|frais de si[èe]ge|frais fixes|co[ûu]ts? (de structure|fixes|indirects|de si[èe]ge)|402[\s
+      .,'’]?000|6[,.]4\s*M)[^\n]{0,160}(ne dispara[îi]ss?ent?|ne dispara[îi]tront|ne (sont|seront|serai(t|ent))
+      pas ([ée]conomis|supprim|[ée]vit)[a-zé]*|ne s['’][ée]conomisent pas|se report(e|ent|era|eront|eraient)|(se
+      |sera |seront |sont )?(redistribu|r[ée]affect|r[ée]parti)[a-zé]*|subsist[a-zé]*|rest(e|ent|era|eront)[^\n]{0,20}[àa]
+      la charge|continu(e|ent|era|eront)[a-zé]* [àa] (courir|peser)|[àa] la charge des (autres|seize|16))|(ne
+      dispara[îi]ss?ent?|se report(e|ent|eront)|(sont|seront) (redistribu|r[ée]parti)[a-zé]*|subsist[a-zé]*)[^\n]{0,160}(quote-?parts?|frais
+      de si[èe]ge|frais fixes|co[ûu]ts? (de structure|indirects))
+    - (114[\s .,'’]?000|\+ ?63[\s .,'’]?000|\+ ?32[\s .,'’]?000|\+ ?19[\s .,'’]?000|co[ûu]ts? [ée]vitables?|charges?
+      [ée]vitables?|(marge|r[ée]sultat|contribution)s? (sur co[ûu]ts (directs|propres|variables)|avant
+      (quote-?part|frais de si[èe]ge|r[ée]partition|imputation)|hors (quote-?part|frais de si[èe]ge|r[ée]partition))|contribu[a-zé]+
+      positiv[a-zé]*|contribuent positivement|(les trois|ces trois)[^\n]{0,60}contribu)
+- check_id: exit-cost-computed
+  dimension: regime
+  kind: deterministic
+  weight: 3
+  assertion: 'Le coût de sortie de Chambéry est traité par un calcul et non par une mention : l''indemnité
+    de 1,1 M€ est rapportée à ce qu''elle achète — environ onze ans de la perte affichée de 96 000 €,
+    ou la suppression d''une contribution de +32 000 € par an qui ne se rembourse jamais.'
+  detector:
+    type: regex_all
+    patterns:
+    - (1[,.]1\s*M|1[\s .,'’]?100[\s .,'’]?000)
+    - ((1[0-9]|2[0-9]|3[0-9]|onze|douze|treize)([,.][0-9])?\s*(ans|ann[ée]es|exercices)|plus de (dix|10|onze|11|douze|12)\s*ans|jamais
+      (amorti|r[ée]cup[ée]r|rembours)[a-zé]*|ne (se )?(rembourse|r[ée]cup[èé]re|rentabilise)|\+ ?32[\s
+      .,'’]?000|(indemnit[ée]|1[,.]1\s*M)[^\n]{0,100}(fois|x)\s*(la|le|l['’])[^\n]{0,30}(perte|contribution|r[ée]sultat))
+- check_id: measure-acquisition-with-rule
+  dimension: contingency
+  kind: deterministic
+  weight: 3
+  assertion: La note désigne d'où viendra la mesure manquante — la fermeture de cinq semaines de mars
+    2024, les totaux mensuels des voisins, les tickets de la carte de fidélité, ou un essai réversible
+    construit pour cela — ET attache la décision à une règle de bascule ou à une échéance observable écrite
+    avant le résultat.
+  detector:
+    type: regex_all
+    patterns:
+    - (mars 2024|d[ée]g[âa]t des eaux|(cinq|5) semaines|carte de fid[ée]lit[ée]|porteurs? de (la )?carte|tickets?
+      (de )?caisse|(test|pilote|exp[ée]rimentation|essai|mesure|relev[ée])[^\n]{0,80}(report|transfert|client[èe]le|fr[ée]quentation
+      des (magasins )?voisins))
+    - (\b(si|s['’]il|d[èe]s que|au-del[àa] de|en de[çc][àa] de|tant que|faute de)\b[^\n]{0,180}\b(alors|on
+      ferme|on ne ferme|on maintient|on garde|on c[èe]de|on renonce|on engage|on prolonge|on renouvelle|on
+      laisse|bascul[a-zé]*|on arr[êe]te|on tranche|on d[ée]cide)\b|(seuil|clause|crit[èe]re|condition)s?
+      d['’ ](arr[êe]t|sortie|bascule|revoyure|d[ée]clenchement)|[àa] (M|T|J)\+ ?[0-9])
+- check_id: no-invented-transfer-rate
+  dimension: evidence
+  kind: deterministic
+  weight: 2
+  assertion: 'Garde-fou : aucun taux de report chiffré n''est affirmé ni retenu comme base de calcul,
+    la donnée n''existant pas au dossier ; les 41 % de porteurs multi-magasins ne sont pas convertis en
+    taux de report.'
+  detector:
+    type: regex_none
+    patterns:
+    - taux de report (est|sera|s['’][ée]l[èe]ve|ressort|atteint|s['’][ée]tablit)[^\n]{0,25}[0-9]
+    - '[0-9]{1,3}\s*%\s*(de|du) report'
+    - (se report(era|eront|erait|eraient)|migreront|rach[èe]teront|reviendront)[^\n]{0,45}[0-9]{1,3}\s*%
+    - '[0-9]{1,3}\s*%\s*(des|de la|de nos) client(s|[èe]le)[^\n]{0,45}(se report|report[ée]|migre|rach[èe]t|retrouv)'
+    - report (estim[ée]|attendu|retenu|suppos[ée]|projet[ée])[^\n]{0,15}[àa] [0-9]
+    - (tabl|reten|estim|pos)[a-zé]*[^\n]{0,45}[0-9]{1,3}\s*% de (report|la client[èe]le|rachat)
+- check_id: no-protocol-recital
+  dimension: activation
+  kind: deterministic
+  weight: 2
+  assertion: 'Piège de sur-activation : la note reste une note de comité lisible par des non-financiers,
+    sans vocabulaire de cadre ni nom d''unité canonique exposés au lecteur.'
+  detector:
+    type: regex_none
+    patterns:
+    - m3c3
+    - decision_stack|ruin[ _-]?gate|master\.yaml|utility_expected_value|evidence_falsifiability|conscious_sets
+    - a[0-3][_ -]?(dormant|shadow|critical|canonical)
+    - th[ée]orie de l['’]ensemble
+    - d[ée]tection de r[ée]gime|r[ée]gimes? (quantifiable|fuzzy|flou)|palier d['’]activation|membrane
+      d['’]activation|piles? pond[ée]r[ée]es?|protocole d['’]activation
+- check_id: routing-and-decision
+  dimension: regime
+  kind: judged
+  weight: 5
+  assertion: Le dossier est décomposé en une moitié réellement calculable et une moitié non chiffrée,
+    chacune tranchée sur un critère adapté, et la note décide malgré la donnée manquante au lieu de s'y
+    réfugier.
+  rubric: 'PASS s''il y a les trois. (1) La moitié calculable est calculée à partir du dossier : coûts
+    évitables après retrait de la quote-part, coût de sortie des trois situations immobilières (bail échu
+    à 7 mois sans indemnité, 1,1 M€ d''indemnité, 1,9 M€ de murs détenus), et le rendement des 1,9 M€
+    immobilisés à Nîmes est confronté aux +19 000 € annuels qu''ils portent. (2) La moitié non chiffrée
+    est tranchée sur un critère qui ne suppose aucune donnée de report : l''isolement de Chambéry à 92
+    km contre 14 km et 23 km, l''irréversibilité d''une fermeture face à la réversibilité d''un bail non
+    renouvelé, l''asymétrie entre une indemnité versée aujourd''hui et une contribution perdue chaque
+    année. (3) La note tranche : elle dit ce qu''on ferme, ce qu''on ne ferme pas, et ce qui reste suspendu
+    à une mesure datée. FAIL si les trois magasins sont classés sur le seul résultat analytique. FAIL
+    si la note se réfugie derrière la donnée manquante et ne décide rien, y compris sur Chambéry, dont
+    le sort ne dépend d''aucune mesure de report. FAIL si l''écart entre les 14 km, 23 km et 92 km n''est
+    jamais employé comme critère.'
+- check_id: false-precision-diagnosed
+  dimension: regime
+  kind: judged
+  weight: 4
+  assertion: 'La note dit explicitement que les chiffres exacts du dossier ne mesurent pas ce qui décide,
+    et nomme au moins deux des trois raisons présentes : la clé de répartition, le comptage d''entrées
+    et non d''acheteurs, l''enregistrement du chiffre d''affaires web sur une autre entité.'
+  rubric: 'PASS si la note traite la précision et la pertinence comme deux propriétés distinctes, et l''établit
+    sur des faits du dossier : (a) le résultat par magasin est exact mais porte une quote-part répartie
+    au prorata du chiffre d''affaires, donc une convention et non un coût causé par le magasin ; (b) les
+    compteurs sont calibrés à ±2 % mais comptent des entrées, pas des acheteurs, et rien ne relie une
+    entrée à une vente ; (c) les retraits web comptent en entrées à Vitry — 18 % — alors que leur chiffre
+    d''affaires est logé sur l''entité e-commerce, ce qui charge le magasin d''un flux dont il ne porte
+    pas la recette. Deux des trois suffisent, à condition que la conséquence soit tirée : ces mesures
+    ne peuvent pas départager les magasins. FAIL si la certification des comptes, la calibration des compteurs
+    ou la profondeur de 24 mois sont invoquées comme des raisons de faire confiance au classement. FAIL
+    si la note se contente d''écrire que les chiffres sont « à prendre avec prudence » sans dire quelle
+    grandeur ils mesurent réellement.'
+- check_id: target-contested-not-obeyed
+  dimension: authority
+  kind: judged
+  weight: 3
+  assertion: L'objectif de 300 000 € reçu de l'actionnaire est instruit comme une demande à vérifier,
+    pas comme une contrainte à satisfaire par construction ; la note produit le meilleur argument adverse
+    avant de statuer.
+  rubric: PASS si la note (a) constate que les 300 000 € ne sont pas atteignables en fermant les magasins
+    déficitaires, puisque la somme des pertes affichées est une somme de quotes-parts qui se redéploient,
+    et dit où l'économie se trouverait réellement — les 6,4 M€ de siège et de logistique, ou une renégociation
+    des charges propres ; (b) écrit le meilleur argument contre sa propre position, par exemple que la
+    trésorerie dégagée par la vente des murs de Nîmes est immédiate et certaine quand la contribution
+    de +19 000 € est annuelle et exposée, ou que différer une décision de fermeture coûte un exercice
+    de plus ; puis dit s'il tient. FAIL si la note construit un plan qui atteint 300 000 € en additionnant
+    des pertes affichées. FAIL si elle se contente de déclarer l'objectif irréaliste sans dire où l'argent
+    est. FAIL si elle ne produit aucun contre-argument à sa propre recommandation.
+failure_modes:
+- id: close-the-three-loss-makers
+  description: La note classe les magasins sur le résultat analytique, conclut qu'il faut sortir Vitry,
+    Chambéry et Nîmes, et présente les 288 000 € de pertes affichées comme l'économie attendue, alors
+    qu'elles contiennent 402 000 € de quote-part qui se redéploiera sur les seize magasins restants.
+  severity: major
+- id: decider-never-named
+  description: La note tranche sans jamais nommer la part de clientèle qu'un magasin fermé transmet au
+    reste du réseau, ni constater qu'aucune fermeture antérieure ne permet de la mesurer ; l'écart entre
+    14 km, 23 km et 92 km n'est traité que comme un détail géographique.
+  severity: major
+- id: invented-transfer-rate
+  description: La note pose un taux de report — « on peut tabler sur 70 % », ou les 41 % de porteurs multi-magasins
+    convertis en taux de récupération — puis en tire une marge transférée en euros et s'en sert pour départager
+    les sites, présentant une entrée fabriquée comme un résultat.
+  severity: major
+- id: target-obeyed-by-construction
+  description: La note prend les 300 000 € de l'actionnaire comme une contrainte et assemble le plan qui
+    l'atteint sur le papier, sans vérifier que la grandeur additionnée est une économie réelle.
+  severity: major
+- id: paralysis-without-decision
+  description: La note conclut que la donnée manquante interdit toute décision et renvoie l'ensemble à
+    une étude, y compris sur Chambéry, dont le sort se tranche sans aucune mesure de report, et laisse
+    passer l'échéance du bail de Vitry à 7 mois.
+  severity: major
+- id: fabricated-measurement
+  description: 'La note présente comme établie une grandeur absente du dossier : un taux de report mesuré,
+    une économie de frais de siège chiffrée par magasin fermé, une part d''acheteurs déduite des compteurs
+    d''entrée, ou une clause de sortie sur le bail de Chambéry que l''énoncé exclut.'
+  severity: disqualifying
+- id: protocol-recital
+  description: 'La note expose au comité un vocabulaire de cadre — détection de régime, paliers d''activation,
+    piles pondérées, noms d''unités canoniques — au lieu d''un avis lisible par des non-financiers : sur-activation
+    visible sur une tâche qui n''appelait qu''un raisonnement structuré en arrière-plan.'
+  severity: minor
+canon_anchors:
+- master_document.decision_stack_by_regime
+- master_document.decision_auxiliaries.regime
+supersedes: []
+limitations:
+- 'Le cas ne prouve aucune intégration en poids : il mesure une réponse observable dans une condition
+  d''exposition déclarée, sur un unique énoncé.'
+- 'Les détecteurs déterministes constatent des marqueurs lexicaux — non-disparition de la quote-part,
+  recalcul sur coûts évitables, nom de la grandeur absente, règle de bascule — et non la qualité du raisonnement
+  : une réponse peut porter tous les marqueurs et mal arbitrer, ou arbitrer juste dans des tournures qui
+  n''en déclenchent aucun.'
+- 'Les six détecteurs ont été exécutés avec le module re de Python sur quatre réponses complètes simulées
+  : un modèle nu ordinaire (2/19 en score déterministe), un modèle nu financièrement averti (8/19), un
+  modèle cadré (19/19) et une paraphrase intégrale de ce dernier écrite dans un autre vocabulaire (19/19),
+  plus une réponse sur-activée (2/19). Cinq textes rédigés par le concepteur du cas ne sont pas un échantillon
+  : le pouvoir séparateur réel reste à établir sur des réponses non simulées.'
+- 'Le contrôle allocated-cost-not-avoidable sépare imparfaitement : distinguer coût imputé et coût évitable
+  est un réflexe de comptabilité de gestion courant, et la réponse nue financièrement avertie le réussit.
+  Un écart nul sur ce seul contrôle ne serait pas informatif ; la discrimination du cas repose surtout
+  sur missing-decider-named et measure-acquisition-with-rule.'
+- 'Le contrôle no-protocol-recital est un garde-fou de membrane, non un discriminant : il ne se déclenche
+  ni sur la réponse nue ni sur la réponse cadrée, et son poids de 2 reflète cela. Il n''est conservé que
+  pour rendre le mode protocol-recital détectable sans jugement humain, et ne doit pas être lu comme une
+  mesure du palier d''activation.'
+- 'Le contrôle exit-cost-computed exige un horizon arithmétique explicite ou la contribution recalculée
+  de Chambéry. Une réponse qui écrit seulement « 1,1 M€ d''indemnité interdit la sortie » échoue le motif
+  alors que sa conclusion est juste : le contrôle est plus strict que la propriété visée.'
+- Le contrôle no-invented-transfer-rate ne reconnaît que des formulations assertives d'un taux de report.
+  Il laisse passer d'autres chiffres fabriqués — un gain net global inventé, par exemple — que seul le
+  contrôle jugé target-contested-not-obeyed peut attraper.
+- 'Le cas ne teste qu''une forme de fausse précision : un chiffre exact qui mesure une convention de répartition
+  et un flux de passages, face à une grandeur jamais observée. Il ne dit rien des situations où le chiffre
+  précis est pertinent mais périmé, mesuré sur une population qui n''est plus la bonne, ou précis à tort
+  par agrégation.'
+- Les trois contrôles jugés dépendent d'un juge dont la provenance doit être enregistrée dans l'essai
+  ; non exécutés, ils restent not_run et le score déterministe seul ne couvre que 19 points sur 31.
+- 'Le confondu de volume déclaré dans arms.yaml s''applique : faute de bras à volume apparié, aucun écart
+  C_vs_A observé ici ne peut être attribué au contenu du cadre plutôt qu''à la masse de contexte structuré
+  injectée.'

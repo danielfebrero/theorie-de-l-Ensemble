@@ -1,0 +1,293 @@
+schema_version: 1
+kind: m3c3_bench_scenario
+scenario_id: export-mandatory-fields-v2
+created_at: '2026-08-08T02:30:00Z'
+family: export_discipline
+title: 'Note d''exclusivité Verdal : décider pour un comité divisé qui exécutera sans pouvoir demander
+  de précision'
+intent: 'Mesure si une décision engageante et irréversible est transmise avec les champs que l''export_gate
+  rend obligatoires — verdict et critère qui a tranché, pire cas chiffré de l''option retenue et ensemble
+  qui l''encaisse, repli à déclencheur observable chiffré, observation qui renverserait le choix, première
+  action attribuée — dans une situation où rien de l''énoncé ne les réclame. Le dispositif d''exécution
+  (auteur injoignable trois semaines, comité divisé par écrit, acheteur adverse admis à plaider en son
+  absence, offre retirée et quatre références déréférencées au huitième jour, retour postérieur à la séance)
+  rend l''incomplétude coûteuse sans jamais nommer les champs manquants. Ce cas ne mesure pas la qualité
+  économique du verdict : signer et refuser peuvent tous deux être corrects. Il mesure la portabilité
+  de la décision vers l''exécutant, c''est-à-dire ce qui reste vrai de la décision une fois son auteur
+  absent et son verdict contesté en séance.'
+membrane_expected: A2_critical
+regime_expected: mixed
+task:
+  prompt: 'Tu es directeur général de Verdal, PME de 180 salariés qui fabrique des plats préparés surgelés
+    : 24 M€ de chiffre d''affaires, 31 % de marge brute.
+
+
+    Ton distributeur historique D pèse 62 % du CA, soit 14,9 M€. Il propose un contrat d''exclusivité
+    de trois ans : remise supplémentaire de 9 % sur le prix de cession, contre un engagement de volume
+    de +18 % la première année, seulement indicatif les deux suivantes. L''exclusivité interdit toute
+    vente par un autre canal pendant la durée du contrat. Sortie anticipée : pénalité de 1,2 M€.
+
+
+    D a avancé son comité d''achat au 20 août. Sans réponse signée sous huit jours, l''offre est retirée
+    et quatre de tes huit références sont déréférencées à cette séance. Au deuxième trimestre, D avait
+    déjà réduit ses commandes de 11 % sans préavis.
+
+
+    Deux alternatives sont en cours. Une centrale d''achat régionale : potentiel 3,5 M€ par an, mais leur
+    décision n''est attendue que dans cinq mois. Une marketplace alimentaire : marge supérieure de 6 points,
+    volume estimé entre 0,4 et 2,2 M€ la première année.
+
+
+    Trésorerie disponible : 2,1 M€, environ trois mois de charges fixes. En dessous de 70 % de plan de
+    charge, l''usine de Redon et ses 52 postes passent en chômage partiel.
+
+
+    Ton comité de direction est divisé et l''a écrit : le directeur financier veut signer, le directeur
+    commercial veut refuser. L''acheteur de D a demandé à venir leur exposer lui-même ses arguments la
+    semaine prochaine.
+
+
+    Tu pars demain diriger le chantier d''ouverture au Maroc et tu seras injoignable trois semaines ;
+    tu rentres après le 20 août. Rédige la note que le comité de direction appliquera en ton absence :
+    ils exécuteront ce que tu auras écrit, sans pouvoir te joindre pour arbitrer quoi que ce soit.
+
+    '
+checks:
+- check_id: verdict-et-critere-tranchant
+  dimension: export
+  kind: deterministic
+  weight: 7
+  assertion: Un verdict est énoncé ET le critère qui a emporté l'arbitrage est nommé comme tel — motif
+    décisif, point qui tranche, calcul qui fonde la décision — au lieu d'être seulement déductible d'une
+    section « pourquoi ».
+  detector:
+    type: regex_all
+    patterns:
+    - \b(nous (ne )?sign(ons|erons)|je (ne )?signe|nous (ne )?refusons|nous acceptons|nous ne rompons|il
+      faut (signer|refuser)|ne pas signer|d[ée]cision (retenue|arr[êe]t[ée]e|prise)|je recommande de (signer|refuser|ne
+      pas signer)|recommandation\s*:|d[ée]cision\s*:|verdict\s*:|nous contre-proposons|sign(ez|er|ons)[^\n]{0,40}(le
+      contrat|l['’]exclusivit[ée]|la proposition)|refus(ez|er|ons)[^\n]{0,40}(le contrat|l['’]exclusivit[ée]|la
+      proposition))
+    - ((le |la |ce |un |notre )?(crit[èe]re|motif|raison|point|fait|calcul|test|principe|argument|consid[ée]ration)\s*(principal|d[ée]cisif|d[ée]terminant|dominant|unique
+      et d[ée]cisi\w*|central)?\s*(qui (a )?tranch\w*|qui fonde|qui l['’]emporte|qui emporte|qui d[ée]cide|qui
+      commande)|(crit[èe]re|motif|raison|point|fait|argument|test)\s+(d[ée]cisif|d[ée]terminant|principal|dominant|central|structurel)|ce
+      qui (a )?tranch[ée]|j['’]ai tranch[ée] (sur|par)|le crit[èe]re est|la raison est celle|ce qui l['’]emporte|il
+      ne l['’]emporte pas[^\n]{0,80}raison|deciding (criterion|factor))
+- check_id: repli-declencheur-chiffre
+  dimension: contingency
+  kind: deterministic
+  weight: 9
+  assertion: La note porte un repli nommé ET un déclencheur observable qui lie, dans une même ligne, une
+    condition, une grandeur chiffrée avec son unité, et l'action de repli à exécuter — et non une intention
+    de vigilance.
+  detector:
+    type: regex_all
+    patterns:
+    - \b(repli|plan\s?b|solution de (secours|repli|rechange)|clause de sortie|porte de sortie|fallback|d[ée]sengagement|sortie
+      anticip[ée]e|se retirer|marche arri[èe]re|roll ?back|option de secours|bascul(e|er|ons|ez)\s+(sur|vers))\b
+    - \b(si|d[èe]s que|d[èe]s lors que|lorsque|quand|au-del[àa] de|en de[çc][àa] de)\b[^\n]{0,140}?\d+([.,]\d+)?\s*(%|m€|k€|€|points?|jours?|semaines?|mois|r[ée]f[ée]rences?|postes?|commandes?)[^\n]{0,140}?\b(activ|bascul|d[ée]clench|suspend|arr[êe]t|stopp|saisi|notifi|convoqu|lanc|engag|ex[ée]cut|appliqu|r[ée]sili|sign|refus|sort|ouvr|c[èe]d|accept)|\b(activ|bascul|d[ée]clench|suspend|arr[êe]t|stopp|lanc|ex[ée]cut|appliqu|ouvr|r[ée]sili)[^\n]{0,140}?\b(si|d[èe]s
+      que|d[èe]s lors que|lorsque|quand|au-del[àa] de|en de[çc][àa] de)\b[^\n]{0,140}?\d+([.,]\d+)?\s*(%|m€|k€|€|points?|jours?|semaines?|mois|r[ée]f[ée]rences?|postes?|commandes?)
+- check_id: observation-renversante
+  dimension: evidence
+  kind: deterministic
+  weight: 9
+  assertion: La note nomme l'observation précise qui renverserait le choix — un falsifieur instancié et
+    rattaché explicitement à la décision, pas une liste de risques ni une clause de vigilance.
+  detector:
+    type: regex_any
+    patterns:
+    - renverser(ait|a|ons|aient)?\s+(le|ce|mon|ma|mes|notre|nos|la|cette|leur)\s+(choix|verdict|arbitrage|d[ée]cision|refus|position)|(d[ée]cision|choix|verdict|arbitrage)
+      (est|serait) renvers[ée]|invalider(ait|aient)?\s+(ce|le|mon|ma|mes|notre|nos|cette|la|leur)\s+(choix|verdict|arbitrage|d[ée]cision|refus|position)|infirmerait|annulerait
+      (la|cette|ma) d[ée]cision|remettrait en cause (la|cette|le|ce|mon|notre) (d[ée]cision|choix|arbitrage|verdict)
+    - ce qui (m['’]|nous |le |la )?(ferait|obligerait [àa]) (changer|revenir|basculer|revoir)|si je me
+      trompe|si ce diagnostic est faux|prouverait que (j['’]ai|nous avons) tort
+    - (condition|crit[èe]re|signal|observation|fait|indicateur) (unique |seul )?de (r[ée]vision|revirement|bascule|renversement)
+    - falsifi
+    - would (reverse|invalidate|overturn)|change (my|our) mind
+- check_id: pire-cas-chiffre
+  dimension: ruin
+  kind: deterministic
+  weight: 6
+  assertion: Le pire cas de l'option retenue est nommé — soit par une étiquette explicite, soit par le
+    scénario de rupture instancié — ET son ampleur est rattachée à une grandeur chiffrée en euros ou en
+    pourcentage, et non laissée à l'appréciation du lecteur.
+  detector:
+    type: regex_all
+    patterns:
+    - (pire\s+(des\s+)?(cas|sc[ée]narios?)|worst[ -]case|au pire\b|dans le pire\b|sc[ée]nario (noir|catastrophe|le
+      plus d[ée]favorable|d[ée]favorable|de rupture)|hypoth[èe]se la plus d[ée]favorable|risque maximal|perte
+      maximale|impact maximal|cas le plus (d[ée]favorable|grave)|cas extr[êe]me|borne (haute|basse) (du|de
+      la) (risque|perte)|si (d|le distributeur|ils?)\b[^\n]{0,70}(d[ée]r[ée]f[ée]rence|ex[ée]cute sa menace|met
+      sa menace|rompt|part\b|coupe|retire|supprime|suspend)[^\n]{0,220}\d+([.,]\d+)?\s*(%|m€|k€|€|postes?|r[ée]f[ée]rences?)|(perte|impact|choc)\b[^\n]{0,90}\bsi\b[^\n]{0,60}(les
+      |des |quatre |4 )?r[ée]f[ée]rences?[^\n]{0,60}(tombe|part|saute|disparai|sont d[ée]r[ée]f[ée]renc)|(perte|impact|choc)\b[^\n]{0,60}(des
+      |de |les )?(4|quatre) r[ée]f[ée]rences?)
+    - (perte|impact|choc|co[ûu]t|manque [àa] gagner|CA perdu|marge perdue)[^\n]{0,130}[-–−]?\s*\d+([.,]\d+)?\s*(m€|k€|€|%)|[-–−]\s*\d+([.,]\d+)?\s*m€[^\n]{0,60}(marge|ca|chiffre)
+- check_id: ensemble-qui-encaisse
+  dimension: ruin
+  kind: deterministic
+  weight: 7
+  assertion: L'ensemble qui encaisse le pire cas est désigné par une attribution explicite — « qui l'encaisse
+    », « supporté par », « pèse sur », « nous assumons » — et non par la simple mention des parties prenantes
+    dans un paragraphe voisin.
+  detector:
+    type: regex_any
+    patterns:
+    - (qui\s+(l['’]|le |la |les )?(encaisse\w*|supporte\w*|subi\w+|assume\w*|absorbe\w*|paie\w*|pay\w+|port\w+|trinque\w*)|(encaisse\w*|supporte\w*|subi\w+|assume\w*|absorbe\w*|paie\w*|pay\w+|port\w+|trinque\w*)\s+par\s+(les?|la|nos|notre|l['’]){0,1}[^\n]{0,30}(salari[ée]s?|52\s*(postes|personnes|emplois)|usine
+      de redon|redon|tr[ée]sorerie|actionnaires|fournisseurs|[ée]quipes|emplois|l['’]entreprise|verdal|nous)|(salari[ée]s?|52\s*(postes|personnes|emplois)|usine
+      de redon|redon|tr[ée]sorerie|actionnaires|fournisseurs|[ée]quipes|emplois|l['’]entreprise|verdal|nous)\s+(qui\s+)?(encaisse\w*|supporte\w*|subi\w+|assume\w*|absorbe\w*|paie\w*|pay\w+|port\w+|trinque\w*)[^\n]{0,60}(le
+      |ce |la |les )?(pire|choc|co[ûu]t|risque|perte|facture|cons[ée]quence)|(le |ce |la |les )?(pire|choc|co[ûu]t|risque|perte|facture)[^\n]{0,90}(salari[ée]s?|52\s*(postes|personnes|emplois)|usine
+      de redon|redon|tr[ée]sorerie|actionnaires|fournisseurs|[ée]quipes|emplois|l['’]entreprise|verdal|nous)\s+(encaisse\w*|supporte\w*|subi\w+|assume\w*|absorbe\w*|paie\w*|pay\w+|port\w+|trinque\w*)|(nous|je)
+      (l['’])?(assum|accept|pren)\w+[^\n]{0,120}(risque|pire|perte|choc|ch[ôo]mage|d[ée]r[ée]f[ée]renc)|ce
+      que (j['’]assume|nous assumons)|(retombe|p[èe]se|repose)(nt)? sur [^\n]{0,40}(salari[ée]s?|52\s*(postes|personnes|emplois)|usine
+      de redon|redon|tr[ée]sorerie|actionnaires|fournisseurs|[ée]quipes|emplois|l['’]entreprise|verdal|nous)|[àa]
+      la charge (de |des |du )?(nous|verdal|l['’]entreprise|salari)|c['’]est\s+[^\n]{0,50}qui\s+(encaisse\w*|supporte\w*|subi\w+|assume\w*|absorbe\w*|paie\w*|pay\w+|port\w+|trinque\w*))
+- check_id: objection-la-plus-forte
+  dimension: evidence
+  kind: deterministic
+  weight: 8
+  assertion: La note formule elle-même l'argument le plus fort contre son propre verdict, nommé comme
+    tel, ET le traite explicitement — pourquoi il ne l'emporte pas, où il est exact, ce qu'il ignore —
+    au lieu de ne présenter que la thèse retenue. Remplace le piège pas-de-renvoi-au-comite de la v1,
+    réussi par tous les sujets.
+  detector:
+    type: regex_all
+    patterns:
+    - ((meilleur|principal|plus (fort|solide|s[ée]rieux|puissant))\s+(contre-?)?argument|contre-?argument|(objection|critique)\s+(la
+      plus (forte|s[ée]rieuse|solide)|principale|majeure|centrale|s[ée]rieuse)|l['’]argument (inverse|adverse|oppos[ée]|contraire|le
+      plus (fort|solide))|ce (qu['’]on|que l['’]on|qu['’]un|que vous|qu['’]ils) (peut|peuvent|pourrait|pourriez|pourront)
+      (m['’]|nous |y |lui )?opposer|argument (contre|qui s['’]oppose [àa]) (cette|ma|notre|la) (note|d[ée]cision|position|recommandation|conclusion)|(th[èe]se|position)
+      (inverse|contraire|adverse)|steel ?man|strongest (counter)?argument|le cas (inverse|contraire|pour
+      signer))
+    - (pourquoi (il|elle|je|cet argument|cette objection|ce point|ce raisonnement) ne (l['’]emporte|tient|renverse|vaut|change|suffit)|(et
+      )?ma r[ée]ponse|je ne (le|la) retiens pas|(o[ùu]|en quoi) (il|elle|cet argument|l['’]argument) est
+      (faux|inexact|erron[ée])|cet argument est (s[ée]rieux|exact|juste|recevable|en partie)|il (est|reste)
+      s[ée]rieux|ce qu['’](il|elle) (ignore|oublie|manque|omet)|(mais|toutefois|cependant|pourtant|or)\s+(il|elle|cet
+      argument|l['’]argument|ce raisonnement)|r[ée]ponse [àa] (cet|cette) (argument|objection)|il ne (l['’]emporte|tient)
+      pas)
+- check_id: note-autoportante
+  dimension: export
+  kind: judged
+  weight: 8
+  assertion: 'La note est exécutable telle quelle pendant trois semaines : verdict unique, critère décisif
+    nommé, première action attribuée à un exécutant avec une échéance exploitable dès demain, et aucun
+    arbitrage renvoyé au comité ou au retour de l''auteur.'
+  rubric: 'Passe si (a) un verdict unique et sans ambiguïté est énoncé — signer, refuser, ou signer sous
+    conditions nommées et rédigées ; (b) le critère décisif est nommé explicitement (par exemple : dépendance
+    à un client unique, protection de la trésorerie, coût de la pénalité de sortie) et non seulement déductible
+    du texte ; (c) une première action concrète est désignée, rattachée à une échéance ou à un jour et
+    confiée à quelqu''un de nommable dans l''entreprise (fonction ou personne), de sorte qu''elle soit
+    exécutable dès demain sans l''auteur ; (d) l''arbitrage n''est renvoyé ni au comité, ni au directeur
+    financier, ni au retour de l''auteur — une enveloppe de négociation bornée n''est pas un renvoi, une
+    invitation à trancher en est un ; (e) un lecteur qui n''a que cette note et le dossier peut agir huit
+    jours durant sans avoir besoin d''une précision. Échoue si le verdict est conditionné à une information
+    que personne ne peut obtenir en l''absence de l''auteur, si plusieurs options restent ouvertes en
+    parallèle, si le critère reste implicite, si la première action n''a ni échéance ni porteur, ou si
+    la note laisse le comité divisé décider lui-même. Le juge n''évalue pas si le verdict est économiquement
+    le meilleur : signer et refuser sont tous deux acceptables s''ils sont portés correctement.'
+- check_id: regime-mixte-tenu
+  dimension: regime
+  kind: judged
+  weight: 6
+  assertion: Les postes chiffrables sont calculés avec les données du dossier, et les postes non chiffrables
+    sont maintenus comme critères distincts plutôt que fondus dans un chiffre unique ou comblés par une
+    grandeur inventée.
+  rubric: Passe si la réponse (a) exploite au moins deux grandeurs du dossier dans un calcul explicite
+    — effet de la remise de 9 % sur les 14,9 M€, marge brute de 31 %, pénalité de 1,2 M€, 2,1 M€ de trésorerie
+    rapportés à trois mois de charges — et (b) traite au moins un poste non chiffrable (dépendance à 62
+    %, crédibilité du volume seulement indicatif en années 2 et 3, perte de canal pendant trois ans, division
+    du comité) comme un critère pesé à part, sans lui attribuer un euro inventé. Échoue si tout est réduit
+    à un unique chiffre de comparaison, si le qualitatif est évacué en une phrase d'ambiance, ou si une
+    grandeur absente du dossier (taux de churn, élasticité prix, poids des quatre références menacées,
+    probabilité de succès de la centrale) est présentée comme établie pour clore l'arbitrage.
+failure_modes:
+- id: note-persuasive-sans-repli
+  description: 'La note argumente bien, tranche, chiffre l''effet de la remise, mais ne prévoit aucun
+    repli : le comité qui la lit ne sait pas quoi faire si D réduit encore ses commandes ou si l''engagement
+    de volume n''est pas tenu. Convaincant et inexécutable.'
+  severity: major
+- id: declencheur-non-observable
+  description: 'Un repli existe mais son déclencheur est une appréciation : « si la relation se dégrade
+    », « en cas de difficulté », « si les volumes déçoivent ». Aucun seuil, aucune date, aucune grandeur
+    mesurable — le comité ne peut jamais constater que le déclencheur est atteint, ni justifier de l''avoir
+    déclenché.'
+  severity: major
+- id: aucun-falsifieur
+  description: La note ne dit nulle part quelle observation ferait revenir sur le choix. La décision est
+    présentée comme définitive, ce qui la rend intestable pendant les trois semaines d'absence et empêche
+    toute correction sur fait nouveau — y compris si D concède par écrit ce qui manquait.
+  severity: major
+- id: plaidoyer-a-charge-unique
+  description: La note ne présente que la thèse retenue et laisse le comité découvrir l'argument inverse
+    dans la bouche de l'acheteur de D ou du directeur qui pense le contraire. Le verdict cède à la première
+    contradiction sérieuse, faute d'avoir été confronté par écrit à son meilleur adversaire.
+  severity: major
+- id: arbitrage-renvoye
+  description: La réponse expose deux ou trois scénarios avec leurs avantages et laisse le comité divisé
+    trancher, ou subordonne la signature au retour de l'auteur, alors que l'offre expire et que quatre
+    références tombent avant ce retour. Aucun verdict n'a été produit.
+  severity: major
+- id: pire-cas-sans-porteur
+  description: 'Le pire cas est chiffré mais reste sans sujet : la note dit combien on perd, jamais qui
+    l''encaisse. Les 52 postes de Redon et la trésorerie apparaissent comme décor du dossier, pas comme
+    l''ensemble qui supporte effectivement le coût de la décision retenue.'
+  severity: minor
+- id: chiffres-fabriques
+  description: La note fonde son verdict sur des grandeurs absentes du dossier présentées comme établies
+    — taux de churn, élasticité prix, poids exact des quatre références menacées, part de marché de la
+    marketplace, probabilité de réussite de la centrale d'achat — donnant à l'arbitrage une assise que
+    le dossier ne fournit pas.
+  severity: disqualifying
+canon_anchors:
+- master_document.execution_envelope.export_gate
+- master_document.execution_envelope.adversarial_step
+- master_document.execution_envelope.contingency_binding
+- master_document.host_enforcement.hard_export_gate
+- master_document.transition_system.export_binding
+- master_document.execution_envelope.depth_selector.tiers.T2_critique
+- master_document.decision_auxiliaries.ruin_gate
+supersedes:
+- export-mandatory-fields-v1
+limitations:
+- 'Les détecteurs de la v2 ont été calibrés sur les réponses réellement observées de la campagne export-mandatory-fields-v1
+  : les formes retenues sont celles que les sujets emploient, et non des formes supposées. Cela les rend
+  valides pour des campagnes futures, mais interdit de s''en servir pour re-noter la campagne qui a servi
+  à les calibrer — un score obtenu sur ce corpus mesurerait l''ajustement du détecteur à ces textes, pas
+  la propriété testée.'
+- 'Le piège pas-de-renvoi-au-comite de la v1 était saturé : réussi par les 18 réponses observées, il ne
+  séparait aucun bras et ne mesurait donc rien. Il est remplacé par objection-la-plus-forte, qui porte
+  sur la partie difficile de la tâche. La condition qu''il portait (ne pas renvoyer l''arbitrage) subsiste
+  dans la rubrique jugée note-autoportante, où elle n''est plus comptée comme un signal déterministe.'
+- 'Deux contrôles de la v1 exigeaient une forme quasi inemployée — pire-cas-et-porteur et le second motif
+  de verdict-et-critere-tranchant ne passaient que sur 1 réponse sur 18. Ce n''est pas une saturation
+  au sens strict, mais un détecteur au plancher ne vaut guère mieux : ils sont reconstruits ici sur les
+  formulations observées, et pire-cas-et-porteur est scindé en pire-cas-chiffre et ensemble-qui-encaisse
+  pour que chaque motif mesure un seul comportement.'
+- 'L''énoncé est durci par rapport à la v1 sur un point précis : la séance de D et l''expiration de l''offre
+  tombent désormais avant le retour de l''auteur, parce que plusieurs réponses de la v1 désamorçaient
+  l''échéance en observant que le retour précédait le comité d''achat de septembre. Ce durcissement rend
+  les autres détecteurs légèrement moins bien calibrés qu''ils ne le paraissent : ils ont été mesurés
+  sur des réponses produites par l''énoncé v1, pas v2.'
+- 'Le cas mesure la présence et la forme des champs d''export dans une note écrite, pas la qualité économique
+  de l''arbitrage : une note complète portant un mauvais verdict passe, une note juste mais muette sur
+  le repli échoue. C''est délibéré, mais cela borne strictement ce qu''un score élevé autorise à conclure.'
+- Le champ « première action » n'a toujours pas de détecteur déterministe. Un détecteur lexical (marqueur
+  d'immédiateté plus échéance) passe sur presque toute note de comité compétente, avec ou sans cadre.
+  Le champ est donc porté par le seul contrôle jugé note-autoportante, qui exige en plus un porteur désigné
+  — il reste par construction moins reproductible que les six motifs déterministes.
+- Les détecteurs sont lexicaux. Une réponse peut porter un vrai repli sans employer aucun des mots retenus,
+  et une réponse peut placer les mots sans que le déclencheur soit réellement observable par le comité.
+  Les faux négatifs de forme et les faux positifs de vocabulaire ne sont pas séparés ici.
+- 'Le dispositif d''injoignabilité et la division du comité sont des leviers d''énoncé : ils rendent l''incomplétude
+  coûteuse et peuvent donc suffire, à eux seuls, à faire émerger un repli ou une objection chez un sujet
+  sans matière M3C3. Un écart C_vs_A faible n''invaliderait pas la propriété testée, il indiquerait que
+  l''énoncé la provoque déjà.'
+- Un seul dossier, un seul secteur, un seul format de sortie, une seule langue. Rien n'établit que la
+  discipline d'export observée ici tiendrait sur une décision technique, médicale ou juridique, ni sur
+  un format oral ou conversationnel, ni sur un énoncé en anglais malgré les variantes anglaises prévues
+  dans les motifs.
+- 'Le confondant de volume déclaré dans arms.yaml s''applique intact : sans bras D à volume apparié, un
+  gain observé en C ne peut pas être attribué au contenu du cadre plutôt qu''à la masse de texte structuré
+  injectée.'
+- 'Le cas ne teste pas l''exception T0 de l''export_gate : la situation est construite comme critique
+  et irréversible, donc il ne dit rien sur la capacité du sujet à s''abstenir des champs obligatoires
+  quand ils ne sont pas dus.'

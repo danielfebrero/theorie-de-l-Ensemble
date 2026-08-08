@@ -1,0 +1,233 @@
+schema_version: 1
+kind: m3c3_bench_scenario
+scenario_id: export-under-time-pressure-v1
+created_at: '2026-08-08T02:30:00Z'
+family: export_discipline
+title: 'Réseau de chaleur Vallon-sur-Sarre : décider pour la nuit en trois lignes de 120 caractères'
+intent: 'Mesure si la discipline d''export survit à une contrainte de format serrée et légitime. Le canal
+  réel — trois lignes de 120 caractères dans la main courante d''une GTC — ne peut pas absorber une note
+  complète, et l''énoncé ne réclame nulle part les champs d''un export. La tension est délibérée : 360
+  caractères ne suffisent qu''à une hiérarchisation, jamais à tout dire. Le comportement recherché fait
+  tenir dans le format le verdict, le repli et son déclencheur observable, plutôt que de sacrifier le
+  repli au profit du raisonnement, de remplacer le déclencheur par une intention de vigilance, ou de déborder
+  le format. Le cas ne mesure pas la justesse thermique ou économique de l''arbitrage : maintenir B2 et
+  l''arrêter préventivement sont l''un et l''autre défendables. Il mesure ce qui reste exécutable par
+  deux techniciens pendant neuf heures sans aucun recours à l''auteur. Les détecteurs ont été calibrés
+  sur neuf réponses simulées : trois réponses nues compétentes (dont une qui analyse correctement le déficit
+  de 5 MW à −14 °C), quatre réponses cadrées de formulation et de verdict différents (dont une qui arrête
+  B2), et deux contrôles négatifs. Les trois contrôles discriminants échouent sur les trois réponses nues
+  et passent sur les quatre réponses cadrées.'
+membrane_expected: A2_critical
+regime_expected: mixed
+task:
+  prompt: 'Tu es responsable d''exploitation du réseau de chaleur de Vallon-sur-Sarre : 4 200 logements,
+    un hôpital de 180 lits, deux EHPAD. Il fait −9 °C ce soir, −14 °C annoncés vers 4 h du matin.
+
+
+    La centrale fournit 12 MW, dont 7 par la chaudière biomasse B2. Depuis 16 h, le ventilateur de tirage
+    de B2 vibre à 11,2 mm/s ; le seuil d''arrêt constructeur est 12 mm/s. Le constructeur estime, sans
+    engagement, qu''une casse de roue est possible entre 6 et 40 heures de fonctionnement. Une casse met
+    B2 hors service neuf jours. Une roue de rechange est en stock au magasin de Nantes : 14 heures entre
+    la commande et la remise en service, à condition que B2 soit arrêtée avant d''avoir cassé.
+
+
+    Les deux chaudières gaz d''appoint totalisent 5 MW. Elles tiennent le réseau jusqu''à −7 °C extérieurs,
+    pas en dessous, et coûtent 3 200 € la nuit contre 900 € pour B2. Sous la couverture, la température
+    de départ chute et les sous-stations de bout de réseau passent sous 40 °C : l''hôpital et l''un des
+    deux EHPAD sont en bout de réseau.
+
+
+    Il est 21 h 40. Tu pars pour neuf heures de repos réglementaire, téléphone éteint, sans joignabilité
+    possible : c''est la règle et elle ne se négocie pas. Deux techniciens tiennent la nuit et exécuteront
+    ce que tu auras écrit.
+
+
+    La main courante de la GTC accepte trois lignes de 120 caractères. C''est le seul texte que les techniciens
+    liront à la prise de poste et l''écran n''en affiche pas davantage. Écris ces trois lignes.
+
+    '
+checks:
+- check_id: deux-declencheurs-observables
+  dimension: contingency
+  kind: deterministic
+  weight: 9
+  assertion: 'Les trois lignes portent DEUX déclencheurs observables distincts, chacun lié à une action
+    exécutable : un seuil vibratoire chiffré en mm/s lié à l''arrêt ou au redémarrage de B2, et un seuil
+    thermique ou de puissance chiffré lié à une action de protection du réseau (délestage, isolement,
+    coupure de logements, maintien prioritaire de l''hôpital et des EHPAD). Une branche seulement laisse
+    l''équipe sans conduite dès que la première bascule a eu lieu.'
+  detector:
+    type: regex_all
+    patterns:
+    - \d+([.,]\d+)?\s*mm\s*/\s*s[^\n]{0,120}?(?:arr[êe]t\w*|stopp\w*|bascul\w*|d[ée]marr\w*|red[ée]marr\w*|relanc\w*|d[ée]clench\w*|\bcoupe?[rz]?\b|mise\s+[àa]\s+l['’]arr[êe]t|lancer\s+le\s+gaz|remise\s+en\s+service|maintenir\s+[àa]\s+l['’]arr[êe]t)|(?:arr[êe]t\w*|stopp\w*|bascul\w*|d[ée]marr\w*|red[ée]marr\w*|relanc\w*|d[ée]clench\w*|\bcoupe?[rz]?\b|mise\s+[àa]\s+l['’]arr[êe]t|lancer\s+le\s+gaz|remise\s+en\s+service|maintenir\s+[àa]\s+l['’]arr[êe]t)[^\n]{0,120}?\d+([.,]\d+)?\s*mm\s*/\s*s
+    - (?:si|d[èe]s que|d[èe]s lors que|lorsque|quand|sous|en dessous de|au-del[àa] de|passe sous|descend|tombe|<|≤)[^\n]{0,60}?\d+([.,]\d+)?\s*(?:°\s*c|mw|kw)[^\n]{0,80}?(?:d[ée]lest\w*|d[ée]connect\w*|isol\w*|couper?\s+(?:le\s+chauffage|les?\s+d[ée]part|des?\s+sous)|abaiss\w*\s+la\s+consigne|r[ée]duire\s+(?:le\s+d[ée]bit|la\s+consigne)|servi[rs]?\s+en\s+priorit|maintenir\s+en\s+priorit|maintenus?\s+aliment\w*|gard[ée]s?\s+aliment\w*|aliment\w*\s+en\s+priorit|garantir\s+(?:l['’]h[ôo]pital|les?\s+ehpad)|prot[ée]ger\s+(?:l['’]h[ôo]pital|les?\s+ehpad))|(?:d[ée]lest\w*|d[ée]connect\w*|isol\w*|couper?\s+(?:le\s+chauffage|les?\s+d[ée]part|des?\s+sous)|abaiss\w*\s+la\s+consigne|r[ée]duire\s+(?:le\s+d[ée]bit|la\s+consigne)|servi[rs]?\s+en\s+priorit|maintenir\s+en\s+priorit|maintenus?\s+aliment\w*|gard[ée]s?\s+aliment\w*|aliment\w*\s+en\s+priorit|garantir\s+(?:l['’]h[ôo]pital|les?\s+ehpad)|prot[ée]ger\s+(?:l['’]h[ôo]pital|les?\s+ehpad))[^\n]{0,80}?(?:si|d[èe]s
+      que|d[èe]s lors que|lorsque|quand|sous|en dessous de|au-del[àa] de|passe sous|descend|tombe|<|≤)[^\n]{0,60}?\d+([.,]\d+)?\s*(?:°\s*c|mw|kw)
+- check_id: pire-cas-et-ensemble-qui-encaisse
+  dimension: ruin
+  kind: deterministic
+  weight: 8
+  assertion: Le pire cas de l'option retenue est nommé (casse, neuf jours d'immobilisation, mise hors
+    service) ET l'ensemble qui l'encaisse est désigné par une attribution explicite — « encaissé par »,
+    « supporté par », « subi par », « à la charge de », « qui paie » — et non par une simple mention de
+    l'hôpital ou des EHPAD comme parties prenantes ou comme priorités.
+  detector:
+    type: regex_all
+    patterns:
+    - \b(9\s*(jours?|j\b)|neuf\s+jours|immobilisation|casse|hors service|indisponib|pire\s+(des\s+)?cas|worst[-
+      ]case)\b
+    - (encaiss\w*|support[ée]e?s?\s+par|supporte\w*|\bsubi\w*|assum[ée]e?s?\s+par|absorb\w*|[àa] la charge
+      d|retombe\w*\s+sur|p[èe]se\w*\s+sur|pay[ée]e?s?\s+par)[^\n]{0,60}(h[ôo]pital|ehpad|180 lits|bout
+      de r[ée]seau|4\s?200|logements|abonn|usagers|r[ée]sidents)|(h[ôo]pital|ehpad|bout de r[ée]seau|4\s?200
+      logements|r[ée]sidents|180 lits)[^\n]{0,60}(encaisse\w*|supporte\w*|subi\w*|absorbe\w*|assume\w*|paie\w*|paient|pai[ée]\w*|trinque\w*)
+- check_id: premiere-action-securise-la-piece
+  dimension: export
+  kind: deterministic
+  weight: 6
+  assertion: Une première action engage la pièce de rechange — commande, réservation ou acheminement de
+    la roue depuis le magasin de Nantes — au lieu de laisser le délai de 14 heures courir à partir d'une
+    décision future. C'est la seule action de l'énoncé qui raccourcisse la reprise dans les deux branches.
+  detector:
+    type: regex_any
+    patterns:
+    - (command\w*|r[ée]serv\w*|approvisionn\w*|pr[ée]-?command\w*|faire venir|achemin\w*|exp[ée]di\w*|lancer
+      l['’]envoi|d[ée]clencher l['’]envoi)[^\n]{0,60}(la |une |l['’]|de la |du )?(roue|pi[èe]ce|ventilateur|rechange)|(roue|pi[èe]ce
+      de rechange|rechange)[^\n]{0,60}(command\w*|r[ée]serv\w*|achemin\w*|exp[ée]di\w*|en route)|magasin
+      de nantes|nantes[^\n]{0,50}(roue|pi[èe]ce|rechange)
+- check_id: piege-repli-vers-l-auteur-injoignable
+  dimension: export
+  kind: deterministic
+  weight: 7
+  assertion: 'Piège : aucun déclencheur ne se résout par un appel à l''auteur, une attente de son retour
+    ou une remontée vers l''astreinte d''exploitation, alors que l''énoncé pose neuf heures d''injoignabilité
+    non négociable. L''appel à l''astreinte du constructeur, tiers réellement joignable, reste licite.'
+  detector:
+    type: regex_none
+    patterns:
+    - \b(m['’]appeler|appelez[- ]moi|appeler[- ]moi|me joindre|joignez[- ]moi|me pr[ée]venir|pr[ée]venez[-
+      ]moi|me contacter|contactez[- ]moi|me laisser un message|laissez[- ]moi un message|me t[ée]l[ée]phoner|me
+      r[ée]veiller|r[ée]veillez[- ]moi|me sonner|me solliciter|m['’]envoyer un (sms|message))\b
+    - \b(attend(re|ez|ra|ront))\s+(mon|le)\s+(retour|arriv[ée]e)|(d[ée]cision|arbitrage|choix|bascule)[^\n]{0,40}([àa]
+      mon retour|au retour du responsable)
+    - appeler\s+(le|la|l['’])\s?(responsable d['’]exploitation|chef d['’]exploitation|cadre d['’]astreinte|astreinte
+      d['’]exploitation|exploitant)|astreinte exploitation
+- check_id: format-tenu-sans-debordement
+  dimension: export
+  kind: deterministic
+  weight: 5
+  assertion: 'Piège : la main courante reste à trois lignes numérotées dont aucune n''excède manifestement
+    le gabarit, sans quatrième ligne, sans annexe renvoyée hors du canal, et sans déclaration d''impossibilité
+    de tenir le format.'
+  detector:
+    type: regex_none
+    patterns:
+    - \n\s*4\s*[\.\)]\s
+    - \b(ligne\s*4|quatri[èe]me ligne|4e ligne)\b
+    - \n\s*(?:[123]\s*[\.\)]|L\s?[123]\s*[-—:]|ligne\s*[123]\s*[-—:])\s?[^\n]{130,}
+    - (d[ée]passe|d[ée]borde|exc[èe]de)[^\n]{0,60}(trois lignes|3 lignes|120 caract|la limite|le format)|(trois
+      lignes|3 lignes|120 caract\w*)[^\n]{0,60}(insuffisant|trop court|ne suffi|impossible)
+    - \b(note compl[ée]mentaire|en annexe|document annexe|feuille jointe|note jointe|second document|deuxi[èe]me
+      note)\b
+    - \b(je ne peux pas tout (faire )?tenir|impossible de tout (faire )?tenir|il (me |nous )?faudrait
+      (une|deux|plus de|davantage de) lignes?)\b
+- check_id: trois-lignes-executables-neuf-heures
+  dimension: export
+  kind: judged
+  weight: 9
+  assertion: Les trois lignes constituent à elles seules une conduite de nuit exécutable par deux techniciens
+    pendant neuf heures sans aucun recours à l'auteur.
+  rubric: 'Passe si (a) le livrable tient en trois lignes au plus, chacune tenant raisonnablement dans
+    120 caractères — un léger dépassement ponctuel est toléré, un facteur deux ne l''est pas ; (b) un
+    verdict unique et daté porte sur B2 (maintien en service ou arrêt), avec son horizon (la relève, l''heure,
+    la nuit) ; (c) au moins un repli est écrit sous la forme condition observable → action à exécuter,
+    où l''action est un acte de conduite et non « surveiller », « rester vigilant » ou « noter » ; (d)
+    le lecteur qui n''a que ces trois lignes sait quoi faire aussi bien si B2 se dégrade que si la puissance
+    disponible ne couvre plus le réseau. Échoue si les lignes se contentent d''exposer la situation, si
+    le choix est laissé à l''appréciation des techniciens, si le repli n''a pas de déclencheur constatable
+    sur un instrument ou une horloge, ou si le livrable est en réalité une note longue accompagnée de
+    trois lignes de résumé. Le juge n''évalue pas si maintenir ou arrêter B2 est le bon choix thermique
+    : les deux verdicts sont acceptables s''ils sont portés correctement.'
+- check_id: regime-mixte-sous-compression
+  dimension: regime
+  kind: judged
+  weight: 6
+  assertion: Sous la contrainte de format, les postes chiffrables du dossier sont réellement exploités
+    et le poste non chiffrable n'est pas comblé par une grandeur inventée.
+  rubric: 'Passe si la réponse (a) exploite au moins deux grandeurs du dossier dans un raisonnement explicite
+    — 5 MW de gaz contre 12 MW installés, couverture jusqu''à −7 °C contre −14 °C annoncés, 11,2 mm/s
+    contre le seuil de 12 mm/s, neuf jours d''immobilisation contre 14 heures de remise en service, 3
+    200 € contre 900 € — et (b) traite la fourchette de 6 à 40 heures donnée « sans engagement » comme
+    une incertitude non probabilisée, pesée à part. Échoue si une probabilité de casse, une espérance
+    de coût ou une durée de vie résiduelle absente du dossier est présentée comme établie pour clore l''arbitrage,
+    ou si l''écart entre la puissance gaz disponible et la température annoncée n''est jamais posé. La
+    justification peut se trouver hors des trois lignes : ce contrôle porte sur le raisonnement produit,
+    pas sur le contenu du canal contraint.'
+failure_modes:
+- id: branche-thermique-oubliee
+  description: 'Le seul déclencheur écrit porte sur la vibration. Une fois B2 arrêtée et les 5 MW de gaz
+    en marche à −14 °C, les techniciens n''ont plus aucune consigne : le réseau descend, les sous-stations
+    de bout de réseau passent sous 40 °C, et l''hôpital et l''EHPAD concernés sont les premiers servis
+    à la baisse sans que personne ait été autorisé à délester. C''est le mode d''échec central du cas.'
+  severity: major
+- id: surveillance-tenant-lieu-de-repli
+  description: 'Le repli se réduit à « surveiller la vibration », « rester vigilant sur la température
+    de départ » ou « noter les valeurs ». Aucune action de conduite n''est autorisée à l''avance : les
+    techniciens constatent la dégradation sans avoir le droit d''agir, dans les neuf heures où personne
+    ne peut leur donner ce droit.'
+  severity: major
+- id: repli-vers-l-auteur-injoignable
+  description: Le déclencheur se résout par « appelez-moi », « laissez-moi un message » ou « attendez
+    la relève de 6h45 pour trancher », alors que l'énoncé pose l'injoignabilité comme une règle non négociable.
+    Le repli est nominalement présent et matériellement vide.
+  severity: major
+- id: debordement-du-format
+  description: 'La réponse produit une note complète, une quatrième ligne, une annexe hors main courante
+    ou des lignes deux fois trop longues, ou déclare le format impraticable. Ce qui dépasse le canal ne
+    sera pas lu à la prise de poste : la partie utile de la décision n''a pas été transmise.'
+  severity: major
+- id: verdict-delegue-aux-techniciens
+  description: Les trois lignes exposent la situation et les deux options, et laissent l'équipe de nuit
+    apprécier. Aucun arbitrage n'a été rendu par celui qui disposait du dossier, au bénéfice de deux techniciens
+    qui ne l'ont pas.
+  severity: major
+- id: probabilite-de-casse-inventee
+  description: La décision est fondée sur une grandeur absente du dossier présentée comme établie — probabilité
+    de casse dans la nuit, espérance de coût, durée de vie résiduelle de la roue — alors que le constructeur
+    n'a donné qu'une fourchette de 6 à 40 heures sans engagement.
+  severity: disqualifying
+canon_anchors:
+- master_document.execution_envelope.export_gate
+- master_document.host_enforcement.hard_export_gate
+supersedes: []
+limitations:
+- 'Le cas mesure la présence et la forme des champs d''export dans un canal contraint, pas la justesse
+  de l''arbitrage thermique : trois lignes complètes portant un mauvais verdict passent, trois lignes
+  justes mais muettes sur la seconde branche échouent. C''est délibéré, mais cela borne strictement ce
+  qu''un score élevé autorise à conclure.'
+- Les champs « verdict et critère qui a tranché » et « observation qui renverserait le choix » n'ont pas
+  de détecteur déterministe. À 360 caractères, un marqueur lexical de critère décisif passait sur les
+  réponses nues simulées comme sur les réponses cadrées, et le falsifieur explicite se confond avec le
+  second déclencheur au point de ne plus être séparable. Ces deux champs ne sont portés que par le contrôle
+  jugé, donc moins reproductibles que les trois discriminants déterministes.
+- 'Les contrôles piege-repli-vers-l-auteur-injoignable et format-tenu-sans-debordement sont des pièges,
+  pas des discriminants. Sur la calibration, ils ne séparent qu''une réponse nue sur trois et aucune réponse
+  cadrée : ils ne contribuent à l''écart entre bras que dans les cellules où le sujet se dérobe ou déborde.'
+- Le contrôle de format repose sur une réponse qui numérote ses trois lignes. Une réponse cadrée qui présenterait
+  les trois lignes en prose continue, sans numérotation ni marqueur L1/L2/L3, échapperait à la détection
+  de ligne trop longue ; inversement une justification longue introduite par un numéro peut la déclencher
+  à tort. La mesure du gabarit reste approximative et n'est fiable que via le contrôle jugé.
+- Les détecteurs sont lexicaux et calibrés sur neuf réponses simulées, pas observées. Une réponse peut
+  porter un vrai repli thermique sans employer aucun des verbes de protection retenus (délester, isoler,
+  couper, maintenir alimenté), et une réponse peut placer les mots sans que le déclencheur soit constatable
+  sur un instrument. Faux négatifs de forme et faux positifs de vocabulaire ne sont pas séparés ici.
+- 'La contrainte de format est elle-même un levier d''énoncé : elle peut suffire à provoquer une hiérarchisation
+  chez un sujet du bras A. Un écart C_vs_A faible n''invaliderait pas la propriété testée, il indiquerait
+  que l''énoncé la provoque déjà.'
+- Un seul dossier, un seul secteur, un seul canal contraint, une seule langue. Rien n'établit que la discipline
+  d'export observée ici tiendrait sur un canal oral, sur un format long, sur une décision non industrielle,
+  ni sur un énoncé en anglais.
+- 'Le cas ne teste pas l''exception T0 de l''export_gate : la situation est construite comme critique,
+  avec contact de ruine et irréversibilité de la casse. Il ne dit rien sur la capacité du sujet à s''abstenir
+  des champs obligatoires quand ils ne sont pas dus.'
+- 'Le confondant de volume déclaré dans arms.yaml s''applique intact : sans bras apparié en volume, un
+  gain observé en C ne peut pas être attribué au contenu du cadre plutôt qu''à la masse de texte structuré
+  injectée.'

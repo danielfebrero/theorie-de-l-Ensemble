@@ -663,6 +663,10 @@ def expected_aggregate() -> tuple[dict[str, Any], list[validate.ValidationError]
     splits, split_errors = load_splits()
     errors.extend(split_errors)
 
+    # Un scénario remplacé est retiré de la grille : ses cellules ne sont plus
+    # exigées. Ses essais restent des mesures valides, simplement hors campagne.
+    retired = validate.superseded_ids(scenarios, "scenario_id")
+    active = [item for item in scenarios if item["scenario_id"] not in retired]
     index = validate.scenario_index(scenarios)
     by_check = validate.judgement_index(judgements)
     measures = [
@@ -670,7 +674,7 @@ def expected_aggregate() -> tuple[dict[str, Any], list[validate.ValidationError]
         for trial in trials
         if str(trial.get("scenario_id")) in index
     ]
-    scenario_ids = sorted(index)
+    scenario_ids = sorted(item["scenario_id"] for item in active)
     cells = build_cells(scenario_ids, measures)
     arms = build_arms(measures)
     judgement_coverage = build_judgement_coverage(measures)

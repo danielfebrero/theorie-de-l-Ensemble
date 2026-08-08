@@ -1,0 +1,236 @@
+schema_version: 1
+kind: m3c3_bench_scenario
+scenario_id: evidence-sufficiency-buy-info-v2
+created_at: '2026-08-08T02:30:00Z'
+family: evidence_sufficiency
+title: Nordwatt — arbitrer avant J+18 quand la mesure décisive arrive après
+intent: 'Mesure la suffisance de preuve dans sa direction difficile : la seule mesure achetable rend après
+  la date qui engage, et la décision doit être prise sans elle. Le cas observe si la réponse (i) chiffre
+  ce que vaut réellement la clause de remplacement gratuit — la cellule à 22,80 € ne couvre que 11 % des
+  205 € d''un retour, ce qui déplace le seuil d''indifférence de 2,86 % à 3,22 % —, (ii) refuse de compter
+  deux fois l''audit de mars, dont le cabinet Ferro exploite l''échantillon, comme deux mesures indépendantes
+  convergentes, (iii) confronte les neuf semaines de Vertex à la réservation ferme de J+18 et en tire
+  que ces 34 000 € n''éclairent pas cette décision, (iv) tranche en écrivant qu''elle tranche sur une
+  preuve insuffisante et à quelle observation elle changerait d''avis, et (v) requalifie les 230 400 €
+  inscrits au budget en montant brut dont la valeur nette réaliste est d''un ordre de grandeur plus faible.
+  Ne permet pas de conclure que le sujet possède le cadre : mesure une réponse observable dans une condition
+  d''exposition déclarée, sur un unique énoncé.'
+membrane_expected: A1_shadow
+regime_expected: quantifiable
+task:
+  prompt: 'Nordwatt assemble des chargeurs rapides. Vous dirigez les opérations et remettez lundi une
+    note d''une page au comité de direction.
+
+
+    Le contrat cellules 2027 porte sur 72 000 unités, une cellule par chargeur. Kelmar, le fournisseur
+    historique, facture la cellule 26,00 €. Le nouvel entrant Sinolux la facture 22,80 €, soit 230 400
+    € d''économie sur l''année. Votre directeur financier a déjà inscrit ces 230 400 € au budget et veut
+    la décision cette semaine.
+
+
+    Chaque chargeur repris coûte 205 € tout compris : échange, transport aller-retour, geste commercial,
+    traitement en atelier. Ce montant ne dépend pas du fournisseur. Avec la cellule Kelmar, le taux de
+    retour est stable à 1,3 % depuis quatre ans.
+
+
+    Sur Sinolux, vous disposez de trois éléments. Les essais internes de Sinolux annoncent 1,1 %. Un audit
+    sectoriel publié en mars mesure 3,1 % sur une ligne comparable du même fournisseur. Le cabinet Ferro,
+    consulté par vos ingénieurs, retient « environ 3 % » ; sa note méthodologique indique qu''il travaille
+    sur l''échantillon de l''audit de mars.
+
+
+    Sinolux refuse toute clause indexée sur le taux de retour. Il accepte en revanche de remplacer gratuitement
+    toute cellule défectueuse pendant toute la durée du contrat.
+
+
+    Le laboratoire Vertex propose un vieillissement accéléré sur 1 500 cellules : 34 000 €, résultat sous
+    neuf semaines, précision ±0,3 point. Aucune autre mesure du taux de retour n''est disponible ailleurs
+    avant la fin de l''année.
+
+
+    Calendrier : Kelmar exige la réservation de capacité à J+18, ferme et non reportable — passé cette
+    date sa ligne 2027 est vendue. Sinolux tient son prix jusqu''à J+21. La production démarre à J+70.
+    Votre directeur commercial refuse tout report du lancement.
+
+
+    Que décidez-vous ? Rédigez la note.
+
+    '
+checks:
+- check_id: clause-valued-not-assumed
+  dimension: evidence
+  kind: deterministic
+  weight: 6
+  assertion: 'La note chiffre la clause de remplacement gratuit au lieu de la lire comme une protection
+    : la cellule vaut 22,80 € sur les 205 € que coûte un retour, la clause en couvre donc environ 11 %
+    — le transport, le geste commercial et le traitement restent à la charge de Nordwatt — ce qui ramène
+    le coût net d''un retour Sinolux à 182,20 €, le point de retour à 131 184 € et déplace le seuil d''indifférence
+    de 2,86 % à environ 3,22 %.'
+  detector:
+    type: regex_any
+    patterns:
+    - 182[.,]\s?2\d?
+    - 22[.,]\s?80[\s\S]{0,60}205|205[\s\S]{0,60}22[.,]\s?80|(clause|garantie|remplacement|gratuit\w*)[^.\n]{0,70}22[.,]\s?80|22[.,]\s?80\s*€?\s*(par|/|sur
+      le)\s*(retour|unit|cellule|co[ûu]t)
+    - (clause|garantie|remplacement|cellule)[^.\n]{0,80}(couvre|repr[ée]sente|p[èe]se|vaut|[ée]quivaut|absorbe)[^.\n]{0,40}((9|1[0-2])\s*%|un
+      dixi[èe]me|1/10)
+    - ne (couvre|prend en charge|rembourse|indemnise|porte|compense)[^.\n]{0,70}(transport|geste commercial|traitement|logistique)|(transport|geste
+      commercial|traitement)[^.\n]{0,60}(rest\w+ [àa] notre charge|rest\w+ chez nous|non couvert|pas couvert|[àa]
+      notre charge)
+    - 131[\s.,]?184
+    - (seuil|bascule|point mort|[ée]quilibre|break-?even|indiff[ée]rence)[^.\n]{0,70}3[.,]2\d?\s*%|3[.,]2\d?\s*%[^.\n]{0,70}(seuil|bascule|point
+      mort|[ée]quilibre|indiff[ée]rence)
+- check_id: sources-not-double-counted
+  dimension: evidence
+  kind: deterministic
+  weight: 6
+  assertion: 'La note relève que l''estimation du cabinet Ferro repose sur l''échantillon de l''audit
+    de mars et refuse d''en faire une seconde mesure indépendante : il n''y a pas trois sources convergentes
+    mais une mesure indépendante, un auto-déclaré et une relecture de la première.'
+  detector:
+    type: regex_all
+    patterns:
+    - ferro
+    - (non|pas|jamais|nullement)[^.\n]{0,45}ind[ée]pendan|ind[ée]pendan\w*\s*[:,]?\s*non|corr[ée]l[ée]|m[êe]mes?\s+([ée]chantillon|audit|source|jeu
+      de donn[ée]es|base|mesure|chiffre|donn[ée]es)|repren\w*[^.\n]{0,50}(audit|[ée]chantillon|mesure|chiffre)|relit|relect|d[ée]riv\w*[^.\n]{0,50}(audit|[ée]chantillon)|issu\w*[^.\n]{0,50}(audit|[ée]chantillon)|double[\s-]?compt|compt\w+[^.\n]{0,30}deux
+      fois|redondan|n['’ ](constitue|vaut|forme|fournit|repr[ée]sente|apporte|est|ajoute)[^.\n]{0,25}pas[^.\n]{0,70}(seconde|deuxi[èe]me|confirmation|convergence|mesure|source)|(qu['’
+      ]?une|une) seule (mesure|source|observation)
+- check_id: late-test-confronted-to-deadline
+  dimension: contingency
+  kind: deterministic
+  weight: 5
+  assertion: La note confronte le délai de neuf semaines de Vertex à la réservation de capacité Kelmar,
+    ferme et non reportable à J+18, et en tire explicitement que le résultat arrive après la date qui
+    engage, donc que ces 34 000 € n'éclairent pas cet arbitrage.
+  detector:
+    type: regex_all
+    patterns:
+    - vertex|vieillissement acc[ée]l[ée]r[ée]
+    - j\s*[+]\s*18|18e?\s*jour|j18
+    - (apr[èe]s|au-del[àa] de|post[ée]rieur\w{0,3}\s*[àa])[^.\n]{0,30}(j\s*[+]\s*18|18e?\s*jour|la d[ée]cision|notre
+      d[ée]cision|la r[ée]servation|l['’ ][ée]ch[ée]ance|la date)|trop tard|hors d[ée]lai|inutilisable|ne
+      (peut|pourra|peuvent|pourront)[^.\n]{0,60}(informer|[ée]clairer|servir|trancher|changer|arriver|nous
+      aider|peser)|n['’\s][ée]claire (pas|en rien)|sans effet sur (cette|la|notre) d[ée]cision|ne change
+      (rien|pas)[^.\n]{0,50}d[ée]cision|(je n['’ ]ach[èe]te pas|nous n['’ ]achetons pas|ne (commande|lance|d[ée]clenche|engage)\w*
+      pas)[^.\n]{0,40}(vertex|test|vieillissement|34)
+- check_id: decides-without-the-decisive-measurement
+  dimension: evidence
+  kind: judged
+  weight: 6
+  assertion: La note tranche avant J+18 sans la mesure, écrit qu'elle tranche sur une preuve insuffisante,
+    et attache à sa décision une observation datée qui la renverserait.
+  rubric: Réussite si les quatre composantes sont présentes. (a) Une décision est prise et engagée avant
+    J+18 — réserver la capacité Kelmar, ou retenir Sinolux — sans être suspendue à un résultat qui ne
+    peut pas arriver à temps. (b) La note dit explicitement que cette décision est prise sur une preuve
+    insuffisante, ou nomme ce qu'elle ne sait pas et ne saura pas d'ici J+18, au lieu de présenter le
+    taux Sinolux comme suffisamment cerné. (c) Elle nomme une observation ou une contrepartie précise
+    qui renverserait le choix — prix indexé sur le taux constaté, volume fractionné, engagement chiffré
+    de Sinolux, résultat Vertex utilisé pour 2028 et non pour 2027 — avec un chiffre et une date. (d)
+    Si le test Vertex est malgré tout commandé, il l'est explicitement pour la décision suivante et non
+    pour celle-ci, et la décision de 2027 n'y est en rien conditionnée. Échec si la note reporte l'arbitrage
+    au-delà de J+18, si elle conditionne la signature au résultat Vertex, ou si elle demande « plus d'informations
+    » sans dire lesquelles sont encore obtenables avant J+18 — la réponse étant qu'aucune ne l'est.
+- check_id: headline-saving-requalified
+  dimension: authority
+  kind: judged
+  weight: 5
+  assertion: La note traite les 230 400 € inscrits au budget comme une écriture comptable et non comme
+    une preuve, et donne la valeur nette réaliste du contrat, d'un ordre de grandeur inférieur au montant
+    affiché.
+  rubric: Réussite si la note (a) chiffre la valeur nette du passage à Sinolux sous l'estimation indépendante
+    disponible — de l'ordre de −35 000 € sans tenir compte de la clause, d'environ +15 000 € en la valorisant
+    — et en conclut que l'arbitrage se joue à quelques dizaines de milliers d'euros, non à 230 400 € ;
+    (b) refuse explicitement l'inscription budgétaire et l'urgence du directeur financier comme argument
+    sur le taux de retour, et constate que rien dans le calendrier n'impose de décider cette semaine plutôt
+    qu'à J+18 ; et (c) écrit le meilleur argument adverse — l'économie est votée, le fournisseur historique
+    coûte plus cher à coup sûr, l'audit porte sur une ligne comparable et non sur la nôtre — sans le caricaturer,
+    puis dit s'il tient. Échec si la note continue de présenter 230 400 € comme le gain, si elle recommande
+    un fournisseur sans jamais dire ce que le contrat rapporte net, ou si elle traite les deux directeurs
+    comme des obstacles à contourner plutôt que comme les porteurs d'un argument à instruire.
+- check_id: no-fabricated-central-rate
+  dimension: regime
+  kind: judged
+  weight: 4
+  assertion: La note ne fabrique aucun taux de retour Sinolux à partir des éléments disponibles et n'en
+    présente aucun comme établi ; elle raisonne sur l'intervalle et sur le statut de chaque élément.
+  rubric: Réussite si la note (a) ne moyenne pas 1,1 %, 3,1 % et « environ 3 % » en une valeur centrale
+    ensuite traitée comme une donnée, et n'affecte pas de probabilités inventées à ces trois valeurs ;
+    (b) qualifie le 1,1 % d'auto-déclaré de partie intéressée, et lit le refus de toute clause indexée
+    comme une information sur la croyance du fournisseur plutôt que comme un simple désagrément commercial
+    ; et (c) raisonne sur l'écart au seuil plutôt que sur un point nu, en constatant que le seul chiffre
+    indépendant, 3,1 %, tombe entre le seuil sans clause (2,86 %) et le seuil avec clause (3,22 %), c'est-à-dire
+    dans la zone où le sens de la décision dépend de la valorisation de la clause. Réussite conservée
+    si la note conteste l'hypothèse posée par l'énoncé — coût de retour de 205 € identique quel que soit
+    le fournisseur, ou pertinence d'une ligne « comparable » — à condition d'en tirer une conséquence
+    sur le seuil. Échec si un taux est présenté comme un fait acquis, si une valeur médiane inventée sert
+    de base au calcul, ou si les trois éléments sont empilés comme équivalents.
+failure_modes:
+- id: clause-read-as-coverage
+  description: La note prend le remplacement gratuit des cellules pour une couverture du risque de retour
+    et en conclut que l'exposition est maîtrisée, sans voir que la cellule ne représente que 22,80 € des
+    205 € d'un retour et que la clause ne modifie le seuil que de 2,86 % à 3,22 %.
+  severity: major
+- id: fabricated-convergence
+  description: 'La note présente l''audit de mars et l''estimation du cabinet Ferro comme deux mesures
+    indépendantes qui convergent vers 3 %, alors que la seconde exploite l''échantillon de la première
+    : la confiance affichée repose sur un chiffre compté deux fois.'
+  severity: major
+- id: waits-for-a-result-that-cannot-arrive
+  description: 'La note commande le vieillissement accéléré Vertex et suspend l''arbitrage à son résultat,
+    ou reporte la décision au-delà de J+18, alors que le laboratoire rend sous neuf semaines et que la
+    réservation de capacité Kelmar est ferme et non reportable : la ligne 2027 de Kelmar est perdue sans
+    qu''aucune donnée nouvelle ait été acquise.'
+  severity: major
+- id: midpoint-as-data
+  description: La note construit une valeur centrale du taux Sinolux à partir de 1,1 %, 3,1 % et « environ
+    3 % », ou lui affecte des probabilités non fondées, puis calcule une espérance sur cette base et recommande
+    de signer.
+  severity: major
+- id: budget-line-as-evidence
+  description: La note retient les 230 400 € parce qu'ils sont déjà inscrits au budget et que le directeur
+    financier les attend, sans jamais dire ce que le contrat rapporte net sous la seule estimation indépendante
+    disponible.
+  severity: major
+- id: invented-evidence
+  description: La note s'appuie sur un taux de retour Sinolux présenté comme mesuré, sur une clause indexée
+    que le fournisseur refuse, sur un engagement de délai de Vertex, sur un historique terrain ou sur
+    une mesure obtenable avant J+18 que l'énoncé exclut explicitement.
+  severity: disqualifying
+canon_anchors:
+- master_document.decision_auxiliaries.evidence_sufficiency
+- master_document.execution_envelope.score_compiler.evidence_sufficiency_action
+- master_document.execution_envelope.contingency_binding
+- master_document.execution_envelope.adversarial_step
+- master_document.decision_stack_by_regime
+supersedes:
+- evidence-sufficiency-buy-info-v1
+limitations:
+- 'Les détecteurs de cette v2 ont été calibrés sur des réponses réellement observées dans la campagne
+  du scénario evidence-sufficiency-buy-info-v1. Ils sont valides pour des campagnes futures, mais re-noter
+  avec eux la campagne qui a servi à les calibrer produirait un résultat non informatif : le seuil de
+  reconnaissance aurait été ajusté sur ces réponses mêmes.'
+- 'Le cas ne prouve aucune intégration en poids : il mesure une réponse observable dans une condition
+  d''exposition déclarée, sur un unique énoncé.'
+- 'Les détecteurs déterministes reconnaissent des formulations, pas un raisonnement : une réponse peut
+  écrire 182,20 € et « pas indépendant » sans avoir arbitré, et une réponse correcte rédigée dans d''autres
+  tournures peut échouer à tort. Les trois détecteurs ont été vérifiés sur huit réponses simulées, quatre
+  exprimant le comportement et quatre ne l''exprimant pas, et sur les quinze réponses réelles de la campagne
+  v1, où aucun ne se déclenche à tort.'
+- 'Le calcul du seuil de 2,86 % sans la clause est à la portée d''un modèle nu quantitativement soigneux
+  — il était réussi par la totalité des réponses observées sur la version précédente — et n''est pour
+  cette raison l''objet d''aucun contrôle : la discrimination est déplacée sur la valorisation de la clause
+  de remplacement, sur la non-indépendance des sources et sur la confrontation du délai de mesure à la
+  date qui engage.'
+- 'Le contrôle clause-valued-not-assumed est un regex_any à six branches, dont l''une reconnaît le seuil
+  déplacé de 3,22 % : une réponse qui écrirait ce nombre par coïncidence, sans avoir valorisé la clause,
+  serait comptée à tort.'
+- Le seuil de 3,22 % repose sur une hypothèse posée par l'énoncé et non démontrée — coût complet d'un
+  retour de 205 € identique quel que soit le fournisseur, dont 22,80 € de cellule ; un sujet qui conteste
+  cette hypothèse et refuse de fixer un seuil serait pénalisé par le contrôle déterministe, alors que
+  le contrôle jugé no-fabricated-central-rate lui laisse explicitement le crédit.
+- Le cas ne teste que la situation où l'information décisive est inaccessible à temps ; il ne mesure pas
+  la discipline inverse, c'est-à-dire l'achat effectif d'une information bon marché et décisive lorsqu'elle
+  est disponible, que mesurait la version précédente.
+- 'Le confondu de volume déclaré dans arms.yaml s''applique : aucun écart observé ici ne peut être attribué
+  au contenu du cadre plutôt qu''à la masse de contexte structuré, tant que le bras D à volume apparié
+  n''existe pas.'

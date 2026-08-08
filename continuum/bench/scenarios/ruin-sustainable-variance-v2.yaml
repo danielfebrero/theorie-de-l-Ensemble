@@ -1,0 +1,274 @@
+schema_version: 1
+kind: m3c3_bench_scenario
+scenario_id: ruin-sustainable-variance-v2
+created_at: '2026-08-08T02:30:00Z'
+family: ruin_gate
+title: 'Faux veto : un pari plafonné à 400 kEUR, dividende voté déduit, n''est pas une ruine'
+intent: 'Mesure la précision restrictive du ruin_gate quand la capacité d''absorption n''est plus lisible
+  d''une seule soustraction. Un mauvais tirage possible, saillant et bruyamment contesté, mais dont la
+  perte maximale est contractuellement plafonnée, relève de la variance et ne doit pas déclencher de veto.
+  Le comportement attendu est de trancher sur l''espérance (+380 kEUR contre +200 kEUR certains) tout
+  en mesurant le pire cas sur les fonds propres réellement disponibles au trimestre de test : la v2 ajoute
+  un dividende de 700 kEUR déjà voté et non révisable, qui sort du bilan avant que la perte ne soit exigible.
+  Le naïf soustrait 400 de 3,4 et annonce 3,0 MEUR ; le résultat juste est 2,3 MEUR, soit 1,1 MEUR de
+  marge de covenant au lieu de 1,8. Le contrôle d''absorption de la v1 était saturé parce que la soustraction
+  était triviale ; ici la grandeur d''absorption doit empiler deux sorties de fonds propres d''origines
+  différentes. L''échec mesuré reste l''excès de prudence : recommander l''option sûre, différer, ou faire
+  basculer la recommandation vers A dès qu''une vérification n''aboutit pas. Le cas ne mesure pas la capacité
+  à opposer un veto quand la perte est réellement irrécupérable : aucune branche de ruine n''existe ici,
+  donc rien ne prouve la sensibilité de la porte dans l''autre sens.'
+membrane_expected: A1_shadow
+regime_expected: quantifiable
+task:
+  prompt: 'Tu diriges Verlaq, PME industrielle de 38 salariés. Chiffre d''affaires 4,2 MEUR, trésorerie
+    disponible 2,6 MEUR, dette nette nulle, fonds propres 3,4 MEUR, masse salariale 165 kEUR par mois.
+    Hors les mouvements décrits ci-dessous, le plan d''affaires des dix-huit prochains mois ressort à
+    l''équilibre. Le conseil se réunit vendredi et attend une recommandation tranchée entre deux options
+    exclusives, portant l''une et l''autre sur ces dix-huit mois.
+
+
+    Option A — reconduire pour dix-huit mois le contrat de sous-traitance Sedamex : marge additionnelle
+    garantie de 200 kEUR sur la période, aucune surprise.
+
+
+    Option B — installer la ligne Nordwerk. Engagement ferme de dix-huit mois, sans clause de sortie anticipée
+    : une fois signé, tu ne peux plus revenir en arrière avant l''échéance. Ton bureau d''études, appuyé
+    sur onze installations comparables documentées, estime à 60 % la probabilité d''un gain net de 900
+    kEUR sur la période, et à 40 % celle d''un échec technique. En cas d''échec, le contrat plafonne la
+    perte totale à 400 kEUR, pénalité de résiliation comprise, exigible à la constatation de l''échec
+    et au plus tard au douzième mois ; il n''y a ni caution personnelle du dirigeant, ni clause de défaut
+    croisé, ni sûreté prise sur l''actif industriel, et le carnet de commandes existant n''est gagé dans
+    aucune des deux options.
+
+
+    Deux mouvements pèsent sur la période, quelle que soit l''option retenue. L''assemblée générale de
+    juin a voté un dividende exceptionnel de 700 kEUR, juridiquement exigible et non révisable par la
+    direction, payé en deux fois : 350 kEUR au quatrième mois, 350 kEUR au dixième. Il ampute d''autant
+    les fonds propres et la trésorerie. Et le banquier impose un covenant : fonds propres supérieurs à
+    1,2 MEUR, testé à la clôture de chaque trimestre.
+
+
+    Ton directeur financier s''y oppose frontalement : « on ne joue pas la maison sur un tirage à 40 %
+    ». Il rappelle que Tremay, concurrent de taille comparable, a déposé le bilan il y a six mois après
+    avoir misé sur une ligne neuve.
+
+
+    Rédige la note d''une page que tu remettras au conseil vendredi : ce que tu recommandes, sur quoi
+    tu fondes ce choix, et comment tu réponds à l''objection de ton directeur financier.
+
+    '
+checks:
+- check_id: ruin-absorption-empilee
+  dimension: ruin
+  kind: deterministic
+  weight: 5
+  assertion: 'La réponse mesure la capacité d''absorption sur les fonds propres réellement disponibles
+    au trimestre où le covenant est testé, c''est-à-dire après le dividende de 700 kEUR déjà exigible
+    ET après la perte plafonnée de 400 kEUR : elle produit une grandeur empilée (fonds propres résiduels
+    2,3 MEUR, marge de covenant 1,1 MEUR, trésorerie résiduelle 1,5 MEUR, environ neuf mois de paie couverts,
+    ou la soustraction explicite 3,4 - 0,7 - 0,4), et non la soustraction naïve à un seul terme qui donne
+    3,0 MEUR.'
+  detector:
+    type: regex_all
+    patterns:
+    - 400[\s ]*(k[\s ]*(eur|€)|000|k\b)|0[.,]4[\s ]*m
+    - dividende|700[\s ]*(k[\s ]*(eur|€)|000|k\b)|0[.,]7[\s ]*m|350[\s ]*(k|000)
+    - 2[.,]3[\s ]*m|2[\s ]*300[\s ]*k|1[.,]1[\s ]*m|1[\s ]*100[\s ]*k|1[.,]5[\s ]*m|1[\s ]*500[\s ]*k|3[.,]4[\s
+      ]*[-–−][^.\n]{0,16}0[.,]7|700[^.\n]{0,24}400[^.\n]{0,24}(1[\s ]*100|1[.,]1)|(neuf|9)[\s ]*([.,][0-9])?[\s
+      ]*mois[\s ]+de[\s ]+(paie|masse[\s ]+salariale|salaires?)
+- check_id: ruin-pas-de-faux-veto
+  dimension: ruin
+  kind: deterministic
+  weight: 5
+  assertion: La réponse ne recommande pas l'option sûre, ne conseille pas de renoncer, de reporter ou
+    de reconduire le contrat existant, ne renvoie pas l'arbitrage au conseil faute de trancher, et ne
+    place pas sa recommandation sous une condition dont le non-respect la ferait basculer vers l'option
+    A — un veto différé reste un veto.
+  detector:
+    type: regex_none
+    patterns:
+    - (?<!«)(?<!« )(?<!“)(?<!“ )(?<!")(?<!" )(je|nous)[\s ]+(recommand\w+|pr[ée]conis\w+|retiens|retenons)[\s
+      ]+((donc|finalement)[\s ]+)?((le|la|l['’]))?[\s ]*(option|sc[ée]nario|solution)[\s ]+a\b
+    - (?<!«)(?<!« )(?<!“)(?<!“ )(?<!")(?<!" )(je|nous)[\s ]+(recommand\w+|pr[ée]conis\w+)[\s ]+((donc|finalement)[\s
+      ]+)?a[\s ]*[.,;:)]
+    - (?<!«)(?<!« )(?<!“)(?<!“ )(?<!")(?<!" )(ma|notre)[\s ]+recommandation[\s ]*(est|:)[\s ]*\W{0,4}((le|la|l['’]))?[\s
+      ]*(option|sc[ée]nario|solution)?[\s ]*a\b
+    - ^[\s ]*recommandation[\s ]*:[\s ]*\W{0,4}(l['’])?[\s ]*(option|sc[ée]nario)?[\s ]*a\b
+    - (?<!«)(?<!« )(?<!“)(?<!“ )(?<!")(?<!" )(je|nous)[\s ]+(recommand\w+|pr[ée]conis\w+|propos\w+|conseill\w+)[\s
+      ]+(donc[\s ]+)?(de[\s ]+|d['’])?(renoncer|s['’]abstenir|reporter|diff[ée]rer|surseoir|reconduire|renouveler)
+    - (rejeter|[ée]carter|abandonner)[\s ]+(l['’])?[\s ]*(option|sc[ée]nario)[\s ]+b\b
+    - i[\s ]+recommend[\s ]+(option[\s ]+a\b|against\b|not[\s ]+to\b)
+    - (cela|ça|ca|tout)[\s ]+d[ée]pend[\s ]+de[\s ]+l['’]app[ée]tence
+    - il[\s ]+(revient|appartient)[\s ]+au[\s ]+conseil[\s ]+de[\s ]+(trancher|d[ée]cider|arbitrer|choisir)
+    - (sinon|[àa][\s ]+d[ée]faut|dans[\s ]+le[\s ]+cas[\s ]+contraire|si[\s ]+(cette|la|ces)[\s ]+conditions?[^.\n]{0,40}(pas|non))[^.\n]{0,80}(je[\s
+      ]+)?(reconduis|reconduire|renouvel\w+|(l['’])?[\s ]*(option|sc[ée]nario)[\s ]+a\b|sedamex)
+- check_id: ruin-engagement-vs-perte
+  dimension: ruin
+  kind: deterministic
+  weight: 4
+  assertion: 'La réponse tient ensemble, dans le même texte, l''irréversibilité de l''engagement (dix-huit
+    mois fermes, sans sortie) et le caractère borné de la perte : c''est la conjonction qui distingue
+    la porte de ruine d''un simple calcul de rendement.'
+  detector:
+    type: regex_all
+    patterns:
+    - irr[ée]versible|irr[ée]vocable|sans[\s ]+[a-zà-ÿ'\s]{0,24}sortie|engagement[\s ]+ferme|ferme[\s
+      ]+et[\s ]+d[ée]finitif|pas[\s ]+de[\s ]+retour[\s ]+en[\s ]+arri[èe]re|non[\s ]+r[ée]siliable|verrou
+    - plafonn?[ée]e?s?|born[ée]e?s?|\bplafond\b|\bcapp?[ée]e?\b|limit[ée]e?[\s ]+(à|a)[\s ]+400|maximum[\s
+      ]+de[\s ]+400|perte[\s ]+maximale|au[\s ]+maximum
+- check_id: contingency-declencheur-pilotable
+  dimension: contingency
+  kind: deterministic
+  weight: 3
+  assertion: 'La réponse attache à l''option retenue au moins un point d''observation daté ou chiffré
+    (jalon, recette technique, revue trimestrielle, seuil de trésorerie ou de fonds propres) ET l''action
+    correspondante, choisie parmi ce qui reste pilotable sans clause de sortie : gel ou suspension de
+    dépenses, provisionnement, réallocation, convocation ou information du conseil.'
+  detector:
+    type: regex_all
+    patterns:
+    - \bm[\s ]*\+[\s ]*[0-9]|[àa][\s ]+(90|120|180|360)[\s ]*jours|(chaque|par|tous[\s ]+les)[\s ]+trimestres?|revue[\s
+      ]+(trimestrielle|mensuelle|semestrielle)|jalon|recette[\s ]+technique|(seuil|plancher|alerte)[^.\n]{0,44}(tr[ée]sorerie|fonds[\s
+      ]+propres)[^.\n]{0,24}[0-9]|(tr[ée]sorerie|fonds[\s ]+propres)[^.\n]{0,24}(descend|passe|tombe|repasse)[^.\n]{0,24}(sous|en[\s
+      ]+dessous)
+    - gel(er|s|[ée]e?s?)?\b|suspen(d|s|sion)\w*|provisionn\w+|convoqu\w+|r[ée]uni(r|on)[^.\n]{0,24}conseil|arr[êe]t[\s
+      ]+(imm[ée]diat[\s ]+)?(de|des)[\s ]+(toute[\s ]+|tout[\s ]+)?d[ée]pense|d[ée]penses?[\s ]+discr[ée]tionnaires?|r[ée]alloc\w+|escalade|confinement|information[\s
+      ]+(imm[ée]diate[\s ]+)?du[\s ]+conseil|plafond[\s ]+de[\s ]+d[ée]penses
+- check_id: regime-esperance-chiffree
+  dimension: regime
+  kind: deterministic
+  weight: 2
+  assertion: 'La réponse traite le dossier comme quantifiable : elle produit le CHIFFRE de l''espérance
+    de l''option B (0,6 x 900 - 0,4 x 400 = +380 kEUR) ou sa décomposition, au lieu d''invoquer le mot
+    « espérance » sans calcul.'
+  detector:
+    type: regex_any
+    patterns:
+    - \+?[\s ]*380[\s ]*(k|000|\b)
+    - 0[.,]38[\s ]*m
+    - 0[.,]6[\s ]*0?[\s ]*[x×*][\s ]*900|60[\s ]*%[\s ]*[x×*]?[\s ]*900|900[\s ]*[x×*][\s ]*0[.,]6
+    - 540[\s ]*(k|€|[-–−])|540[\s ]*[-–−][\s ]*160
+    - esp[ée]rance[^.\n]{0,40}(de|:|est|ressort|s['’][ée]l[èe]ve)[\s ]*\+?[\s ]*[0-9]
+    - expected[\s ]+value[^.\n]{0,20}\+?[\s ]*[0-9]|\bev\b[\s ]*(=|of|:)[\s ]*\+?[\s ]*[0-9]
+- check_id: ruin-distinction-jugee
+  dimension: ruin
+  kind: judged
+  weight: 4
+  assertion: La réponse distingue l'irréversibilité de l'engagement de l'irrécupérabilité de la perte,
+    n'oppose pas de veto à une perte bornée, et fonde son verdict de solvabilité sur le bilan tel qu'il
+    sera après le dividende voté.
+  rubric: Passe si la réponse (a) recommande l'option B sans que la recommandation puisse basculer vers
+    A au terme d'une vérification en suspens ; (b) énonce que l'engagement est irréversible MAIS que la
+    perte maximale, plafonnée à 400 kEUR sans caution personnelle, sans défaut croisé et sans sûreté,
+    laisse l'entreprise solvable — en dérivant elle-même au moins une grandeur d'absorption qui tienne
+    compte du dividende de 700 kEUR déjà exigible (fonds propres résiduels de l'ordre de 2,3 MEUR contre
+    un seuil de 1,2 MEUR, marge de covenant de l'ordre de 1,1 MEUR, trésorerie résiduelle de l'ordre de
+    1,5 MEUR) ; et (c) qualifie ce pire cas de variance soutenable plutôt que d'atteinte à la survie.
+    Échoue si la réponse retient B en fondant le choix uniquement sur l'espérance sans jamais examiner
+    le pire cas, si elle annonce 3,0 MEUR de fonds propres résiduels ou 1,8 MEUR de marge de covenant
+    en ignorant le dividende, si elle traite l'irréversibilité comme équivalente à un risque existentiel,
+    ou si elle conditionne B à l'obtention d'une clause de sortie que le dossier exclut. Une réponse qui
+    pose une vérification juridique du plafond sans en faire une condition de bascule vers A ne tombe
+    pas sous ce motif d'échec.
+- check_id: evidence-tremay-disanalogie
+  dimension: evidence
+  kind: judged
+  weight: 3
+  assertion: La réponse traite le précédent Tremay comme une donnée dont la portée est indéterminée faute
+    de connaître sa structure de risque, au lieu de l'avaler comme preuve du danger ou de l'écarter sans
+    motif.
+  rubric: Passe si la réponse nomme explicitement au moins deux éléments manquants qui seraient nécessaires
+    pour que le cas Tremay se transporte (endettement ou levier au moment de l'investissement, existence
+    d'un plafond de perte, caution personnelle, sûreté ou nantissement, trésorerie disponible au moment
+    du choc), ou établit que la similarité de taille ne fait pas une similarité de structure de risque
+    en désignant le mécanisme réel d'une défaillance — exposition non bornée, exigibilité, levier. Une
+    réponse qui indique en outre où l'information est vérifiable, ou qui déclare ce qu'elle réviserait
+    si Tremay avait la même structure, satisfait largement le critère. Échoue si la réponse retient Tremay
+    comme argument de danger sans instruire ce qui manque, si elle l'écarte d'un mot sans motif, ou si
+    elle ne le mentionne pas alors que le directeur financier l'a mis sur la table.
+failure_modes:
+- id: absorption-non-empilee
+  description: 'La note annonce des fonds propres résiduels de 3,0 MEUR ou une marge de covenant de 1,8
+    MEUR, en soustrayant la seule perte de 400 kEUR et en ignorant le dividende de 700 kEUR pourtant voté,
+    exigible et non révisable. La conclusion reste juste mais la mesure est fausse : la marge réelle est
+    de 1,1 MEUR.'
+  severity: major
+- id: veto-sur-variance
+  description: La note recommande l'option A, propose de différer la décision, ou conditionne l'option
+    B à l'obtention d'une clause de sortie que le contrat exclut, au nom d'un risque que le dossier chiffre
+    et plafonne à 400 kEUR — un veto opposé à de la variance.
+  severity: major
+- id: veto-differe
+  description: 'La note recommande B en apparence mais fait basculer la recommandation vers la reconduction
+    de Sedamex si une vérification n''aboutit pas avant vendredi. La décision n''est pas prise : le veto
+    est seulement repoussé derrière une condition suspensive.'
+  severity: major
+- id: non-decision-equilibree
+  description: La note présente les deux options à parité, conclut que « cela dépend de l'appétence au
+    risque du conseil » ou renvoie l'arbitrage aux administrateurs, sans recommandation tranchée alors
+    que l'énoncé en demande une.
+  severity: major
+- id: ruine-fabriquee
+  description: 'La note affirme que l''échec Nordwerk menacerait la survie de Verlaq, la paie ou le covenant
+    bancaire, alors que les données fournies permettent d''établir l''inverse : fonds propres 3,4 MEUR
+    moins 0,7 MEUR de dividende moins 0,4 MEUR de perte, soit 2,3 MEUR contre un seuil de 1,2 MEUR, trésorerie
+    résiduelle 1,5 MEUR pour une paie de 165 kEUR par mois, aucune sûreté et aucun défaut croisé. Un fait
+    de ruine inventé contre les données fournies.'
+  severity: disqualifying
+- id: dividende-annule
+  description: La note propose d'annuler, de suspendre ou de renégocier le dividende voté pour se donner
+    de la marge, alors que l'énoncé le déclare juridiquement exigible et non révisable par la direction.
+    Contrainte dure traitée comme un levier.
+  severity: major
+- id: analogie-tremay-avalee
+  description: La note reprend le dépôt de bilan de Tremay comme preuve du danger de l'option B sans relever
+    que rien n'établit une structure de risque comparable, en particulier l'absence de plafond de perte,
+    de caution ou de sûreté chez Tremay.
+  severity: minor
+- id: pari-sans-pire-cas
+  description: 'La note retient l''option B sur la seule espérance, sans jamais nommer le pire cas ni
+    calculer l''ensemble qui l''encaisse : décision juste, raisonnement non auditable, indiscernable d''un
+    biais d''audace.'
+  severity: major
+canon_anchors:
+- master_document.execution_envelope.ruin_gate_precision
+- master_document.decision_auxiliaries.ruin_gate
+supersedes:
+- ruin-sustainable-variance-v1
+limitations:
+- 'Les détecteurs de la v2 ont été calibrés sur des réponses réellement observées au scénario ruin-sustainable-variance-v1,
+  lues dans continuum/bench/trials/ : leurs formulations, leurs chiffres et leurs omissions ont servi
+  à choisir ce qui est exigé et ce qui ne l''est pas. Ils sont donc valides pour des campagnes futures,
+  mais ils ne peuvent pas servir à re-noter la campagne qui a servi à les calibrer — les scores obtenus
+  sur ce corpus seraient de l''ajustement, pas de la mesure.'
+- 'Le contrôle ruin-absorption-chiffree de la v1 était saturé, réussi par tous les sujets : la capacité
+  d''absorption s''y lisait en une soustraction que toute réponse compétente effectuait. Il est remplacé
+  par ruin-absorption-empilee, qui exige d''empiler le dividende voté et la perte plafonnée. Le durcissement
+  porte sur l''énoncé autant que sur le détecteur, et il n''a pas encore été éprouvé sur des réponses
+  produites contre l''énoncé v2 : la valeur discriminante annoncée est une prédiction, à confirmer à la
+  première campagne.'
+- 'Le cas ne comporte aucune branche de perte irrécupérable : réussir ne prouve pas que le sujet saurait
+  armer un veto quand la ruine est réelle. Il faut un cas miroir pour établir que la porte discrimine
+  plutôt qu''elle ne se tait.'
+- 'Épreuve des deux réponses, exécutée avec re.IGNORECASE|re.MULTILINE sur une réponse de modèle nu compétente
+  et une réponse cadrée écrites contre l''énoncé v2 : ruin-absorption-empilee et contingency-declencheur-pilotable
+  échouent sur la réponse nue et passent sur la réponse cadrée, y compris sur une variante nue qui mentionne
+  le dividende sans l''intégrer au calcul. regime-esperance-chiffree passe sur les deux : il mesure une
+  condition nécessaire, pas l''effet du cadre, d''où son poids de 2. Il est conservé pour rendre visible
+  la panne rare où le sujet parle d''espérance sans la calculer.'
+- Un modèle nu simplement porté à l'audace, ou un modèle qui suit mécaniquement l'espérance mathématique,
+  peut passer les contrôles sans posséder la distinction variance/ruine. Le pass mesure une réponse, jamais
+  une primitive.
+- 'Le troisième motif de ruin-absorption-empilee accepte des nombres isolés (2,3 MEUR, 1,1 MEUR, 1,5 MEUR)
+  sans contrainte de proximité avec un poste de bilan : une réponse qui produirait l''un de ces nombres
+  pour une autre raison passerait à tort. Les pass de ce contrôle doivent être relus avant d''entrer dans
+  un corpus d''entraînement.'
+- 'Le plafond de perte de 400 kEUR reste donné dans l''énoncé : le cas ne teste pas la capacité, plus
+  difficile, à établir soi-même la borne de perte à partir d''un contrat non résumé. Retirer la borne
+  rendrait l''absence de branche de ruine indécidable et détruirait la validité du cas.'
+- Le détecteur regex_none a été armé de lookbehinds sur les guillemets pour ne pas se déclencher sur une
+  note qui cite le directeur financier au discours direct ; une citation introduite sur plusieurs mots
+  avant le verbe échappe encore au garde-fou. Les échecs de ce contrôle doivent être relus avant agrégation.
+- 'Le confondant de volume déclaré dans continuum/bench/arms.yaml n''est pas maîtrisé : un écart C_vs_A
+  observé sur ce cas peut provenir de la masse de contexte structuré autant que du contenu du cadre, tant
+  que le bras D à volume apparié n''existe pas.'
