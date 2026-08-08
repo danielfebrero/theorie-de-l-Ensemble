@@ -963,11 +963,27 @@ class EmptyRegistryTests(unittest.TestCase):
         self.records_dir = self.corpus_root / "records"
         self.export_dir = self.corpus_root / "export"
         self.corpus_root.mkdir()
+        # Le plan du dépôt ne doit pas fuiter dans un registre de test : prononcer
+        # la séparation train/eval en vrai basculerait splits_assigned et ferait
+        # tomber ce test sans qu'aucune ligne de code ait changé.
+        self.plan_path = self.root / "analysis-plan.yaml"
+        self.plan_path.write_text(
+            yaml.safe_dump(
+                {
+                    "preregistered_at": "2026-08-07T22:30:00Z",
+                    "decision_thresholds": {"marginal_delta": 0.10, "minimum_trials_per_cell": 5},
+                    "corpus_gate": {"split_status": "not_assigned"},
+                },
+                allow_unicode=True,
+            ),
+            encoding="utf-8",
+        )
 
         patches = [
             mock.patch.object(validate, "SCENARIOS_DIR", self.scenarios_dir),
             mock.patch.object(validate, "TRIALS_DIR", self.trials_dir),
             mock.patch.object(validate, "JUDGEMENTS_DIR", self.judgements_dir),
+            mock.patch.object(validate, "ANALYSIS_PLAN_PATH", self.plan_path),
             mock.patch.object(build_index, "SCENARIO_INDEX_PATH", self.scenarios_dir / "index.yaml"),
             mock.patch.object(build_index, "TRIAL_INDEX_PATH", self.trials_dir / "index.yaml"),
             mock.patch.object(build_index, "SPLITS_PATH", self.root / "splits.yaml"),

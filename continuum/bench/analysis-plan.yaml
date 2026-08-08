@@ -96,11 +96,21 @@ corpus_gate:
     Un scénario ayant servi à l'entraînement ne peut plus servir à l'évaluation
     du modèle entraîné. La séparation est matérialisée par split dans l'index des
     scénarios ; sans elle, la mesure post-distillation ne vaut rien.
-  split_status: not_assigned
+  split_status: assigned
+  split_file: continuum/bench/splits.yaml
+  split_pronounced_at: "2026-08-08T01:10:00Z"
+  split_rule: >
+    Trier les scenario_id par SHA-256 de l'identifiant, puis alterner eval/train
+    dans cet ordre. Règle rejouable à l'identique par quiconque, qui ne regarde
+    ni la famille, ni les résultats.
   split_status_reason: >
-    L'affectation train/eval est faite une seule fois, avant le premier essai
-    destiné à l'entraînement, et devient immuable. Aucun essai n'existant encore,
-    elle n'est pas encore prononcée.
+    Prononcée après le pilote de 8 essais et AVANT la campagne complète. Cette
+    chronologie est le point faible du dispositif et doit rester déclarée : trois
+    scénarios avaient déjà des scores connus au moment de l'affectation. Le choix
+    d'une règle déterministe sur le hash des identifiants est ce qui borne le
+    risque — elle ne pouvait pas être rejouée jusqu'à obtenir une répartition
+    flatteuse, et le vérifier ne demande que de la relancer. Aucun essai destiné
+    à l'entraînement n'existait avant elle, ce qui est la condition posée ici.
 
 known_limitations:
   - Un bench mesure des réponses, pas des garanties. Les propriétés S1–S5 sont

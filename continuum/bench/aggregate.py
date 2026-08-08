@@ -138,7 +138,13 @@ def _is_number(value: Any) -> bool:
 
 
 def _display(path: Path) -> str:
-    return path.relative_to(validate.REPO_ROOT).as_posix()
+    # Un chemin hors dépôt est légitime (registre temporaire d'un test, racine
+    # déplacée) : il s'affiche en absolu plutôt que de faire échouer l'agrégation
+    # sur la mise en forme d'un message d'erreur.
+    path = Path(path)
+    if path.is_relative_to(validate.REPO_ROOT):
+        return path.relative_to(validate.REPO_ROOT).as_posix()
+    return path.as_posix()
 
 
 def _ratio(numerator: float, denominator: float) -> float | None:
