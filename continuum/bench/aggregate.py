@@ -113,7 +113,8 @@ LIMITATIONS = (
     "quand un juge passe.",
     "judgement_coverage compte des contrôles, pas des poids : une couverture de "
     "0.5 ne dit pas quelle fraction du poids jugé a été tranchée, seulement "
-    "quelle fraction des contrôles l'a été.",
+    "quelle fraction des contrôles l'a été. all_blinded vaut false en l'absence "
+    "de tout jugement : aucun aveuglement n'est attesté quand rien n'a été jugé.",
     "over_activation_rate, false_veto_rate, honesty_violation_rate et "
     "export_completeness reposent sur les dimensions, familles et identifiants "
     "déclarés par les scénarios ; ce sont des rapprochements de forme, pas des "
