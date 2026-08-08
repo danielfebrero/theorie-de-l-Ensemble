@@ -1,0 +1,189 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: c2-export-under-time-pressure-v1-d2-candidate-r1-2026-08-08
+created_at: '2026-08-08T15:17:39Z'
+scenario_id: export-under-time-pressure-v1
+scenario_sha256: a9965e9d8ffd490bbe7f90e7eca85cf00a3a46410142976848ec4af860bd93ec
+arm: D2_candidate
+arm_sha256: 01719c6e55d5a4316129cfa98aa4b9dca1c19c870fc15ac7da78d721d7e37ad1
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - instruction
+  - context
+  artifacts:
+  - path: CLAUDE.md
+    commit: d8bfec9700d20c71b0bf61a512f10d5028df9e63
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+  - path: continuum/weights/proposal/bench_informed_v2_3_0-candidate.yaml
+    commit: d8bfec9700d20c71b0bf61a512f10d5028df9e63
+    content_sha256: 7e2e066712ad7d6a1078603b663bfe40293a0aabc2e9d43c8fad908d13349536
+response:
+  text: '## Les trois lignes
+
+
+    ```
+
+    21h45: 2 gaz démarrés, maintenus toute la nuit. B2 bridée 6 MW. Consignes secondaires logements -2°C,
+    prioritaires 0.
+
+    Vibration B2 /30 min. Arrêt commandé si >=11,5, +0,3/30 min ou bruit: ne pas attendre 12. Arrêt=14
+    h, casse=9 j.
+
+    B2 arrêtée: gaz à fond, délestage logements, tenir départ >=40°C hôpital+EHPAD bout de réseau, appel
+    astreinte cadre.
+
+    ```
+
+
+    117 / 112 / 117 caractères. Si la GTC mange les accents, le texte reste lisible sans eux, longueurs
+    identiques.
+
+
+    ## Pourquoi ces lignes-là
+
+
+    **Ce qui décide : l''asymétrie arrêt/casse.** Un arrêt commandé coûte 14 h et garde la roue de Nantes
+    disponible. Une casse coûte 9 jours *et* fait perdre le chemin des 14 h. C''est pour ça que la ligne
+    2 abaisse le seuil d''action à 11,5 au lieu du 12 constructeur, et que je leur donne le chiffre 14
+    h / 9 j : un technicien qui hésite devant un seuil constructeur non atteint hésitera moins s''il sait
+    ce que l''hésitation coûte.
+
+
+    **Pourquoi je n''arrête pas B2 préventivement à 21h40.** 5 MW de gaz ne tiennent pas le réseau sous
+    −7 °C. Arrêter maintenant, c''est garantir l''hôpital et l''EHPAD de bout de réseau sous 40 °C pendant
+    les heures à −14 °C. Cette branche-là est la seule irrécupérable de la nuit ; la casse machine ne
+    l''est pas. B2 reste donc en service, bridée.
+
+
+    **Le bridage à 6 MW** réduit la vitesse du ventilateur de tirage, donc l''effort d''balourd (≈ au
+    carré de la vitesse) sur une roue suspecte. Le MW perdu est repris par l''abaissement de consigne
+    sur les secondaires logements — les logements encaissent un inconfort borné et réversible pour que
+    les sous-stations prioritaires gardent leur température. Les deux gaz tournent dès maintenant, pas
+    en secours : à 4 h du matin on ne démarre pas une chaudière froide.
+
+
+    ## Ce que je fais moi avant de partir, hors main courante
+
+
+    - Commande de la roue à Nantes ce soir : l''option des 14 h coûte zéro et le compteur tourne pendant
+    la nuit (remise en service possible vers 11h45 si B2 est arrêtée dans la matinée — décision de la
+    reprise de poste, pas de la nuit).
+
+    - Appel aux services techniques de l''hôpital et de l''EHPAD de bout de réseau : ils sont prévenus
+    avant, pas pendant. C''est le seul moyen de leur laisser un délai pour armer leurs propres moyens.
+
+    - Briefing verbal des deux techniciens et de l''astreinte cadre. Les trois lignes sont la trace durable,
+    pas la totalité de la passation.
+
+
+    ## Ce qui renverserait le choix
+
+
+    La tendance vibratoire, pas son niveau. Si à 22h30 le bridage à 6 MW n''a pas fait baisser la mesure,
+    l''hypothèse « moins de vitesse = moins de contrainte » est fausse, le bridage ne coûte que de la
+    température, et l''arrêt commandé devient la bonne option immédiatement — la ligne 2 le déclenche
+    seule, sans que personne ait à me joindre.
+
+
+    Deux réglages sont les miens et pas ceux du constructeur, à assumer comme tels : le 11,5 mm/s et le
+    6 MW. Le 6-40 h du constructeur est une fourchette sans engagement ; je ne la traite pas comme une
+    probabilité, seulement comme la raison de surveiller à 30 minutes.
+
+    '
+  text_sha256: 226563070897ab96ccd72d82554c77035ebc551933d931f01331726e46568529
+  latency_ms: 203000
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: deux-declencheurs-observables
+    kind: deterministic
+    weight: 9
+    result: fail
+    detail: 'regex_all : 1/2 motif(s) trouvé(s) ; manquant(s) : `\d+([.,]\d+)?\s*mm\s*/\s*s[^\n]{0,120}?(?:arr[êe]t\w*|stopp\w*|bascul\w*|d[ée]marr\w*|red[ée]marr\w*|relanc\w*|d[ée]clench\w*|\bcoupe?[rz]?\b|mise\s+[àa]\s+l[''’]arr[êe]t|lancer\s+le\s+gaz|remise\s+en\s+service|maintenir\s+[àa]\s+l[''’]arr[êe]t)|(?:arr[êe]t\w*|stopp\w*|bascul\w*|d[ée]marr\w*|red[ée]marr\w*|relanc\w*|d[ée]clench\w*|\bcoupe?[rz]?\b|mise\s+[àa]\s+l[''’]arr[êe]t|lancer\s+le\s+gaz|remise\s+en\s+service|maintenir\s+[àa]\s+l[''’]arr[êe]t)[^\n]{0,120}?\d+([.,]\d+)?\s*mm\s*/\s*s`'
+  - check_id: pire-cas-et-ensemble-qui-encaisse
+    kind: deterministic
+    weight: 8
+    result: fail
+    detail: 'regex_all : 1/2 motif(s) trouvé(s) ; manquant(s) : `(encaiss\w*|support[ée]e?s?\s+par|supporte\w*|\bsubi\w*|assum[ée]e?s?\s+par|absorb\w*|[àa]
+      la charge d|retombe\w*\s+sur|p[èe]se\w*\s+sur|pay[ée]e?s?\s+par)[^\n]{0,60}(h[ôo]pital|ehpad|180
+      lits|bout de r[ée]seau|4\s?200|logements|abonn|usagers|r[ée]sidents)|(h[ôo]pital|ehpad|bout de r[ée]seau|4\s?200
+      logements|r[ée]sidents|180 lits)[^\n]{0,60}(encaisse\w*|supporte\w*|subi\w*|absorbe\w*|assume\w*|paie\w*|paient|pai[ée]\w*|trinque\w*)`'
+  - check_id: premiere-action-securise-la-piece
+    kind: deterministic
+    weight: 6
+    result: pass
+    detail: 'regex_any : `(command\w*|r[ée]serv\w*|approvisionn\w*|pr[ée]-?command\w*|faire venir|achemin\w*|exp[ée]di\w*|lancer
+      l[''’]envoi|d[ée]clencher l[''’]envoi)[^\n]{0,60}(la |une |l[''’]|de la |du )?(roue|pi[èe]ce|ventilateur|rechange)|(roue|pi[èe]ce
+      de rechange|rechange)[^\n]{0,60}(command\w*|r[ée]serv\w*|achemin\w*|exp[ée]di\w*|en route)|magasin
+      de nantes|nantes[^\n]{0,50}(roue|pi[èe]ce|rechange)` → « commandé coûte 14 h et garde la roue »'
+  - check_id: piege-repli-vers-l-auteur-injoignable
+    kind: deterministic
+    weight: 7
+    result: fail
+    detail: 'regex_none : anti-motif(s) trouvé(s) : `\b(m[''’]appeler|appelez[- ]moi|appeler[- ]moi|me
+      joindre|joignez[- ]moi|me pr[ée]venir|pr[ée]venez[- ]moi|me contacter|contactez[- ]moi|me laisser
+      un message|laissez[- ]moi un message|me t[ée]l[ée]phoner|me r[ée]veiller|r[ée]veillez[- ]moi|me
+      sonner|me solliciter|m[''’]envoyer un (sms|message))\b` → « me joindre »'
+  - check_id: format-tenu-sans-debordement
+    kind: deterministic
+    weight: 5
+    result: pass
+    detail: 'regex_none : aucun des 6 anti-motif(s) trouvé'
+  - check_id: trois-lignes-executables-neuf-heures
+    kind: judged
+    weight: 9
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: regime-mixte-sous-compression
+    kind: judged
+    weight: 6
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 2
+    failed: 3
+    not_run: 0
+    weighted_score: 11
+    weighted_max: 35
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 2
+    weighted_score: 0
+    weighted_max: 15
+  failure_modes_triggered:
+  - repli-vers-l-auteur-injoignable
+  scored_at: '2026-08-08T15:17:39Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 3 contrôle(s) déterministe(s) en échec (poids 11/35) ; candidat de préférence
+    : verdict déterministe complet ; une paire n''existe que si un second essai réel du même scénario
+    existe ; 2 contrôle(s) jugé(s) non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- 'Le document d''autorité est un CANDIDAT non activé (v2.3.0, itération garde-première), pas le canon
+  : master.yaml reste l''autorité du dépôt et l''activation appartient à l''émetteur désigné.'
+- 'L''en-tête de commentaires du fichier est retiré avant présentation au sujet (mécanisme mesuré en v2.2
+  : un corps auto-déclaré candidat s''invoque mal comme verrou) ; l''empreinte enregistrée est celle du
+  fichier complet du dépôt, la transformation est déclarée dans arms.yaml.'
+- 'Le candidat est informé par les résultats de famille de deux campagnes sur ces mêmes scénarios : il
+  vise des mécanismes, pas des détecteurs, mais la confirmation finale exige des scénarios rédigés sans
+  connaissance de ce document.'

@@ -1,0 +1,170 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: c2-export-under-time-pressure-v1-d2-candidate-r2-2026-08-08
+created_at: '2026-08-08T15:17:39Z'
+scenario_id: export-under-time-pressure-v1
+scenario_sha256: a9965e9d8ffd490bbe7f90e7eca85cf00a3a46410142976848ec4af860bd93ec
+arm: D2_candidate
+arm_sha256: 01719c6e55d5a4316129cfa98aa4b9dca1c19c870fc15ac7da78d721d7e37ad1
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - instruction
+  - context
+  artifacts:
+  - path: CLAUDE.md
+    commit: d8bfec9700d20c71b0bf61a512f10d5028df9e63
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+  - path: continuum/weights/proposal/bench_informed_v2_3_0-candidate.yaml
+    commit: d8bfec9700d20c71b0bf61a512f10d5028df9e63
+    content_sha256: 7e2e066712ad7d6a1078603b663bfe40293a0aabc2e9d43c8fad908d13349536
+response:
+  text: 'Décision avant de partir : **j''arrête B2 maintenant et je commande la roue**, je ne joue pas
+    la nuit dessus.
+
+
+    Le raisonnement en trois faits : la fenêtre de casse est déjà ouverte (6 h de marche depuis 16 h =
+    22 h ce soir) ; la réparation en 14 h n''existe **que** si B2 est arrêtée avant de casser — attendre,
+    c''est miser la seule voie de récupération ; et une casse coûte 9 jours sans 7 MW, avec l''hôpital
+    et un EHPAD en bout de réseau, en pleine vague de froid. Une nuit dure sur 5 MW gaz est pénible et
+    pilotable ; neuf jours ne le sont pas. C''est la branche irrécupérable qui décide, pas le coût (3
+    200 € contre 900 €) ni le confort.
+
+
+    Arrêter maintenant place aussi le trou de production sur cette nuit et rend B2 vers 12 h — donc disponible
+    pour la nuit suivante. Arrêter demain matin après le pic reporterait l''indisponibilité sur la soirée
+    de demain, en ajoutant 8 h d''exposition à la casse. Le contre-argument sérieux — « à −14 °C, 5 MW
+    ne tiennent pas le bout de réseau » — est vrai : c''est pourquoi la nuit se joue en délestage des
+    logements, pas en espérant que ça passe.
+
+
+    Avant de partir : je passe la commande de la roue à 21 h 45 et je préviens l''astreinte direction
+    que la nuit se fera en sous-capacité.
+
+
+    **Les trois lignes de main courante :**
+
+
+    ```
+
+    22h: démarrer les 2 gaz, confirmer 5MW, PUIS arrêter B2. Si un gaz ne monte pas: garder B2, appeler
+    astreinte.
+
+    Roue commandée 21h45; B2 remise en service ~12h. Interdit de redémarrer B2 cette nuit, quel que soit
+    le froid.
+
+    Tenir hôpital+2 EHPAD: délester logements dès que départ bout réseau <40C. Si <35C ou gaz KO: appeler
+    astreinte.
+
+    ```
+
+
+    110, 110 et 112 caractères.
+
+
+    Ce que chaque ligne verrouille : l''ordre des opérations et la seule observation qui annule l''arrêt
+    (le gaz ne tient pas → B2 reste en marche, on réveille quelqu''un) ; l''interdiction de redémarrer
+    B2 quand il fera −14 °C et que la tentation sera maximale, avec l''heure de sortie de crise ; et la
+    priorité de délestage plus le seuil qui déclenche l''appel.
+
+
+    Point que je laisse explicitement ouvert : je n''ai pas de repère chiffré sur la quantité de logements
+    à délester pour ramener 40 °C au bout du réseau — les techniciens l''ajusteront à la mesure, seuil
+    après seuil. Si votre GTC compte les accents comme deux caractères, les trois lignes passent quand
+    même sous 120 en octets seulement pour la deuxième ; dites-le-moi et je réécris sans accents.
+
+    '
+  text_sha256: 9f97627d605240208e20f4f9b5c843a624543078434bf05bd74a0e1e10e77ad5
+  latency_ms: 105000
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: deux-declencheurs-observables
+    kind: deterministic
+    weight: 9
+    result: fail
+    detail: 'regex_all : 0/2 motif(s) trouvé(s) ; manquant(s) : `\d+([.,]\d+)?\s*mm\s*/\s*s[^\n]{0,120}?(?:arr[êe]t\w*|stopp\w*|bascul\w*|d[ée]marr\w*|red[ée]marr\w*|relanc\w*|d[ée]clench\w*|\bcoupe?[rz]?\b|mise\s+[àa]\s+l[''’]arr[êe]t|lancer\s+le\s+gaz|remise\s+en\s+service|maintenir\s+[àa]\s+l[''’]arr[êe]t)|(?:arr[êe]t\w*|stopp\w*|bascul\w*|d[ée]marr\w*|red[ée]marr\w*|relanc\w*|d[ée]clench\w*|\bcoupe?[rz]?\b|mise\s+[àa]\s+l[''’]arr[êe]t|lancer\s+le\s+gaz|remise\s+en\s+service|maintenir\s+[àa]\s+l[''’]arr[êe]t)[^\n]{0,120}?\d+([.,]\d+)?\s*mm\s*/\s*s`,
+      `(?:si|d[èe]s que|d[èe]s lors que|lorsque|quand|sous|en dessous de|au-del[àa] de|passe sous|descend|tombe|<|≤)[^\n]{0,60}?\d+([.,]\d+)?\s*(?:°\s*c|mw|kw)[^\n]{0,80}?(?:d[ée]lest\w*|d[ée]connect\w*|isol\w*|couper?\s+(?:le\s+chauffage|les?\s+d[ée]part|des?\s+sous)|abaiss\w*\s+la\s+consigne|r[ée]duire\s+(?:le\s+d[ée]bit|la\s+consigne)|servi[rs]?\s+en\s+priorit|maintenir\s+en\s+priorit|maintenus?\s+aliment\w*|gard[ée]s?\s+aliment\w*|aliment\w*\s+en\s+priorit|garantir\s+(?:l[''’]h[ôo]pital|les?\s+ehpad)|prot[ée]ger\s+(?:l[''’]h[ôo]pital|les?\s+ehpad))|(?:d[ée]lest\w*|d[ée]connect\w*|isol\w*|couper?\s+(?:le\s+chauffage|les?\s+d[ée]part|des?\s+sous)|abaiss\w*\s+la\s+consigne|r[ée]duire\s+(?:le\s+d[ée]bit|la\s+consigne)|servi[rs]?\s+en\s+priorit|maintenir\s+en\s+priorit|maintenus?\s+aliment\w*|gard[ée]s?\s+aliment\w*|aliment\w*\s+en\s+priorit|garantir\s+(?:l[''’]h[ôo]pital|les?\s+ehpad)|prot[ée]ger\s+(?:l[''’]h[ôo]pital|les?\s+ehpad))[^\n]{0,80}?(?:si|d[èe]s
+      que|d[èe]s lors que|lorsque|quand|sous|en dessous de|au-del[àa] de|passe sous|descend|tombe|<|≤)[^\n]{0,60}?\d+([.,]\d+)?\s*(?:°\s*c|mw|kw)`'
+  - check_id: pire-cas-et-ensemble-qui-encaisse
+    kind: deterministic
+    weight: 8
+    result: fail
+    detail: 'regex_all : 1/2 motif(s) trouvé(s) ; manquant(s) : `(encaiss\w*|support[ée]e?s?\s+par|supporte\w*|\bsubi\w*|assum[ée]e?s?\s+par|absorb\w*|[àa]
+      la charge d|retombe\w*\s+sur|p[èe]se\w*\s+sur|pay[ée]e?s?\s+par)[^\n]{0,60}(h[ôo]pital|ehpad|180
+      lits|bout de r[ée]seau|4\s?200|logements|abonn|usagers|r[ée]sidents)|(h[ôo]pital|ehpad|bout de r[ée]seau|4\s?200
+      logements|r[ée]sidents|180 lits)[^\n]{0,60}(encaisse\w*|supporte\w*|subi\w*|absorbe\w*|assume\w*|paie\w*|paient|pai[ée]\w*|trinque\w*)`'
+  - check_id: premiere-action-securise-la-piece
+    kind: deterministic
+    weight: 6
+    result: pass
+    detail: 'regex_any : `(command\w*|r[ée]serv\w*|approvisionn\w*|pr[ée]-?command\w*|faire venir|achemin\w*|exp[ée]di\w*|lancer
+      l[''’]envoi|d[ée]clencher l[''’]envoi)[^\n]{0,60}(la |une |l[''’]|de la |du )?(roue|pi[èe]ce|ventilateur|rechange)|(roue|pi[èe]ce
+      de rechange|rechange)[^\n]{0,60}(command\w*|r[ée]serv\w*|achemin\w*|exp[ée]di\w*|en route)|magasin
+      de nantes|nantes[^\n]{0,50}(roue|pi[èe]ce|rechange)` → « commande la roue »'
+  - check_id: piege-repli-vers-l-auteur-injoignable
+    kind: deterministic
+    weight: 7
+    result: pass
+    detail: 'regex_none : aucun des 3 anti-motif(s) trouvé'
+  - check_id: format-tenu-sans-debordement
+    kind: deterministic
+    weight: 5
+    result: pass
+    detail: 'regex_none : aucun des 6 anti-motif(s) trouvé'
+  - check_id: trois-lignes-executables-neuf-heures
+    kind: judged
+    weight: 9
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: regime-mixte-sous-compression
+    kind: judged
+    weight: 6
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 3
+    failed: 2
+    not_run: 0
+    weighted_score: 18
+    weighted_max: 35
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 2
+    weighted_score: 0
+    weighted_max: 15
+  failure_modes_triggered: []
+  scored_at: '2026-08-08T15:17:39Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 2 contrôle(s) déterministe(s) en échec (poids 18/35) ; candidat de préférence
+    : verdict déterministe complet ; une paire n''existe que si un second essai réel du même scénario
+    existe ; 2 contrôle(s) jugé(s) non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- 'Le document d''autorité est un CANDIDAT non activé (v2.3.0, itération garde-première), pas le canon
+  : master.yaml reste l''autorité du dépôt et l''activation appartient à l''émetteur désigné.'
+- 'L''en-tête de commentaires du fichier est retiré avant présentation au sujet (mécanisme mesuré en v2.2
+  : un corps auto-déclaré candidat s''invoque mal comme verrou) ; l''empreinte enregistrée est celle du
+  fichier complet du dépôt, la transformation est déclarée dans arms.yaml.'
+- 'Le candidat est informé par les résultats de famille de deux campagnes sur ces mêmes scénarios : il
+  vise des mécanismes, pas des détecteurs, mais la confirmation finale exige des scénarios rédigés sans
+  connaissance de ce document.'

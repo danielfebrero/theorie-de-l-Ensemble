@@ -1,0 +1,160 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: c2-contingency-binding-trigger-v2-d2-candidate-r3-2026-08-08
+created_at: '2026-08-08T15:17:39Z'
+scenario_id: contingency-binding-trigger-v2
+scenario_sha256: 21350c940984fe3c3c09f50cab25c08414f4add90b4902013a1a6929f2534b82
+arm: D2_candidate
+arm_sha256: 01719c6e55d5a4316129cfa98aa4b9dca1c19c870fc15ac7da78d721d7e37ad1
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - instruction
+  - context
+  artifacts:
+  - path: CLAUDE.md
+    commit: d8bfec9700d20c71b0bf61a512f10d5028df9e63
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+  - path: continuum/weights/proposal/bench_informed_v2_3_0-candidate.yaml
+    commit: d8bfec9700d20c71b0bf61a512f10d5028df9e63
+    content_sha256: 7e2e066712ad7d6a1078603b663bfe40293a0aabc2e9d43c8fad908d13349536
+response:
+  text: '**Verdict : Option B.** La note est ci-dessus (je n''ai pas pu écrire dans le répertoire de travail
+    — permission refusée —, elle est donc dans le scratchpad ; dis-moi si tu veux que je la place ailleurs).
+
+
+    Le raisonnement derrière l''arbitrage, en trois points :
+
+
+    **1. Les 190 k€ d''écart achètent un bouton de retour arrière.** L''option A n''en a aucun : jetons
+    transférés, compte Solda clos, six semaines pour rouvrir *et* recollecte des empreintes auprès de
+    2,1 M clients. L''option B garde les deux comptes ouverts, donc un repli en 15 minutes — le pire cas
+    passe de ~2 M€ à ~16 k€.
+
+
+    **2. Sur l''espérance mathématique seule, c''est serré, et je le dis dans la note.** À 5–10 % de probabilité
+    d''un décembre dégradé, la perte évitée équivaut à peu près à la prime payée. Le départage ne vient
+    pas du calcul d''espérance mais de l''irrécupérabilité : la base de jetons est l''actif, et une perte
+    d''actif ne se compense pas par une économie de 500 k€.
+
+
+    **3. J''ai modifié le calendrier de B, et c''est le vrai apport de la note.** Les deux options proposées
+    démarrent le 3 novembre, ce qui est un choix par défaut, pas une contrainte : Solda est payé jusqu''au
+    30 novembre de toute façon. En démarrant le 21 septembre, on atteint 100 % le 16 novembre — onze jours
+    de trafic plein avant le Black Friday, avec Solda encore sous contrat. Surtout, avec une signature
+    le 11 septembre, **le Black Friday tombe à l''intérieur de la fenêtre de sortie gratuite à 90 jours**.
+    Sous l''option A, cette clause ne sert à rien puisqu''au moment où elle s''applique il n''y a plus
+    de prestataire de repli.
+
+
+    Deux points à surveiller, tous deux dans la note :
+
+
+    - **Le préavis Solda du 15 octobre est l''acte de lundi**, indépendamment du reste. Notifier ne coûte
+    rien, ne pas notifier supprime définitivement le filet. À faire confirmer par écrit : la notification
+    ouvre l''option sans engagement de durée minimale.
+
+    - **Le découpage par paliers doit suivre des cohortes clients**, pas un tirage par transaction — sinon
+    les clients échantillonnés perdent le paiement en un clic faute de jeton chez Payflux. C''est la seule
+    question technique réellement ouverte ; elle ne change pas le verdict A/B, elle conditionne l''exécution.
+
+
+    Je n''ai pas vérifié une chose faute d''information : si les 310 k€ d''économie de B intègrent déjà
+    la prolongation Solda à 130 k€/mois. La note est construite pour que ça n''affecte pas la conclusion
+    — même en retranchant deux mois pleins, B reste gagnante face au renouvellement — mais ça vaut une
+    confirmation de la DAF avant vendredi.
+
+    '
+  text_sha256: d3e650535950c0d40d495512d0d7018a7b6f55075ef1597426d1c299190f68c8
+  latency_ms: 276000
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: repli-seuil-fenetre-action-liee
+    kind: deterministic
+    weight: 8
+    result: fail
+    detail: 'regex_all : 1/3 motif(s) trouvé(s) ; manquant(s) : `(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|above|over)[^\n%]{0,40}\d+[.,]?\d*\s*%`,
+      `(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|above|over)[^\n%]{0,40}\d+[.,]?\d*\s*%[\s\S]{0,240}?(?:r[ée]achemin\w+|reroute\w*|rollback|repli\w*|retour\s+arri[èe]re|revien\w+|revenir|revenons|rebascul\w+|re-?bascul\w+|bascul\w+[^\n]{0,25}(?:vers|sur)\s+solda|router[^\n]{0,20}trafic|suspend\w+|gel(?:er|ons|é|e)\w*|arr[êe]t\w*|stopp?\w*|kill)|(?:r[ée]achemin\w+|reroute\w*|rollback|repli\w*|retour\s+arri[èe]re|revien\w+|revenir|revenons|rebascul\w+|re-?bascul\w+|bascul\w+[^\n]{0,25}(?:vers|sur)\s+solda|router[^\n]{0,20}trafic|suspend\w+|gel(?:er|ons|é|e)\w*|arr[êe]t\w*|stopp?\w*|kill)[\s\S]{0,240}?(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|above|over)[^\n%]{0,40}\d+[.,]?\d*\s*%`'
+  - check_id: reprise-sous-re-decision
+    kind: deterministic
+    weight: 8
+    result: fail
+    detail: 'regex_any : aucun des 3 motif(s) : `aucune\s+repri\w+\s+automatique|(?:pas|jamais|ni)\s+de\s+repri\w+\s+automatique|sans\s+repri\w+\s+automatique|la\s+repri\w+\s+n(?:e\s+sera|''aura|''est)[^.\n]{0,40}automatique`,
+      `(?:repri\w+|repren\w+|remont\w+|red[ée]marr\w+|relanc\w+|rebascul\w+|re-?bascul\w+)[^.\n]{0,90}(?:sur|apr[èe]s|moyennant|sous\s+r[ée]serve\s+d''?)\s*(?:une?\s+|le\s+|la\s+|l'')?(?:d[ée]cision|validation|arbitrage|accord|confirmation|feu\s+vert|autorisation|revue|re-?d[ée]cision|comit[ée])`,
+      `ne\s+(?:repren\w+|red[ée]marr\w+|rebascul\w+|remont\w+|relanc\w+)[^.\n]{0,80}qu(?:e|'')\s*(?:sur|apr[èe]s|avec)`'
+  - check_id: arret-de-boucle-de-repli
+    kind: deterministic
+    weight: 7
+    result: fail
+    detail: 'regex_any : aucun des 2 motif(s) : `(?:(?:deux|2|second[e]?|deuxi[èe]me|trois|3|troisi[èe]me|nouveau|nouvelle|autre)\s+(?:replis?|rebascules?|d[ée]clenchements?|retours?\s+arri[èe]re|incidents?|franchissements?|alertes?)|au\s+(?:second|deuxi[èe]me|troisi[èe]me)\s+(?:repli|d[ée]clenchement|incident|retour)|(?:plus\s+d(?:e|'')|au-?del[àa]\s+d(?:e|''))\s*(?:un|1|deux|2)\s+(?:replis?|d[ée]clenchements?|incidents?)|(?:repli|rebascule|d[ée]clenchement|seuil)[^.\n]{0,60}(?:se\s+r[ée]p[èe]te|se\s+reproduit|[àa]\s+nouveau|une\s+(?:seconde|deuxi[èe]me)\s+fois|deux\s+fois)|si\s+(?:nous\s+|on\s+)?(?:devons|doit|devions)\s+replier|si\s+le\s+repli\s+(?:est|doit\s+[êe]tre)\s+d[ée]clench[ée])[\s\S]{0,200}?(?:(?:arr[êe]t|gel|abandon|renoncement|blocage)\s+d[ée]finiti\w*|(?:mont[ée]e|bascule|migration|rampe|projet)\s+(?:est\s+|sont\s+)?(?:arr[êe]t[ée]\w*|abandonn[ée]\w*|stopp[ée]\w*|annul[ée]\w*)|(?:on\s+)?(?:arr[êe]te\w*|abandonn\w+|stopp\w+|annule\w*)\s+(?:la\s+|le\s+|toute\s+)?(?:bascule|migration|mont[ée]e|rampe|projet|op[ée]ration)|(?:abandon|sortie|renoncement)\s+(?:de\s+|d[ue]\s+)?payflux|renon[çc]\w+|r[ée]sili\w+|clause\s+de\s+sortie|(?:renouvel\w+|reconduc\w+|reconduire|rester|restons|revenir\s+d[ée]finitivement)[^.\n]{0,30}solda|retour\s+d[ée]finitif[^.\n]{0,30}solda)`,
+      `(?:(?:arr[êe]t|gel|abandon|renoncement|blocage)\s+d[ée]finiti\w*|(?:mont[ée]e|bascule|migration|rampe|projet)\s+(?:est\s+|sont\s+)?(?:arr[êe]t[ée]\w*|abandonn[ée]\w*|stopp[ée]\w*|annul[ée]\w*)|(?:on\s+)?(?:arr[êe]te\w*|abandonn\w+|stopp\w+|annule\w*)\s+(?:la\s+|le\s+|toute\s+)?(?:bascule|migration|mont[ée]e|rampe|projet|op[ée]ration)|(?:abandon|sortie|renoncement)\s+(?:de\s+|d[ue]\s+)?payflux|renon[çc]\w+|r[ée]sili\w+|clause\s+de\s+sortie|(?:renouvel\w+|reconduc\w+|reconduire|rester|restons|revenir\s+d[ée]finitivement)[^.\n]{0,30}solda|retour\s+d[ée]finitif[^.\n]{0,30}solda)[\s\S]{0,200}?(?:(?:deux|2|second[e]?|deuxi[èe]me|trois|3|troisi[èe]me|nouveau|nouvelle|autre)\s+(?:replis?|rebascules?|d[ée]clenchements?|retours?\s+arri[èe]re|incidents?|franchissements?|alertes?)|au\s+(?:second|deuxi[èe]me|troisi[èe]me)\s+(?:repli|d[ée]clenchement|incident|retour)|(?:plus\s+d(?:e|'')|au-?del[àa]\s+d(?:e|''))\s*(?:un|1|deux|2)\s+(?:replis?|d[ée]clenchements?|incidents?)|(?:repli|rebascule|d[ée]clenchement|seuil)[^.\n]{0,60}(?:se\s+r[ée]p[èe]te|se\s+reproduit|[àa]\s+nouveau|une\s+(?:seconde|deuxi[èe]me)\s+fois|deux\s+fois)|si\s+(?:nous\s+|on\s+)?(?:devons|doit|devions)\s+replier|si\s+le\s+repli\s+(?:est|doit\s+[êe]tre)\s+d[ée]clench[ée])`'
+  - check_id: fenetre-de-repli-datee
+    kind: deterministic
+    weight: 7
+    result: pass
+    detail: 'regex_all : 2/2 motif(s) — `(?:6|six)\s*semaines|empreintes?\s+de\s+carte|recollect\w+|re-?collect\w+|point\s+de\s+non-?retour|2[.,]1\s*millions?\s+de\s+jetons|cl[ôo]tur\w+[^.\n]{0,40}compte|compte\s+solda[^.\n]{0,40}(?:clos|cl[ôo]tur|ferm)`
+      → « compte Solda clos », `tant\s+que[^.\n]{0,70}(?:ouvert|compte|solda)|avant[^.\n]{0,40}(?:cl[ôo]ture|clos\b|transfert\s+des\s+jetons|15\s*octobre)|prolong\w+|(?:maintenir|maintien|conserver|garder|laisser)[^.\n]{0,40}(?:compte|solda)|fen[êe]tre\s+de\s+repli|apr[èe]s[^.\n]{0,40}cl[ôo]tur\w+[^.\n]{0,90}(?:plus|aucun|impossible|n''existe)`
+      → « prolongation »'
+  - check_id: ancrage-chiffres-dossier
+    kind: deterministic
+    weight: 4
+    result: fail
+    detail: 'anchor_ids : 5/6 occurrence(s) distincte(s) : « six semaines », « 130 k », « 5 minutes »,
+      « 15 minutes », « 90 jours »'
+  - check_id: repli-porte-sur-option-retenue
+    kind: judged
+    weight: 8
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: sortie-de-la-boucle-arbitree
+    kind: judged
+    weight: 7
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 1
+    failed: 4
+    not_run: 0
+    weighted_score: 7
+    weighted_max: 34
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 2
+    weighted_score: 0
+    weighted_max: 15
+  failure_modes_triggered: []
+  scored_at: '2026-08-08T15:17:39Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 4 contrôle(s) déterministe(s) en échec (poids 7/34) ; candidat de préférence
+    : verdict déterministe complet ; une paire n''existe que si un second essai réel du même scénario
+    existe ; 2 contrôle(s) jugé(s) non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- 'Le document d''autorité est un CANDIDAT non activé (v2.3.0, itération garde-première), pas le canon
+  : master.yaml reste l''autorité du dépôt et l''activation appartient à l''émetteur désigné.'
+- 'L''en-tête de commentaires du fichier est retiré avant présentation au sujet (mécanisme mesuré en v2.2
+  : un corps auto-déclaré candidat s''invoque mal comme verrou) ; l''empreinte enregistrée est celle du
+  fichier complet du dépôt, la transformation est déclarée dans arms.yaml.'
+- 'Le candidat est informé par les résultats de famille de deux campagnes sur ces mêmes scénarios : il
+  vise des mécanismes, pas des détecteurs, mais la confirmation finale exige des scénarios rédigés sans
+  connaissance de ce document.'
