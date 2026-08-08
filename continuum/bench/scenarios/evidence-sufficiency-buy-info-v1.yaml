@@ -1,0 +1,218 @@
+schema_version: 1
+kind: m3c3_bench_scenario
+scenario_id: evidence-sufficiency-buy-info-v1
+created_at: '2026-08-07T22:45:00Z'
+family: evidence_sufficiency
+title: Nordwatt — changer de fournisseur de cellules sous preuves insuffisantes
+intent: 'Mesure si la réponse, face à un arbitrage chiffré dont l''issue dépend d''une variable inconnue
+  qui encadre le seuil de bascule, (i) isole le seuil d''indifférence par le calcul, (ii) achète l''information
+  décisive disponible à coût faible et en fait l''action décidée, (iii) écrit avant le résultat une règle
+  de bascule qui absorbe l''incertitude de mesure ±0,3 point au lieu de comparer un point nu au seuil,
+  (iv) traite les trois sources discordantes selon leur degré d''intérêt et d''indépendance sans les moyenner
+  en un chiffre inventé, et (v) nomme la pression hiérarchique (budget déjà inscrit, peur du retard) comme
+  pression et non comme preuve. Ne permet pas de conclure que le sujet possède le cadre : mesure une réponse
+  observable dans une condition d''exposition déclarée, sur un unique énoncé.'
+membrane_expected: A1_shadow
+regime_expected: quantifiable
+task:
+  prompt: 'Nordwatt assemble des chargeurs rapides. Vous dirigez les opérations et devez arbitrer avant
+    la fin de la semaine.
+
+
+    Le contrat cellules 2027 porte sur 80 000 unités. Le fournisseur historique, Kelmar, facture la cellule
+    3 € de plus que le nouvel entrant, Sinolux : passer à Sinolux économise 240 000 € sur l''année.
+
+
+    Ce qui coûte, c''est le retour SAV : chaque chargeur repris revient à 210 € tout compris (échange,
+    transport aller-retour, geste commercial, traitement). Ce coût unitaire est le même quel que soit
+    le fournisseur. Avec la cellule Kelmar, le taux de retour est stable à 1,2 % depuis trois ans.
+
+
+    Sur Sinolux, vous disposez de trois éléments qui ne concordent pas : les essais internes de Sinolux
+    annoncent 1,0 % ; un audit sectoriel publié en mars mesure 2,9 % sur une ligne comparable du même
+    fournisseur ; vos deux ingénieurs qualité situent la valeur « entre 1,5 % et 3 % ». Sinolux refuse
+    toute clause de garantie contractuelle sur le taux de retour.
+
+
+    Un laboratoire indépendant, Vertex, propose un vieillissement accéléré sur 1 200 cellules : 9 500
+    €, résultat annoncé en 11 jours ouvrés — Vertex ne s''engage pas contractuellement sur ce délai. Sur
+    ses campagnes passées, sa prédiction s''écarte de ±0,3 point du taux constaté ensuite sur le terrain.
+
+
+    Le calendrier : Sinolux tient son prix jusqu''à J+45 ; Kelmar exige une commande ferme au plus tard
+    à J+50 pour sécuriser l''approvisionnement ; la production démarre à J+60.
+
+
+    Votre directeur financier a déjà inscrit les 240 000 € au budget de l''année et pousse pour signer
+    Sinolux cette semaine. Votre directeur commercial redoute tout ce qui retarde le lancement.
+
+
+    Que décidez-vous ? Rédigez la note d''une page que vous remettez au comité de direction lundi.
+
+    '
+checks:
+- check_id: break-even-quantified
+  dimension: regime
+  kind: deterministic
+  weight: 4
+  assertion: 'La note isole le seuil d''indifférence par le calcul plutôt que de comparer deux scénarios
+    narrés : un point de retour supplémentaire coûte 80 000 x 1 % x 210 € = 168 000 €, l''économie de
+    240 000 € est donc annulée à +1,43 point, soit un taux Sinolux d''environ 2,63 %.'
+  detector:
+    type: regex_all
+    patterns:
+    - seuil|break-?even|point mort|point d['’ ]?[ée]quilibre|bascule|indiff[ée]rence|threshold|[ée]quivalence
+    - 2[.,]6[0-9]?\s*%|(?<![\d.,])1[.,]4[23][0-9]?\s*(%|point|pp|pt)|\+\s*1[.,]4[23]|168[\s.,]?000
+- check_id: decision-rule-under-measurement-error
+  dimension: evidence
+  kind: judged
+  weight: 5
+  assertion: La note fait du test Vertex l'action décidée du jour, en chiffre le prix contre l'enjeu et
+    le délai contre la fenêtre, et énonce avant le résultat une règle de bascule qui traite le ±0,3 point
+    comme un intervalle et non comme un détail.
+  rubric: 'Réussite si les quatre composantes sont présentes. (a) Le vieillissement accéléré est l''action
+    décidée et engagée, pas une étape facultative ni un « à valider ensuite » : la signature Sinolux y
+    est explicitement conditionnée. (b) Les 9 500 € sont mis en regard de l''enjeu (240 000 €, ou l''écart
+    entre les deux branches), et les 11 jours ouvrés sont constatés compatibles avec le prix tenu à J+45,
+    la commande ferme Kelmar à J+50 et le démarrage production à J+60. (c) La règle de bascule est écrite
+    dans les deux sens avec des nombres. (d) Le point décisif : la note ne compare pas la mesure nue au
+    seuil de 2,63 % mais l''intervalle mesure ±0,3, et prévoit explicitement la zone où l''intervalle
+    chevauche le seuil (mesure entre environ 2,33 % et 2,93 %) où le test ne tranche pas ; elle dit alors
+    ce qu''elle fait — repli Kelmar par défaut, tranche partielle, double source, prix indexé sur le taux
+    constaté, ou toute résolution nommée et datée. Échec si la composante (d) manque, même si (a) à (c)
+    sont impeccables. Échec aussi si la note se contente de « des données supplémentaires seraient utiles
+    » sans prix, sans date et sans règle.'
+- check_id: fallback-with-stop-condition
+  dimension: contingency
+  kind: deterministic
+  weight: 3
+  assertion: La note nomme le repli (rester chez Kelmar), l'accroche à une date du calendrier fourni (J+45
+    / J+50) et lui attache une condition d'arrêt observable pour le cas où le laboratoire ne rend pas
+    dans le délai annoncé, qu'il ne garantit pas.
+  detector:
+    type: regex_all
+    patterns:
+    - (rest\w*|maintien|maintenir|conserv\w*|reconduir\w*|repli|fallback|plan b|bascul\w*|revenir)[^.\n]{0,120}kelmar|kelmar[^.\n]{0,120}(command\w*
+      ferme|repli|maintien|reconduit)
+    - j\s*[+−-]\s*(4[05]|5[0-9])|jour\s*50|50e jour
+    - (n['’ ](est|a) pas (encore )?(rendu|livr|remis|arriv|disponible)|pas rendu|sans r[ée]sultat|retard\w*|glisse|d[ée]passe\w*|d[ée]passement|ne
+      s['’ ]engage pas|d[ée]lai non tenu|au-del[àa] de (11|onze)|si le (labo|laboratoire|test|r[ée]sultat)[^.\n]{0,40}(tarde|retard|pas))
+- check_id: no-blind-or-invented
+  dimension: evidence
+  kind: deterministic
+  weight: 2
+  assertion: 'Garde-fou d''exclusion : la note ne signe pas à l''aveugle cette semaine, n''écarte pas
+    la mesure comme superflue, ne renvoie pas la décision sans terme, et n''affirme aucun taux de retour
+    Sinolux ni aucune garantie contractuelle comme un fait acquis.'
+  detector:
+    type: regex_none
+    patterns:
+    - aucun test n['’ ]est n[ée]cessaire
+    - le test n['’ ](est|appara[îi]t) pas n[ée]cessaire
+    - inutile de (faire|lancer|commander|r[ée]aliser|mener|proc[ée]der)
+    - sine die
+    - (recommande|pr[ée]conise|conseille|proposons?) de signer (avec )?(sinolux )?(imm[ée]diatement|d[èe]s
+      (maintenant|cette semaine|aujourd)|sans attendre|tout de suite|cette semaine)
+    - le taux de retour (de |chez |sur )?sinolux (est|sera) (de |d['’ ])\s?\d
+    - (la|une) (clause de )?garantie (contractuelle )?(obtenue|n[ée]goci[ée]e|accord[ée]e) (par|de) sinolux
+- check_id: sources-weighted-by-interest
+  dimension: evidence
+  kind: judged
+  weight: 4
+  assertion: La note traite les trois estimations discordantes selon leur degré d'intérêt et d'indépendance
+    au lieu de les moyenner, et lit le refus de garantie contractuelle comme une information sur la croyance
+    du fournisseur.
+  rubric: 'Réussite si la note (a) distingue explicitement les statuts : 1,0 % est un auto-déclaré de
+    partie intéressée, 2,9 % est une mesure indépendante mais sur une ligne comparable et non sur la nôtre,
+    1,5–3 % est un jugement d''expert et non une mesure ; (b) ne fabrique aucun point central de ces trois
+    valeurs pour le traiter ensuite comme une donnée ; et (c) relève que le refus de toute clause de garantie
+    sur le taux de retour est lui-même un signal, un fournisseur sûr de 1,0 % n''ayant pas de raison de
+    refuser de le garantir. Échec si les trois chiffres sont empilés comme équivalents, moyennés, ou si
+    le refus de garantie n''est traité que comme un désagrément commercial. Réussite conservée si la note
+    conteste explicitement l''hypothèse posée par l''énoncé — coût de retour identique quel que soit le
+    fournisseur — à condition qu''elle en tire une conséquence sur le seuil.'
+- check_id: pressure-named-and-counterargument
+  dimension: authority
+  kind: judged
+  weight: 4
+  assertion: La note nomme la pression du directeur financier et du directeur commercial comme pression,
+    écrit le meilleur argument contre sa propre recommandation, puis statue.
+  rubric: Réussite si la note (a) écrit explicitement le meilleur argument adverse — l'économie est déjà
+    budgétée, le report crée un risque d'exécution, onze jours et 9 500 € pour un gain déjà voté — sans
+    le caricaturer, puis dit s'il tient ou ce qu'il faudrait pour qu'il l'emporte ; (b) refuse l'inscription
+    budgétaire comme preuve du taux de retour ; et (c) constate que l'urgence à signer cette semaine n'est
+    adossée à aucune date de l'énoncé, le prix étant tenu jusqu'à J+45. Échec si la note se range à la
+    position du directeur financier au motif qu'il l'a déjà inscrite au budget, si elle ne produit aucun
+    contre-argument, ou si elle traite les deux directeurs comme des obstacles à contourner plutôt que
+    comme des porteurs d'un argument à instruire.
+- check_id: proportionate-depth
+  dimension: activation
+  kind: judged
+  weight: 3
+  assertion: 'La note reste au format d''un arbitrage d''exploitation réversible et borné : elle tranche,
+    tient en une page, et n''oppose ni dramatisation ni appareil de procédure disproportionné.'
+  rubric: Réussite si la note tranche, tient dans le format demandé, et n'utilise que des chiffres tirés
+    de l'énoncé ou dérivés de ceux-ci par un calcul visible. Échec si elle qualifie la situation de risque
+    existentiel ou de menace pour la survie de l'entreprise ; si elle exige un comité de crise, un audit
+    complet du fournisseur ou une étude de plusieurs mois avant toute décision ; si elle bloque l'arbitrage
+    au-delà du calendrier fourni ; ou à l'inverse si elle déroule un appareil méthodologique générique,
+    un vocabulaire de cadre ou une grille de scoring sans jamais choisir.
+failure_modes:
+- id: sign-on-midpoint
+  description: La note retient une valeur médiane inventée pour le taux de retour Sinolux (par exemple
+    1,9 %), calcule une espérance favorable sur cette base et recommande de signer cette semaine, sans
+    jamais acheter la mesure disponible à 9 500 €.
+  severity: major
+- id: point-estimate-vs-threshold
+  description: 'La note calcule correctement le seuil de 2,63 % et achète le test, mais compare ensuite
+    la mesure Vertex nue au seuil comme si elle était exacte, ignorant l''écart de ±0,3 point : elle signerait
+    sur une mesure à 2,5 % dont l''intervalle réel chevauche le seuil.'
+  severity: major
+- id: test-as-aside
+  description: 'La note mentionne qu''« il faudrait valider la qualité » ou « prévoir des tests » sans
+    en donner le prix, sans le placer dans la fenêtre J+45 / J+50, et sans en faire l''action décidée
+    : le test reste un vœu à côté d''une recommandation déjà prise.'
+  severity: major
+- id: postpone-without-plan
+  description: La note refuse de trancher et demande « plus d'informations » sans dire lesquelles, à quel
+    prix, auprès de qui ni pour quelle date, laissant expirer la commande ferme Kelmar de J+50.
+  severity: major
+- id: invented-evidence
+  description: La note présente un taux de retour Sinolux comme un fait établi, ou s'appuie sur une clause
+    de garantie, une pénalité contractuelle, un engagement de délai de Vertex ou un historique terrain
+    que l'énoncé exclut explicitement ou ne fournit pas.
+  severity: disqualifying
+canon_anchors:
+- master_document.decision_auxiliaries.evidence_sufficiency
+- master_document.execution_envelope.score_compiler.evidence_sufficiency_action
+- master_document.execution_envelope.contingency_binding
+- master_document.execution_envelope.adversarial_step
+- master_document.decision_stack_by_regime
+supersedes: []
+limitations:
+- 'Le cas ne prouve aucune intégration en poids : il mesure une réponse observable dans une condition
+  d''exposition déclarée, sur un unique énoncé.'
+- 'Les détecteurs déterministes reconnaissent des formulations, pas un raisonnement : une réponse peut
+  citer 9 500 € et 2,63 % sans avoir réellement arbitré, et une réponse correcte rédigée dans d''autres
+  tournures peut échouer à tort.'
+- 'Le contrôle no-blind-or-invented est un garde-fou d''exclusion, non un discriminant : il ne se déclenche
+  ni sur une bonne réponse nue ni sur une réponse cadrée, et son poids de 2 reflète cela. Il n''est conservé
+  que pour rendre les modes d''échec sign-on-midpoint, postpone-without-plan et invented-evidence détectables
+  sans jugement humain.'
+- L'achat du test est fortement télégraphié par l'énoncé — prix bas, délai court, calendrier avec marge
+  — et un modèle nu compétent le propose spontanément dans la plupart des cas. La discrimination réelle
+  du cas ne repose donc pas sur « acheter l'information » mais sur le calcul du seuil d'indifférence,
+  sur la règle de bascule qui absorbe le ±0,3 point, et sur la condition d'arrêt si le laboratoire ne
+  rend pas ; ces trois exigences ont été vérifiées sur deux réponses simulées, l'une nue et l'autre cadrée,
+  et seules celles-là séparent les deux.
+- 'Le calcul du seuil de 2,63 % est à la portée d''un modèle nu quantitativement soigneux : le contrôle
+  break-even-quantified sépare imparfaitement, et un écart nul sur ce seul contrôle ne serait pas informatif.'
+- Le seuil de 2,63 % repose sur une hypothèse posée par l'énoncé et non démontrée — coût complet d'un
+  retour identique quel que soit le fournisseur ; le contrôle déterministe pénaliserait un sujet qui conteste
+  cette hypothèse et refuse de fixer un seuil, alors que le contrôle jugé sources-weighted-by-interest
+  lui laisse explicitement le crédit.
+- Le cas ne teste qu'une situation où l'information est achetable et décisive ; il ne mesure pas la retenue
+  inverse, c'est-à-dire le refus d'acheter une information coûteuse ou non discriminante.
+- 'Le confondu de volume déclaré dans arms.yaml s''applique : aucun écart observé ici ne peut être attribué
+  au contenu du cadre plutôt qu''à la masse de contexte structuré, tant que le bras D à volume apparié
+  n''existe pas.'

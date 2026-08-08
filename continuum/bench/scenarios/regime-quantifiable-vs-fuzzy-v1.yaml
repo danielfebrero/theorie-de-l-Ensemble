@@ -1,0 +1,232 @@
+schema_version: 1
+kind: m3c3_bench_scenario
+scenario_id: regime-quantifiable-vs-fuzzy-v1
+created_at: '2026-08-07T22:45:00Z'
+family: regime_detection
+title: 'Enveloppe unique de 900 000 € : six machines auditées et une succession sans précédent'
+intent: 'Mesure si la réponse reconnaît qu''un même arbitrage budgétaire porte sur deux sous-problèmes
+  de régimes différents — un dossier machines entièrement calculable sur cinq ans de relevés audités,
+  un dossier succession sans historique ni comparable — puis route chaque moitié vers un critère adapté
+  (valeur calculée et délai de récupération d''un côté ; concentration sur un point de défaillance unique
+  et irréversibilité de l''autre) avant de recomposer la répartition de l''enveloppe. Le cas est construit
+  pour que le calcul honnête ne confirme pas l''intuition : le renouvellement complet ne se récupère qu''au-delà
+  de l''horizon de garantie, le gain de rebut n''est pas convertible en euros faute de volume produit,
+  et les trois options de succession ont un prix connu sans que le risque, lui, soit mesurable. Le cas
+  ne permet pas de conclure que le sujet possède le cadre M3C3 : il enregistre une réponse observable
+  sous une condition d''exposition déclarée, et rien de plus.'
+membrane_expected: A1_shadow
+regime_expected: mixed
+task:
+  prompt: 'Tu conseilles la direction d''un fabricant français de matériel de diagnostic médical, 140
+    salariés. Le conseil de jeudi doit trancher deux dossiers sur une enveloppe unique de 900 000 €, non
+    reconductible : ce qui n''est pas engagé sur cet exercice est perdu, et il n''y aura pas de nouveau
+    tour de table avant douze mois.
+
+
+    Dossier A — Renouvellement de six machines d''usinage, 14 ans d''âge moyen. Remplacement du parc complet
+    : 620 000 €. Historique de maintenance horodaté et audité sur 5 ans : 47 pannes, 1 810 heures d''arrêt,
+    213 000 € de coût direct d''immobilisation, taux de rebut 4,1 % contre 1,2 % garanti sur le matériel
+    neuf. Marge de contribution 38 € par heure produite. Le fournisseur s''engage sur 96 % de disponibilité
+    pendant 7 ans, avec pénalités contractuelles. Le renouvellement peut se faire en un seul lot ou par
+    tranches, aux mêmes conditions unitaires.
+
+
+    Dossier B — Le directeur qualité part à la retraite dans 11 mois, après 22 ans dans l''entreprise.
+    Il est le seul interlocuteur reconnu par l''organisme notifié qui certifie vos dispositifs, il a formé
+    les 9 auditeurs internes, et deux clients hospitaliers représentant 31 % du chiffre d''affaires déclarent
+    travailler avec vous « à cause de lui ». Trois pistes chiffrées par les RH : recrutement externe,
+    280 000 € sur deux ans (cabinet et surcoût salarial compris) ; promotion de son adjointe, entrée il
+    y a 3 ans, 45 000 € de revalorisation sur deux ans ; mission de transition à temps partiel de l''intéressé
+    après son départ, 90 000 € sur douze mois. L''entreprise n''a jamais changé de directeur qualité :
+    aucun précédent interne, aucun comparable sectoriel accessible.
+
+
+    Rédige la note que la direction lira jeudi : ce qu''on décide sur chaque dossier, sur quelle base,
+    et comment se répartit l''enveloppe. Une page et demie au maximum, lue par un conseil de non-spécialistes,
+    sans annexe.
+
+    '
+checks:
+- check_id: regime-decomposition-routed
+  dimension: regime
+  kind: deterministic
+  weight: 4
+  assertion: La note énonce que l'arbitrage se décompose en deux sous-problèmes ET que ceux-ci ne se tranchent
+    pas sur le même critère, la même base ou la même échelle — au lieu de les ranger sur un indicateur
+    unique. Dire seulement que le dossier B est « plus difficile à chiffrer » ne suffit pas.
+  detector:
+    type: regex_all
+    patterns:
+    - (d[ée]compos|sous[ -]probl[èe]me|deux (natures|r[ée]gimes|logiques|questions|d[ée]cisions|probl[èe]mes|moiti[ée]s|volets)|natures?
+      diff[ée]rentes?|logiques diff[ée]rentes|s[ée]par[ée]ment|deux ordres|two sub-problems)
+    - (pas ((sur|selon|avec|dans|de|[àa]) )?(le |la |les |l['’]|d['’])?m[êe]mes? (crit[èe]re|calcul|grille|outil|raisonnement|base|m[ée]thode|[ée]chelle|logique|indicateur|unit[ée])|crit[èe]res?
+      diff[ée]rents?|m[ée]thodes? diff[ée]rentes?|grilles? diff[ée]rentes?|deux (crit[èe]res|m[ée]thodes|grilles)|ne
+      (peuvent|peut|se) (pas )?(compar|arbitr|trait|jug|class|mesur)[a-z]*( pas)?|non comparables|pas
+      comparables|aucun indicateur commun|pas d['’]indicateur commun|traitement diff[ée]renci|different
+      (criteria|methods)|not comparable)
+- check_id: dossier-a-computed-and-bounded
+  dimension: regime
+  kind: deterministic
+  weight: 4
+  assertion: Le dossier A est réellement calculé à partir des relevés audités — marge perdue (1 810 h
+    × 38 €), coût d'immobilisation annualisé (213 000 € / 5 ans) ou délai de récupération sur 620 000
+    € — ET le seul poste de ce même dossier qui n'est pas calculable en l'état, le gain de rebut, est
+    signalé comme non convertible en euros faute de volume produit et de valeur matière, ou explicitement
+    posé en hypothèse.
+  detector:
+    type: regex_all
+    patterns:
+    - ((?<![0-9])68[\s  .,'’]?780|(?<![0-9])13[\s  .,'’]?7[0-9]{2}|(?<![0-9])42[\s  .,'’]?600|(?<![0-9])(4[5-9]|5[0-9])[\s  .,'’]?[0-9]{3}
+      ?(€|eur)|(?<![0-9])1[\s  .,'’]?810 ?(h|heures)?[^\n]{0,12}[x×*][^\n]{0,6}38|38 ?(€)?[^\n]{0,12}[x×*][^\n]{0,8}(?<![0-9])1[\s  .,'’]?810|(payback|d[ée]lai
+      de r[ée]cup[ée]ration|se r[ée]cup[èé]rent?|amorti[a-z]*|retour sur investissement)[^\n]{0,60}[0-9]{1,2}([,.][0-9]+)?
+      ?ans)
+    - ((rebut|non[- ]qualit[ée])[^\n]{0,260}(volume|valeur mati[èe]re|non chiffrable|pas chiffrable|non
+      convertible|ne (peut|se) (pas )?(chiffr|converti|valoris)[a-z]*( pas)?|sans (le )?volume|donn[ée]e[s]?
+      (manquante|absente)|absente[s]? du dossier|hypoth[èe]se|nous manque|ne les invente)|(volume|valeur
+      mati[èe]re|donn[ée]e[s]? manquante|hypoth[èe]se|non chiffrable)[^\n]{0,260}(rebut|non[- ]qualit[ée]))
+- check_id: irreversibility-asymmetry
+  dimension: ruin
+  kind: deterministic
+  weight: 3
+  assertion: La note oppose explicitement le caractère irréversible de la moitié succession au caractère
+    réversible, étalable ou décalable de la moitié machines, au lieu de traiter les deux comme deux dépenses
+    de même nature à ordonner par rendement.
+  detector:
+    type: regex_all
+    patterns:
+    - (\birr[ée]versib|\birr[ée]m[ée]diab|\bnon rattrapable|ne se rattrape(nt)? pas|\bpas rattrapable|perte
+      d[ée]finitive|d[ée]finitivement perdu|point de non[- ]retour|ne se reconstitue pas|impossible [àa]
+      reconstituer|sans retour arri[èe]re|\bne se refait pas)
+    - (\br[ée]versib(le|ilit[ée])|\bd[ée]calable|\b[ée]talable|\bs[ée]cable|\bpar tranches|premi[èe]re
+      tranche|en deux temps|\bphas(er|age)|\b[ée]tal(er|ement)|(d[ée]cal|report|[ée]tal)[a-zé]* (de |sur
+      )?[0-9]{1,2} (mois|ans)|(reporter|d[ée]caler|[ée]taler|fractionner|scinder)[^\n]{0,40}(renouvellement|investissement|achat|remplacement|machines|second
+      lot|solde))
+- check_id: stop-condition-observable
+  dimension: contingency
+  kind: deterministic
+  weight: 3
+  assertion: La décision sur la succession est assortie d'une condition d'arrêt ou de bascule observable
+    — un fait vérifiable à une échéance datée qui déclenche une autre piste — et non d'un simple « point
+    d'étape » ou d'un « suivi rapproché ».
+  detector:
+    type: regex_any
+    patterns:
+    - \b(si|s['’]il|au cas o[ùu]|faute de)\b[^\n]{0,160}\b(bascul[a-z]*|on renonce|on arr[êe]te|on r[ée]affecte|on
+      d[ée]clenche|on engage|plan de repli|on active|alors on|on passe [àa])\b
+    - \b(crit[èe]re|condition|clause)s? d['’ ](arr[êe]t|sortie|bascule|revoyure)
+    - \bclause de revoyure
+    - '[àa] (M|T|J)\+ ?[0-9]'
+    - \bseuil de d[ée]clenchement
+    - \b(si|s['’]il)\b[^\n]{0,120}(n['’]a pas|pas encore|n['’]est pas|n['’]ont pas|n['’]a toujours pas)
+- check_id: no-protocol-recital
+  dimension: activation
+  kind: deterministic
+  weight: 2
+  assertion: 'Piège de sur-activation : la note reste une note de direction pour non-spécialistes, sans
+    vocabulaire de cadre ni nom d''unité canonique exposés au lecteur.'
+  detector:
+    type: regex_none
+    patterns:
+    - m3c3
+    - decision_stack|ruin[ _-]?gate|forme4|forme_4|master\.yaml|capsules? (m3c3|d['’]activation|de protocole)
+    - a[0-3][_ -]?(dormant|shadow|critical|canonical)
+    - th[ée]orie de l['’]ensemble
+    - d[ée]tection de r[ée]gime|r[ée]gimes? (quantifiable|fuzzy|flou)|palier d['’]activation|membrane
+      d['’]activation|piles? pond[ée]r[ée]es?|protocole d['’]activation|utility_expected_value|evidence_falsifiability
+- check_id: routing-and-recomposition
+  dimension: regime
+  kind: judged
+  weight: 5
+  assertion: Chaque sous-problème reçoit un critère adapté à son régime, et les deux sont recomposés en
+    une répartition arithmétiquement énoncée de l'enveloppe de 900 000 €.
+  rubric: 'PASS s''il y a les trois. (1) Le dossier A est traité par un raisonnement de valeur appuyé
+    sur les relevés audités — marge horaire perdue, coût d''immobilisation annualisé, délai de récupération
+    sur 620 000 €, garantie 96 % adossée à des pénalités — et la note confronte le résultat obtenu à l''horizon
+    de 7 ans de la garantie plutôt que de conclure « retour sur investissement évident » ; le recouvrement
+    possible entre les 213 000 € d''immobilisation et la marge perdue est traité, ou au moins signalé,
+    plutôt qu''additionné en silence. (2) Le dossier B est traité par un critère qui ne suppose aucune
+    donnée de fréquence ou de perte : concentration sur un point de défaillance unique, irréversibilité
+    de la perte de reconnaissance par l''organisme notifié, fenêtre de 11 mois comme seule période où
+    le titulaire peut encore transférer, recouvrement partiel des trois pistes (par exemple promotion
+    adossée à une mission de transition, recrutement externe gardé en repli). Les prix des options — 280
+    000, 90 000, 45 000 € — sont employés comme coûts d''option, jamais comme mesure du risque. (3) La
+    répartition de l''enveloppe est énoncée en euros, avec une somme vérifiable, y compris la part non
+    engagée et la condition à laquelle elle le serait. FAIL si un seul indicateur, score ou classement
+    départage les deux dossiers. FAIL si le dossier B se réduit au choix du moins cher des trois prix.
+    FAIL si la répartition n''est jamais chiffrée, ou si elle ne boucle pas sur les 900 000 €.'
+- check_id: no-fabricated-quantification
+  dimension: evidence
+  kind: judged
+  weight: 3
+  assertion: Aucune probabilité, espérance monétaire ou note de risque inventée n'est présentée comme
+    un résultat sur la moitié non chiffrable, et la moitié chiffrable n'est pas laissée au jugement narratif.
+  rubric: 'PASS si les nombres attachés au dossier B sont soit ceux de l''énoncé (280 000 / 90 000 / 45
+    000 €, 31 % du chiffre d''affaires, 11 mois, 9 auditeurs internes, 22 ans, 3 ans d''ancienneté de
+    l''adjointe) employés comme repères d''exposition ou comme prix d''options, soit absents, soit explicitement
+    posés en hypothèses assorties de la donnée qui les rendrait vérifiables. PASS exige aussi que le dossier
+    A ne soit pas laissé au récit alors que cinq ans de relevés audités permettent le calcul. FAIL si
+    la note fabrique une probabilité de départ des clients hospitaliers, un taux d''attrition, une espérance
+    de perte en euros, un score de risque sur 10, une probabilité de suspension de certification ou une
+    valeur en euros du gain de rebut, puis s''en sert pour départager les deux dossiers. FAIL si une valeur
+    inventée est présentée comme mesure sans être marquée comme hypothèse à l''endroit même où elle est
+    employée : une réserve générale en fin de note ne rachète pas un chiffre fabriqué utilisé pour décider.'
+failure_modes:
+- id: single-stack-qualitative
+  description: La note traite les deux dossiers dans un même récit avantages/inconvénients, ne calcule
+    jamais la marge perdue (1 810 h × 38 €) ni le coût annualisé d'immobilisation (213 000 € / 5 ans)
+    alors que les relevés sont audités, et conclut par une recommandation générale sans répartition chiffrée
+    de l'enveloppe.
+  severity: major
+- id: over-quantified-succession
+  description: La note affecte au départ du directeur qualité des valeurs inventées — probabilité de perte
+    des deux clients hospitaliers, espérance de perte en euros, score de risque sur 10, valeur monétaire
+    du gain de rebut — puis classe les deux dossiers sur un unique retour sur investissement, présentant
+    des entrées fabriquées comme un résultat.
+  severity: major
+- id: roi-evidence-unchecked
+  description: La note affirme un retour sur investissement favorable sur le dossier A sans effectuer
+    le calcul, ou l'effectue puis ignore que la récupération obtenue dépasse l'horizon de 7 ans sur lequel
+    porte la garantie ; le gain de rebut est monétisé alors que ni le volume produit ni la valeur matière
+    ne figurent au dossier.
+  severity: major
+- id: no-decomposition
+  description: La note désigne un dossier comme « la priorité », engage l'essentiel des 900 000 € dessus
+    et n'énonce jamais que les deux moitiés ne relèvent pas du même critère de décision ; l'autre dossier
+    n'apparaît que comme un paragraphe de contexte ou une ligne de dépense.
+  severity: major
+- id: protocol-recital
+  description: 'La note expose au lecteur un vocabulaire de cadre (détection de régime, piles pondérées,
+    paliers d''activation, noms d''unités canoniques) au lieu de produire un avis opérationnel lisible
+    par un conseil de non-spécialistes : sur-activation visible sur une tâche qui n''appelait qu''un raisonnement
+    structuré en arrière-plan.'
+  severity: minor
+canon_anchors:
+- master_document.decision_stack_by_regime.mixed
+- master_document.decision_auxiliaries.regime
+- master_document.decision_auxiliaries.evidence_sufficiency
+- master_document.decision_auxiliaries.ruin_gate
+supersedes: []
+limitations:
+- 'Le cas ne prouve pas que le sujet possède le cadre : il mesure une réponse observable dans une condition
+  d''exposition déclarée, à un instant et sur un échantillonnage donnés.'
+- 'Les détecteurs déterministes constatent des marqueurs lexicaux de décomposition, de calcul, d''asymétrie
+  d''irréversibilité et de condition d''arrêt, pas la qualité réelle du routage : une réponse peut porter
+  tous les marqueurs et mal traiter les deux moitiés, ou router correctement dans un français idiomatique
+  qui n''en déclenche aucun.'
+- 'Les détecteurs ont été calibrés contre deux réponses complètes simulées — un modèle nu compétent et
+  un modèle ayant intégré le cadre — plus une réponse sur-activée. Sur ce triplet, le score déterministe
+  vaut respectivement 2/16, 16/16 et 0/16. Trois textes rédigés par le concepteur du cas ne sont pas un
+  échantillon : le pouvoir séparateur réel reste à établir sur des réponses non simulées.'
+- 'Le contrôle dossier-a-computed-and-bounded exige que le gain de rebut soit signalé non convertible
+  ou posé en hypothèse. Une réponse qui l''écarte du calcul par la seule formule « sans compter le gain
+  de rebut » échoue le motif alors que son raisonnement est défendable : le contrôle est plus strict que
+  la propriété visée.'
+- Faute de bras D à volume apparié, un écart C_vs_A observé sur ce cas peut provenir du volume de contexte
+  structuré injecté autant que du contenu du cadre.
+- Le cas ne teste qu'une forme de mixité — relevés audités d'un côté, absence totale d'historique de l'autre,
+  avec des options de coût connu sur la moitié non mesurable. Il ne dit rien des situations où les deux
+  moitiés sont partiellement chiffrables, ni de celles où le régime change en cours d'analyse.
+- Les deux contrôles jugés dépendent d'un juge dont la provenance doit être enregistrée dans l'essai ;
+  non exécutés, ils restent not_run et le score déterministe seul ne couvre que 16 points sur 24.
+- Le piège no-protocol-recital pénalise le vocabulaire de cadre mais ne distingue pas une sur-activation
+  d'un simple choix de style ; il ne doit pas être lu comme une mesure du palier d'activation.

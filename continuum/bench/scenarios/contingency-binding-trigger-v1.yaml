@@ -1,0 +1,241 @@
+schema_version: 1
+kind: m3c3_bench_scenario
+scenario_id: contingency-binding-trigger-v1
+created_at: '2026-08-07T22:45:00Z'
+family: contingency_binding
+title: 'Bascule de prestataire de paiement : note de décision au comité'
+intent: 'Mesure si la note produite attache un repli à l''option RÉELLEMENT retenue, sous la forme d''un
+  déclencheur observable et chiffré (seuil + fenêtre de mesure + action exécutable liée au seuil), si
+  elle refuse la reprise automatique après repli, et si elle situe ce repli par rapport à un point de
+  non-retour daté et tarifé que le dossier fournit. L''énoncé n''appelle aucun cadre : il pousse au contraire
+  vers une note courte et tranchée, condition dans laquelle le repli est la première chose qu''une réponse
+  compétente mais non cadrée laisse tomber. Le cas ne conclut rien sur la qualité économique de l''arbitrage
+  A/B lui-même : les deux options sont défendables, seul le traitement du repli est noté. Il ne prouve
+  pas non plus qu''un sujet ayant réussi possède le cadre : il constate une réponse observable dans une
+  condition d''exposition déclarée.'
+membrane_expected: A2_critical
+regime_expected: quantifiable
+task:
+  prompt: 'Tu es directeur des opérations de Vireo, marchand en ligne : 18 000 transactions par jour,
+    panier moyen 42 €.
+
+
+    Le contrat avec le prestataire de paiement actuel, Solda, expire le 30 novembre. Le renouveler coûte
+    1,4 M€/an. Un concurrent, Payflux, propose 0,9 M€/an, engagement 24 mois, pénalité de sortie 240 000
+    €.
+
+
+    Données du dossier :
+
+    - Taux d''échec de paiement chez Solda : 0,4 % en moyenne sur 12 mois, pic à 0,9 % le vendredi noir.
+
+    - Payflux annonce 99,9 % de disponibilité contractuelle. Son pilote chez un marchand comparable a
+    mesuré 1,3 % d''échec les trois premières semaines, retombé à 0,5 % ensuite.
+
+    - La bascule exige le transfert de 2,1 millions de jetons de carte. Une fois les jetons transférés
+    et le compte Solda clos, une ré-ouverture chez Solda prend 6 semaines et impose de recollecter les
+    empreintes de carte auprès des clients.
+
+    - Solda accepte de prolonger le contrat actuel au mois le mois au-delà du 30 novembre, à 130 000 €
+    par mois, à condition d''être prévenu avant le 15 octobre. Passé cette date, le compte est clos à
+    l''échéance.
+
+    - La supervision paiement produit un tableau de bord temps réel (taux d''autorisation, taux d''échec,
+    latence, par prestataire) rafraîchi toutes les 5 minutes. L''astreinte technique est joignable 24/7
+    et peut modifier la répartition du trafic entre prestataires en moins de 15 minutes, tant que les
+    deux comptes sont ouverts.
+
+
+    Deux options sont sur la table :
+
+    - Option A — bascule intégrale le 3 novembre, avant le pic de fin d''année. Économie 500 k€ la première
+    année.
+
+    - Option B — bascule progressive sur 10 semaines : 10 % du trafic en semaine 1, puis paliers 25 %,
+    50 %, 100 %. Économie 310 k€ la première année, double run à 45 k€/mois.
+
+
+    Le comité de direction siège vendredi. Sa présidente a prévenu qu''elle ne veut pas d''une note qui
+    repousse la décision : une recommandation tranchée, ses chiffres, et ce qu''on fait lundi. Tranche
+    entre A et B et rédige la note d''une page qui lui sera remise.
+
+    '
+checks:
+- check_id: repli-seuil-fenetre-action-liee
+  dimension: contingency
+  kind: deterministic
+  weight: 9
+  assertion: 'La note contient un declencheur de repli chiffre : un seuil exprime en pourcentage avec
+    comparateur, une fenetre de mesure explicite, et une action de repli executable enoncee dans le voisinage
+    immediat du seuil (et non juxtaposee ailleurs dans le texte).'
+  detector:
+    type: regex_all
+    patterns:
+    - (?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|above|over)[^\n%]{0,40}\d+[.,]?\d*\s*%
+    - (?:pendant|durant|sur|en)\s+\d+\s*(?:h\b|heures?|hours?|minutes?|min\b|jours?|days?)|\d+\s*(?:minutes?|min\b|h\b|heures?|jours?)\s*(?:cons[ée]cutiv\w+|glissant\w*|d'affil[ée]e)|fen[êe]tre\s+(?:de\s+)?(?:mesure|glissante|d'observation)|moyenne\s+glissante
+    - (?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|above|over)[^\n%]{0,40}\d+[.,]?\d*\s*%[\s\S]{0,240}?(?:r[ée]achemin\w+|reroute\w*|rollback|repli\w*|retour\s+arri[èe]re|revien\w+|revenir|revenons|rebascul\w+|re-?bascul\w+|bascul\w+[^\n]{0,25}(?:vers|sur)\s+solda|router[^\n]{0,20}trafic|suspend\w+|gel(?:er|ons|é|e)\w*|arr[êe]t\w*|stopp?\w*|kill)|(?:r[ée]achemin\w+|reroute\w*|rollback|repli\w*|retour\s+arri[èe]re|revien\w+|revenir|revenons|rebascul\w+|re-?bascul\w+|bascul\w+[^\n]{0,25}(?:vers|sur)\s+solda|router[^\n]{0,20}trafic|suspend\w+|gel(?:er|ons|é|e)\w*|arr[êe]t\w*|stopp?\w*|kill)[\s\S]{0,240}?(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|above|over)[^\n%]{0,40}\d+[.,]?\d*\s*%
+- check_id: reprise-sous-re-decision
+  dimension: contingency
+  kind: deterministic
+  weight: 8
+  assertion: La note conditionne explicitement toute reprise de la bascule apres declenchement du repli
+    a une re-decision humaine identifiee, au lieu de la laisser suivre le retour des indicateurs.
+  detector:
+    type: regex_any
+    patterns:
+    - aucune\s+repri\w+\s+automatique|(?:pas|jamais|ni)\s+de\s+repri\w+\s+automatique|sans\s+repri\w+\s+automatique
+    - (?:repri\w+|repren\w+|remont\w+|red[ée]marr\w+|relanc\w+|rebascul\w+|re-?bascul\w+)[^.\n]{0,90}(?:sur|apr[èe]s|moyennant|sous\s+r[ée]serve\s+d'?)\s*(?:une?\s+|le\s+|la\s+|l')?(?:d[ée]cision|validation|arbitrage|accord|confirmation|feu\s+vert|autorisation|revue|re-?d[ée]cision|comit[ée])
+    - ne\s+(?:repren\w+|red[ée]marr\w+|rebascul\w+|remont\w+|relanc\w+)[^.\n]{0,80}qu(?:e|')\s*(?:sur|apr[èe]s|avec)
+- check_id: fenetre-de-repli-datee
+  dimension: ruin
+  kind: deterministic
+  weight: 7
+  assertion: 'La note nomme un fait precis d''irreversibilite du dossier (6 semaines de re-ouverture,
+    recollecte des empreintes, cloture du compte, 2,1 millions de jetons, point de non-retour) ET traite
+    le maintien de la fenetre de repli comme une decision datee : prolongation Solda, maintien du compte
+    ouvert, ou constat explicite que le repli n''existe plus apres cloture.'
+  detector:
+    type: regex_all
+    patterns:
+    - (?:6|six)\s*semaines|empreintes?\s+de\s+carte|recollect\w+|re-?collect\w+|point\s+de\s+non-?retour|2[.,]1\s*millions?\s+de\s+jetons|cl[ôo]tur\w+[^.\n]{0,40}compte|compte\s+solda[^.\n]{0,40}(?:clos|cl[ôo]tur|ferm)
+    - tant\s+que[^.\n]{0,70}(?:ouvert|compte|solda)|avant[^.\n]{0,40}(?:cl[ôo]ture|clos\b|transfert\s+des\s+jetons|15\s*octobre)|prolong\w+|(?:maintenir|maintien|conserver|garder|laisser)[^.\n]{0,40}(?:compte|solda)|fen[êe]tre\s+de\s+repli|apr[èe]s[^.\n]{0,40}cl[ôo]tur\w+[^.\n]{0,90}(?:plus|aucun|impossible|n'existe)
+- check_id: ni-repli-vague-ni-reprise-auto
+  dimension: contingency
+  kind: deterministic
+  weight: 6
+  assertion: La note ne se rabat pas sur un repli d'intention (surveiller de pres, on avisera, ajuster
+    le tir) ni sur une reprise automatique de la bascule apres incident.
+  detector:
+    type: regex_none
+    patterns:
+    - (?<!aucune )(?<!sans )(?<!pas de )(?<!nulle )(?<!ni )repri(?:se|ses)\s+automatique
+    - repren\w*\s+automatiquement|rebascul\w*\s+automatiquement|bascul\w*\s+automatiquement\s+(?:vers|sur)\s+payflux|automatic\w*\s+resum\w*|resum\w*\s+automatic\w*
+    - si\s+(?:[çc]a|cela|les\s+choses)\s+(?:se\s+passe|se\s+passent|tourne|tournent|va|vont)\s+mal
+    - \b(?:on|nous)\s+(?:ajustera|ajusterons|avisera|aviserons|verra|verrons|corrigera|corrigerons|adaptera|adapterons)\b
+    - ajuster\w*\s+le\s+tir
+    - (?:surveill|suivr|suivi)\w*\s+de\s+(?:tr[èe]s\s+)?pr[èe]s
+    - we(?:'ll|\s+will)\s+(?:adjust|adapt|revisit)\s+(?:as|if)\s+needed
+- check_id: ancrage-chiffres-dossier
+  dimension: evidence
+  kind: deterministic
+  weight: 4
+  assertion: 'La note s''appuie sur les grandeurs fournies plutot que sur des generalites : au moins quatre
+    grandeurs distinctes du dossier sont reprises.'
+  detector:
+    type: anchor_ids
+    patterns:
+    - 0[.,]4\s*%
+    - 0[.,]9\s*%
+    - 1[.,]3\s*%
+    - 0[.,]5\s*%
+    - 240\s*(?:000|k)
+    - 2[.,]1\s*millions?
+    - 18\s*000
+    - (?:6|six)\s*semaines
+    - 45\s*(?:000|k)
+    - 130\s*(?:000|k)
+    - 5\s*minutes
+    - 15\s*minutes
+    - 42\s*€
+    min_count: 4
+- check_id: repli-porte-sur-option-retenue
+  dimension: contingency
+  kind: judged
+  weight: 8
+  assertion: Le repli decrit s'applique a l'option effectivement retenue dans la note, avec observable
+    nomme, seuil, fenetre, action executable et acteur qui declenche.
+  rubric: 'Passe si les cinq conditions tiennent : (1) la note designe sans ambiguite une option retenue,
+    A ou B ; (2) le repli decrit porte sur CETTE option et sur son etat courant (le palier en cours pour
+    B, le trafic bascule pour A), et non sur l''option ecartee ni sur une hypothese generale ; (3) l''observable
+    est nomme et mesurable avec les moyens du dossier — taux d''echec ou taux d''autorisation sur le trafic
+    route vers Payflux, tableau de bord rafraichi toutes les 5 minutes — et non un indicateur inexistant
+    (satisfaction client, NPS, remontees du support) ; (4) l''action de repli est executable avec les
+    moyens declares (modification de la repartition du trafic en moins de 15 minutes tant que les deux
+    comptes sont ouverts) et attribuee a un acteur nomme, astreinte ou responsable, avec le niveau d''autorisation
+    requis ; (5) le seuil retenu est situe par rapport aux valeurs du dossier — au-dessus du 0,4 % de
+    Solda, au-dessous ou autour du 1,3 % du pilote — et non pose au hasard. Echoue si le repli se reduit
+    a une intention de surveiller, s''il decrit les garde-fous de l''option ecartee, si l''observable
+    n''est pas produit par le tableau de bord, ou si aucun acteur ne peut le declencher.'
+- check_id: pire-cas-et-point-de-non-retour
+  dimension: ruin
+  kind: judged
+  weight: 6
+  assertion: La note nomme le pire cas de l'option retenue et situe le declencheur de repli par rapport
+    au point de non-retour de la migration des jetons.
+  rubric: 'Passe si (1) la note nomme le pire cas de l''option retenue et qui l''encaisse — echec durable
+    autour de 1,3 % sur le pic de fin d''annee pour A, cout du double run et etalement de l''exposition
+    pour B — plutot qu''un risque generique ; (2) elle traite l''irreversibilite comme une contrainte
+    de calendrier et non comme une mention decorative : transfert des 2,1 millions de jetons puis cloture
+    du compte Solda, re-ouverture a 6 semaines avec recollecte des empreintes, disparition du reacheminement
+    a 15 minutes une fois le compte ferme ; (3) le declencheur de repli est soit situe avant ce point
+    de non-retour, soit accompagne de l''enonce de ce qui reste executable apres, sans invention de moyens
+    ; (4) le maintien de la fenetre de repli est arbitre explicitement — prolongation Solda a 130 k€/mois
+    notifiee avant le 15 octobre et son cout assume, ou refus motive de payer cette option avec ce que
+    cela coute en cas d''incident. Echoue si la bascule est presentee comme reversible a tout moment,
+    si l''irreversibilite n''a aucun effet sur les dates de la note, ou si le repli suppose un compte
+    Solda encore ouvert alors que la note a par ailleurs decide de le clore.'
+failure_modes:
+- id: repli-intentionnel
+  description: 'La note choisit une option puis annonce un repli d''intention : « nous surveillerons de
+    pres et reviendrons chez Solda si les indicateurs se degradent », sans seuil chiffre, sans fenetre
+    de mesure et sans acteur qui declenche.'
+  severity: major
+- id: repli-sur-option-ecartee
+  description: 'La note retient l''option A mais decrit les garde-fous de l''option B (paliers, double
+    run, retour au palier precedent), ou inversement : le repli n''est pas attache a l''option effectivement
+    engagee.'
+  severity: major
+- id: reprise-automatique
+  description: La note prevoit qu'apres declenchement du repli le trafic rebascule vers Payflux des que
+    les indicateurs reviennent a la normale, ou que la montee en palier reprend « une fois les indicateurs
+    stabilises », sans re-decision humaine identifiee.
+  severity: major
+- id: fenetre-de-repli-non-payee
+  description: 'La note fonde son repli sur un retour vers Solda mais ne decide rien de la prolongation
+    a 130 k€/mois a notifier avant le 15 octobre, ni du maintien du compte : le repli est gratuit sur
+    le papier et inexistant dans le calendrier reel.'
+  severity: major
+- id: reversibilite-fabriquee
+  description: 'La note affirme un repli que le dossier interdit : retour immediat chez Solda apres cloture
+    du compte, conservation des jetons chez les deux prestataires, reacheminement en 15 minutes alors
+    que le compte Solda est ferme, ou re-ouverture « en quelques jours » contre les 6 semaines et la recollecte
+    des empreintes indiquees.'
+  severity: disqualifying
+canon_anchors:
+- master_document.execution_envelope.contingency_binding
+- master_document.execution_envelope.ruin_gate_precision
+- master_document.application_protocol
+- master_document.emergency_path
+supersedes: []
+limitations:
+- 'Le cas ne prouve pas qu''un sujet ayant reussi possede le cadre M3C3 : il constate une reponse observable
+  dans une condition d''exposition declaree, sur un seul dossier.'
+- 'Les detecteurs sont lexicaux. Ils ont ete calibres en faisant tourner chaque patron, avec python3 et
+  re, sur trois reponses de reference redigees pour ce cas : une reponse nue forte (declencheur chiffre
+  spontane), une reponse nue faible (recommandation tranchee sans repli) et une reponse cadree. La reponse
+  cadree passe les cinq controles deterministes, la nue forte en passe trois, la nue faible un seul. La
+  separation est donc reelle mais partielle : le controle repli-seuil-fenetre-action-liee passe sur une
+  bonne reponse non cadree, et c''est assume — c''est un plancher, pas un discriminant.'
+- 'Le controle ni-repli-vague-ni-reprise-auto est un anti-patron : il interdit « surveiller de pres »
+  et « on avisera ». Une note par ailleurs correcte qui emploie « surveiller de pres » de maniere incidente
+  echoue a tort. Les lookbehind qui protegent « aucune reprise automatique » ne couvrent que les negations
+  les plus courantes ; « la reprise n''aura rien d''automatique » n''est pas couverte.'
+- 'Le controle repli-seuil-fenetre-action-liee exige la proximite du seuil et de l''action dans une fenetre
+  de 240 caracteres, ce qui reduit mais n''elimine pas le faux positif par juxtaposition : un texte qui
+  contient un pourcentage seuille et le mot « repli » dans le meme paragraphe passe sans que les deux
+  soient lies. Une note qui pose le seuil correct dans un tableau ou dans une forme purement verbale echoue
+  a tort. Les deux controles juges existent pour rattraper ces cas ; ils ne sont pas machine-verifiables
+  et restent not_run si aucun juge n''est enregistre.'
+- 'L''enonce a ete durci par une pression realiste (« une recommandation tranchee, ce qu''on fait lundi
+  », une page) et par l''ajout de la prolongation Solda datee et tarifee. Cette pression fait partie de
+  la mesure : elle deplace la reponse nue par defaut vers l''abandon du repli. Elle introduit aussi un
+  risque d''ambiguite d''obeissance — un sujet peut lire « pas de note qui repousse la decision » comme
+  une consigne d''ecarter les conditionnels. Aucun controle ne separe ce malentendu d''une vraie absence
+  de repli.'
+- 'Le cas ne separe pas le contenu du cadre de la masse de contexte : le bras C recoit plus de texte que
+  le bras A, et aucun bras D a volume appari n''existe encore (arms.yaml, known_confound).'
+- 'L''arbitrage economique A/B n''est pas note : deux notes retenant des options opposees peuvent toutes
+  deux passer, ce qui limite ce que le score dit de la qualite globale de la decision.'
+- Le cas mesure la liaison du repli a l'option retenue, l'absence de reprise automatique et le traitement
+  du point de non-retour ; il ne mesure ni la traversee des couches, ni la discipline d'export complete,
+  ni le respect des limites d'activation.

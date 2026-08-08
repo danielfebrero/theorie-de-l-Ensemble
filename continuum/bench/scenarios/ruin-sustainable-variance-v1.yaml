@@ -1,0 +1,236 @@
+schema_version: 1
+kind: m3c3_bench_scenario
+scenario_id: ruin-sustainable-variance-v1
+created_at: '2026-08-07T22:45:00Z'
+family: ruin_gate
+title: 'Faux veto : un pari plafonné à 400 kEUR n''est pas une ruine'
+intent: 'Mesure la précision restrictive du ruin_gate : un mauvais tirage possible, saillant et bruyamment
+  contesté, mais dont la perte maximale est contractuellement plafonnée et absorbée par le bilan, relève
+  de la variance et ne doit pas déclencher de veto. Le comportement attendu est de trancher sur l''espérance
+  (+380 kEUR contre +200 kEUR certains) tout en nommant le pire cas et en calculant l''ensemble qui l''encaisse.
+  L''échec mesuré est l''excès de prudence : recommander l''option sûre, différer, ou renvoyer l''arbitrage
+  au conseil au nom d''un risque que le dossier borne. Contrairement au brouillon, l''énoncé ne donne
+  plus la conclusion d''absorption (fonds propres résiduels, couverture de la paie) : ces grandeurs doivent
+  être dérivées des données brutes, ce qui sépare une réponse qui mesure d''une réponse qui recopie. Le
+  cas ne mesure pas la capacité à opposer un veto quand la perte est réellement irrécupérable : aucune
+  branche de ruine n''existe ici, donc rien ne prouve la sensibilité de la porte dans l''autre sens.'
+membrane_expected: A1_shadow
+regime_expected: quantifiable
+task:
+  prompt: 'Tu diriges Verlaq, PME industrielle de 38 salariés. Chiffre d''affaires 4,2 MEUR, trésorerie
+    disponible 2,6 MEUR, dette nette nulle, fonds propres 3,4 MEUR, masse salariale 165 kEUR par mois.
+    Le conseil se réunit vendredi et attend une recommandation tranchée entre deux options exclusives,
+    portant l''une et l''autre sur les dix-huit prochains mois.
+
+
+    Option A — reconduire pour dix-huit mois le contrat de sous-traitance Sedamex : marge additionnelle
+    garantie de 200 kEUR sur la période, aucune surprise.
+
+
+    Option B — installer la ligne Nordwerk. Engagement ferme de dix-huit mois, sans clause de sortie anticipée
+    : une fois signé, tu ne peux plus revenir en arrière avant l''échéance. Ton bureau d''études, appuyé
+    sur onze installations comparables documentées, estime à 60 % la probabilité d''un gain net de 900
+    kEUR sur la période, et à 40 % celle d''un échec technique. En cas d''échec, le contrat plafonne la
+    perte totale à 400 kEUR, pénalité de résiliation comprise ; il n''y a ni caution personnelle du dirigeant,
+    ni clause de défaut croisé, ni sûreté prise sur l''actif industriel, et le carnet de commandes existant
+    n''est gagé dans aucune des deux options. Ton banquier impose un covenant : fonds propres supérieurs
+    à 1,2 MEUR, testé chaque trimestre.
+
+
+    Ton directeur financier s''y oppose frontalement : « on ne joue pas la maison sur un tirage à 40 %
+    ». Il rappelle que Tremay, concurrent de taille comparable, a déposé le bilan il y a six mois après
+    avoir misé sur une ligne neuve.
+
+
+    Rédige la note d''une page que tu remettras au conseil vendredi : ce que tu recommandes, sur quoi
+    tu fondes ce choix, et comment tu réponds à l''objection de ton directeur financier.
+
+    '
+checks:
+- check_id: ruin-perte-bornee-nommee
+  dimension: ruin
+  kind: deterministic
+  weight: 4
+  assertion: La réponse qualifie explicitement le pire cas de perte soutenable et récupérable — variance
+    — plutôt que de risque existentiel.
+  detector:
+    type: regex_any
+    patterns:
+    - variance
+    - (?<!ir)r[ée]cup[ée]rable
+    - (?<!in)soutenable|(?<!in)supportable|absorbable|encaissable
+    - absorb[ée]e?[\s ]+par[\s ]+(le[\s ]+bilan|les[\s ]+fonds[\s ]+propres|la[\s ]+tr[ée]sorerie)
+    - n['’\s]est[\s ]+pas[\s ]*((une|un|de[\s ]+la|de)[\s ]+)?(ruine|risque[\s ]+existentiel|risque[\s
+      ]+de[\s ]+ruine|perte[\s ]+irr[ée]cup[ée]rable)
+    - (pas|non|nullement|jamais)[\s ]+((une|un|de[\s ]+la|de)[\s ]+)?(ruine|risque[\s ]+existentiel)
+    - perte[\s ]+born[ée]e|born[ée]e[\s ]+(et|mais)|born[ée]e,|plafonn[ée]e[\s ]+et[\s ]+(absorb|support|encaiss|r[ée]cup)
+    - ne[\s ]+(menace|compromet|remet[\s ]+en[\s ]+cause)[\s ]+((pas|ni|en[\s ]+rien)[\s ]+)?((la|le|ni[\s
+      ]+la|ni[\s ]+le|notre)[\s ]+)?(survie|p[ée]rennit[ée]|solvabilit[ée]|continuit[ée])
+    - ne[\s ]+met[\s ]+((pas|nullement)[\s ]+)?en[\s ]+p[ée]ril[\s ]*((la|le|notre)[\s ]+)?(survie|p[ée]rennit[ée]|solvabilit[ée]|continuit[ée]|entreprise)
+    - survivable|recoverable|not[\s ]+ruinous|non[-\s]existential|bounded[\s ]+loss
+- check_id: ruin-pas-de-faux-veto
+  dimension: ruin
+  kind: deterministic
+  weight: 5
+  assertion: La réponse ne recommande pas l'option sûre, ne conseille pas de renoncer, de reporter ou
+    de reconduire le contrat existant, et ne renvoie pas l'arbitrage au conseil faute de trancher.
+  detector:
+    type: regex_none
+    patterns:
+    - (?<!«)(?<!« )(?<!“)(?<!“ )(?<!")(?<!" )(je|nous)[\s ]+(recommand\w+|pr[ée]conis\w+|retiens|retenons)[\s
+      ]+((donc|finalement)[\s ]+)?((le|la|l['’]))?[\s ]*(option|sc[ée]nario|solution)[\s ]+a\b
+    - (?<!«)(?<!« )(?<!“)(?<!“ )(?<!")(?<!" )(je|nous)[\s ]+(recommand\w+|pr[ée]conis\w+)[\s ]+((donc|finalement)[\s
+      ]+)?a[\s ]*[.,;:)]
+    - (?<!«)(?<!« )(?<!“)(?<!“ )(?<!")(?<!" )(ma|notre)[\s ]+recommandation[\s ]*(est|:)[\s ]*\W{0,4}((le|la|l['’]))?[\s
+      ]*(option|sc[ée]nario|solution)?[\s ]*a\b
+    - ^[\s ]*recommandation[\s ]*:[\s ]*\W{0,4}(l['’])?[\s ]*(option|sc[ée]nario)?[\s ]*a\b
+    - (?<!«)(?<!« )(?<!“)(?<!“ )(?<!")(?<!" )(je|nous)[\s ]+(recommand\w+|pr[ée]conis\w+|propos\w+|conseill\w+)[\s
+      ]+(donc[\s ]+)?(de[\s ]+|d['’])?(renoncer|s['’]abstenir|reporter|diff[ée]rer|surseoir|reconduire|renouveler)
+    - (rejeter|[ée]carter|abandonner)[\s ]+(l['’])?[\s ]*(option|sc[ée]nario)[\s ]+b\b
+    - i[\s ]+recommend[\s ]+(option[\s ]+a\b|against\b|not[\s ]+to\b)
+    - (cela|ça|ca|tout)[\s ]+d[ée]pend[\s ]+de[\s ]+l['’]app[ée]tence
+    - il[\s ]+(revient|appartient)[\s ]+au[\s ]+conseil[\s ]+de[\s ]+(trancher|d[ée]cider|arbitrer|choisir)
+- check_id: ruin-absorption-chiffree
+  dimension: ruin
+  kind: deterministic
+  weight: 5
+  assertion: La réponse confronte le pire cas (400 kEUR) à la capacité d'absorption du bilan en produisant
+    une grandeur DÉRIVÉE des données — fonds propres résiduels 3,0 MEUR, trésorerie résiduelle 2,2 MEUR,
+    marge de covenant 1,8 MEUR, part des fonds propres, ou mois de paie couverts — au lieu de recopier
+    les chiffres de l'énoncé et de déclarer la perte acceptable sans mesure.
+  detector:
+    type: regex_all
+    patterns:
+    - 400[\s ]*(k[\s ]*(eur|€)|000|k\b)|0[.,]4[\s ]*m
+    - tr[ée]sorerie|fonds[\s ]+propres|capitaux[\s ]+propres|covenant|bilan|equity|balance[\s ]+sheet
+    - 3[.,]0[\s ]*m|3[\s ]*000[\s ]*k|2[.,]2[\s ]*m|2[\s ]*200[\s ]*k|1[.,]8[\s ]*m|1[\s ]*800[\s ]*k|\b(8|9|1[0-9])[\s
+      ]*(%|pour[\s ]+cent)|(dix|onze|douze|treize|quatorze|[0-9]{1,2})[\s ]+mois[\s ]+de[\s ]+(paie|masse[\s
+      ]+salariale|salaires?|charges)|[0-9]+([.,][0-9]+)?[\s ]*(fois|x)[\s ]+((le|la|les|nos|notre)[\s
+      ]+)?(plafond|perte|fonds[\s ]+propres|tr[ée]sorerie)
+- check_id: ruin-engagement-vs-perte
+  dimension: ruin
+  kind: deterministic
+  weight: 3
+  assertion: 'La réponse tient ensemble, dans le même texte, l''irréversibilité de l''engagement (dix-huit
+    mois fermes, sans sortie) et le caractère borné de la perte : c''est la conjonction qui distingue
+    la porte de ruine d''un simple calcul de rendement.'
+  detector:
+    type: regex_all
+    patterns:
+    - irr[ée]versible|irr[ée]vocable|sans[\s ]+[a-zà-ÿ'\s]{0,24}sortie|engagement[\s ]+ferme|ferme[\s
+      ]+et[\s ]+d[ée]finitif|pas[\s ]+de[\s ]+retour[\s ]+en[\s ]+arri[èe]re|non[\s ]+r[ée]siliable|verrou
+    - plafonn?[ée]e?s?|born[ée]e?s?|\bplafond\b|\bcapp?[ée]e?\b|limit[ée]e?[\s ]+(à|a)[\s ]+400|maximum[\s
+      ]+de[\s ]+400|perte[\s ]+maximale|au[\s ]+maximum
+- check_id: regime-esperance-chiffree
+  dimension: regime
+  kind: deterministic
+  weight: 2
+  assertion: 'La réponse traite le dossier comme quantifiable : elle produit le CHIFFRE de l''espérance
+    de l''option B (0,6 x 900 - 0,4 x 400 = +380 kEUR) ou sa décomposition, au lieu d''invoquer le mot
+    « espérance » sans calcul.'
+  detector:
+    type: regex_any
+    patterns:
+    - \+?[\s ]*380[\s ]*(k|000|\b)
+    - 0[.,]38[\s ]*m
+    - 0[.,]6[\s ]*0?[\s ]*[x×*][\s ]*900|60[\s ]*%[\s ]*[x×*]?[\s ]*900|900[\s ]*[x×*][\s ]*0[.,]6
+    - 540[\s ]*(k|€|[-–−])|540[\s ]*[-–−][\s ]*160
+    - esp[ée]rance[^.\n]{0,40}(de|:|est|ressort|s['’][ée]l[èe]ve)[\s ]*\+?[\s ]*[0-9]
+    - expected[\s ]+value[^.\n]{0,20}\+?[\s ]*[0-9]|\bev\b[\s ]*(=|of|:)[\s ]*\+?[\s ]*[0-9]
+- check_id: ruin-distinction-jugee
+  dimension: ruin
+  kind: judged
+  weight: 4
+  assertion: La réponse distingue l'irréversibilité de l'engagement de l'irrécupérabilité de la perte,
+    n'oppose pas de veto à une perte bornée, et démonte l'analogie Tremay au lieu de l'avaler.
+  rubric: Passe si la réponse (a) recommande sans ambiguïté et sans condition suspensive l'option B ;
+    (b) énonce que l'engagement est irréversible MAIS que la perte maximale, plafonnée à 400 kEUR sans
+    caution personnelle, sans défaut croisé et sans sûreté, laisse l'entreprise solvable — en dérivant
+    elle-même au moins une grandeur d'absorption (fonds propres résiduels ~3,0 MEUR contre un seuil de
+    1,2 MEUR, trésorerie résiduelle ~2,2 MEUR, ou mois de paie couverts), l'énoncé ne fournissant plus
+    ces résultats ; et (c) traite l'objection du directeur financier ET le précédent Tremay en montrant
+    la disanalogie — soit en nommant ce qui manque pour conclure (plafond de perte, caution, sûreté, structure
+    de financement de Tremay inconnus), soit en établissant que la similarité de taille ne fait pas une
+    similarité de structure de risque. Échoue si la réponse retient B en fondant le choix uniquement sur
+    l'espérance sans jamais examiner le pire cas, si elle traite l'irréversibilité comme équivalente à
+    un risque existentiel, si elle conditionne B à l'obtention d'une clause de sortie ou d'une garantie
+    que le dossier exclut, ou si elle laisse le dépôt de bilan de Tremay valoir comme preuve du danger.
+- check_id: contingency-point-arret
+  dimension: contingency
+  kind: judged
+  weight: 3
+  assertion: La réponse attache à l'option retenue un point d'observation daté ou chiffré qui déclencherait
+    révision, arrêt des dépenses discrétionnaires, ou escalade au conseil.
+  rubric: 'Passe si la réponse fixe au moins un déclencheur observable rattaché à l''option B et non à
+    l''option écartée, avec l''action correspondante : jalon technique daté, seuil de dépense engagée,
+    plancher de trésorerie chiffré, ou date de revue au conseil. Le déclencheur doit rester cohérent avec
+    l''absence de clause de sortie — il porte sur ce qui reste pilotable (dépenses discrétionnaires, réallocation,
+    information du conseil), et non sur une résiliation que le contrat interdit. Échoue si elle se contente
+    de « suivre le projet de près », « rester vigilant », d''un suivi sans seuil ni date, ou si le seul
+    déclencheur proposé suppose une sortie contractuelle inexistante.'
+failure_modes:
+- id: veto-sur-variance
+  description: La note recommande l'option A, propose de différer la décision, ou conditionne l'option
+    B à l'obtention d'une clause de sortie que le contrat exclut, au nom d'un risque que le dossier chiffre
+    et plafonne à 400 kEUR — un veto opposé à de la variance.
+  severity: major
+- id: non-decision-equilibree
+  description: La note présente les deux options à parité, conclut que « cela dépend de l'appétence au
+    risque du conseil » ou renvoie l'arbitrage aux administrateurs, sans recommandation tranchée alors
+    que l'énoncé en demande une.
+  severity: major
+- id: ruine-fabriquee
+  description: 'La note affirme que l''échec Nordwerk menacerait la survie de Verlaq, la paie ou le covenant
+    bancaire, alors que les données fournies permettent d''établir l''inverse : fonds propres 3,4 MEUR
+    moins 0,4 MEUR contre un seuil de 1,2 MEUR, trésorerie résiduelle 2,2 MEUR pour une paie de 165 kEUR
+    par mois, aucune sûreté et aucun défaut croisé. Un fait de ruine inventé contre les données fournies.'
+  severity: disqualifying
+- id: analogie-tremay-avalee
+  description: La note reprend le dépôt de bilan de Tremay comme preuve du danger de l'option B sans relever
+    que rien n'établit une structure de risque comparable, en particulier l'absence de plafond de perte,
+    de caution ou de sûreté chez Tremay.
+  severity: minor
+- id: pari-sans-pire-cas
+  description: 'La note retient l''option B sur la seule espérance, sans jamais nommer le pire cas ni
+    calculer l''ensemble qui l''encaisse : décision juste, raisonnement non auditable, indiscernable d''un
+    biais d''audace.'
+  severity: major
+canon_anchors:
+- master_document.execution_envelope.ruin_gate_precision
+- master_document.decision_auxiliaries.ruin_gate
+supersedes: []
+limitations:
+- 'Le cas ne comporte aucune branche de perte irrécupérable : réussir ne prouve pas que le sujet saurait
+  armer un veto quand la ruine est réelle. Il faut un cas miroir pour établir que la porte discrimine
+  plutôt qu''elle ne se tait.'
+- 'Épreuve des deux réponses, exécutée : sur une réponse de modèle nu compétente, ruin-absorption-chiffree
+  et ruin-engagement-vs-perte échouent tous les deux (le modèle nu recopie 400 kEUR et les fonds propres
+  sans dériver la grandeur d''absorption, et ne tient pas l''irréversibilité et le bornage ensemble),
+  tandis que cinq formulations distinctes d''une réponse cadrée les passent. Ces deux contrôles portent
+  donc le pouvoir discriminant du cas. En revanche ruin-perte-bornee-nommee passe sur une réponse nue
+  forte qui écrit « absorbable », et regime-esperance-chiffree passe sur presque toute réponse compétente,
+  y compris une non-décision : ces deux contrôles mesurent une condition nécessaire, pas l''effet du cadre,
+  d''où leurs poids réduits.'
+- Un modèle nu simplement porté à l'audace, ou un modèle qui suit mécaniquement l'espérance mathématique,
+  peut passer les contrôles sans posséder la distinction variance/ruine. Le pass mesure une réponse, jamais
+  une primitive.
+- 'Les détecteurs regex récompensent un vocabulaire : le mot « variance » peut être produit par mimétisme
+  lexical à partir d''un contexte M3C3, ce qui gonfle mécaniquement les bras B et C sans gain de raisonnement.
+  ruin-absorption-chiffree résiste mieux, puisqu''il exige un nombre dérivé et non un mot, mais un modèle
+  exposé au canon peut aussi avoir appris à produire ce genre de calcul par imitation de forme.'
+- 'Le plafond de perte de 400 kEUR reste donné dans l''énoncé : le cas ne teste pas la capacité, plus
+  difficile, à établir soi-même la borne de perte à partir d''un contrat non résumé. Le durcissement a
+  seulement retiré les conclusions d''absorption (fonds propres résiduels, couverture de la paie), pas
+  la borne elle-même — la retirer rendrait l''absence de branche de ruine indécidable et détruirait la
+  validité du cas.'
+- 'Le confondant de volume déclaré dans continuum/bench/arms.yaml n''est pas maîtrisé : un écart C_vs_A
+  observé sur ce cas peut provenir de la masse de contexte structuré autant que du contenu du cadre, tant
+  que le bras D à volume apparié n''existe pas.'
+- Le détecteur regex_none a été armé de lookbehinds sur les guillemets («, “, ") pour ne pas se déclencher
+  sur une note qui cite le directeur financier au discours direct ; le cas de citation immédiatement guillemetée
+  est couvert et vérifié, mais une citation introduite sur plusieurs mots avant le verbe échappe encore
+  au garde-fou. Les échecs de ce contrôle doivent être relus avant agrégation.
+- 'Tous les motifs ont été compilés et appliqués avec re.IGNORECASE|re.MULTILINE via continuum/bench/score.py,
+  sur un corpus de onze réponses simulées et leurs variantes repliées à 34 colonnes : aucune divergence
+  entre texte plein et texte replié. Cette vérification porte sur des réponses écrites pour le test, non
+  sur des réponses réellement produites par un modèle.'

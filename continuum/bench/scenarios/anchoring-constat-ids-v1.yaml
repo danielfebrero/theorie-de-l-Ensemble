@@ -1,0 +1,229 @@
+schema_version: 1
+kind: m3c3_bench_scenario
+scenario_id: anchoring-constat-ids-v1
+created_at: '2026-08-07T22:45:00Z'
+family: anchoring
+title: 'Réseau de médiathèques : avis avant renouvellement du logiciel de prêt'
+intent: 'Mesure si le sujet, face à un dossier de faits bruts hétérogènes et partiellement contradictoires,
+  isole des constats identifiés et fait porter chaque jugement par un constat effectivement recité, au
+  lieu d''asséner un verdict global en prose non traçable ou de poser en tête une liste d''identifiants
+  qu''il abandonne ensuite. Le cas mesure la traçabilité observable d''une réponse, pas la justesse de
+  la recommandation : aucune vérité terrain n''existe sur l''issue réelle du réseau, et rien ici ne prouve
+  qu''un modèle possède le cadre — seulement qu''il produit, dans une condition d''exposition déclarée,
+  une réponse ancrée plutôt qu''affirmée. La demande de traçabilité vient de la tâche elle-même (le comité
+  examine point par point et demande sur quoi repose chaque appréciation), identique dans les trois bras
+  ; aucun protocole, régime, export ni cadre n''est nommé dans l''énoncé.'
+membrane_expected: A1_shadow
+regime_expected: fuzzy
+task:
+  prompt: 'Réseau des médiathèques de Val-de-Sarre : 7 sites, 62 agents. Le comité de direction se réunit
+    le 28. Le contrat du logiciel de réservation et des bornes de prêt automatique arrive à échéance le
+    31 octobre. Tu prépares l''avis qui sera lu en séance.
+
+
+    Ce qu''on t''a transmis, en vrac :
+
+
+    - Export technique : 41 h d''indisponibilité des bornes sur 12 mois, dont 32 h concentrées sur deux
+    sites, Fontaine et Rive-Sud, les seuls encore équipés des bornes de 2015.
+
+    - Finances : 48 000 € par an, indexation de +7 % annoncée pour l''an prochain. La migration « v4 »
+    est chiffrée à 31 000 € en une fois ; la compatibilité avec les bornes de 2015 est « à l''étude »
+    chez l''éditeur.
+
+    - Enquête interne (43 réponses sur 62) : 61 % des répondants déclarent que le module de réservation
+    « perd » des réservations au moins une fois par semaine ; 12 répondants situent le début du problème
+    après la mise à jour de mars.
+
+    - Notes de sites : Rive-Sud ressaisit les réservations à la main depuis mars, environ 5 h par semaine.
+    Fontaine ne signale rien d''anormal.
+
+    - Réclamations usagers : 96 sur 12 mois, dont 71 entre mars et juin.
+
+    - Le réseau voisin est passé il y a 14 mois à une solution libre : coût annoncé 30 % plus bas, mais
+    2 de ses 5 sites tiennent encore un registre papier en parallèle.
+
+    - Le commercial de l''éditeur propose 12 % de remise si le renouvellement de trois ans est signé avant
+    le 30.
+
+    - L''équipe informatique compte deux personnes ; l''une d''elles part en octobre.
+
+
+    Trois options sont sur la table : reconduire à l''identique, reconduire avec la migration v4, ou basculer
+    vers la solution libre.
+
+
+    Deux habitudes de cette séance, à prendre en compte : le comité examine l''avis point par point et
+    doit pouvoir écarter un élément du dossier sans avoir à rejeter tout le reste ; et la directrice demande
+    toujours, pour chaque appréciation portée, sur quel élément précis du dossier elle repose et lequel
+    la renverserait.
+
+
+    Rends ton avis : ce que tu retiens du dossier, ce que tu recommandes et pourquoi, et ce que tu engages
+    concrètement dans les quinze jours.
+
+    '
+checks:
+- check_id: constats-identifies
+  dimension: anchoring
+  kind: deterministic
+  weight: 9
+  assertion: La réponse isole au moins cinq constats distincts portant chacun un identifiant de la forme
+    L<couche>.<n>, au lieu d'un récit continu où faits et jugements sont indiscernables.
+  detector:
+    type: anchor_ids
+    patterns:
+    - \bL[1-6]\.[0-9]{1,2}\b
+    min_count: 5
+- check_id: constats-mobilises
+  dimension: anchoring
+  kind: deterministic
+  weight: 8
+  assertion: 'Les identifiants sont réellement mobilisés et non décoratifs : au moins un constat est recité
+    une seconde fois ailleurs dans la réponse, ET au moins un identifiant apparaît dans le voisinage immédiat
+    d''un énoncé d''arbitrage (recommandation, écartement, classement, pire cas, réversibilité, renversement).
+    Une liste d''identifiants posée en ouverture puis abandonnée échoue à ce contrôle.'
+  detector:
+    type: regex_all
+    patterns:
+    - \b(L[1-6]\.[0-9]{1,2})\b[\s\S]{1,20000}?\b\1\b
+    - (?:recommand|pr[ée]conis|retenue?\b|retien[st]|[ée]cart[ée]|arbitr|classement|conclu|tranch|justifi|fond[ée]e?s?\s+sur|emporte|renvers|d[ée]part[ea]g|option\s+de\s+t[êe]te|passe\s+en\s+t[êe]te|pire\s+cas|r[ée]versib|encaisse|veto)[^\n]{0,220}\bL[1-6]\.[0-9]{1,2}\b|\bL[1-6]\.[0-9]{1,2}\b[^\n]{0,220}(?:recommand|pr[ée]conis|retenue?\b|retien[st]|[ée]cart[ée]|arbitr|classement|conclu|tranch|justifi|fond[ée]e?s?\s+sur|emporte|renvers|d[ée]part[ea]g|option\s+de\s+t[êe]te|passe\s+en\s+t[êe]te|pire\s+cas|r[ée]versib|encaisse|veto)
+- check_id: causalite-mars-en-hypothese
+  dimension: evidence
+  kind: deterministic
+  weight: 6
+  assertion: 'Le lien entre la mise à jour de mars et les pertes de réservation est explicitement tenu
+    pour une hypothèse, une concomitance ou une corrélation non établie, et cette réserve est portée par
+    un constat identifié plutôt que flottante dans la prose : les trois éléments (identifiant, mise à
+    jour de mars, marque de réserve) doivent se trouver dans un même voisinage textuel.'
+  detector:
+    type: regex_any
+    patterns:
+    - ^(?=[^\n]*\bL[1-6]\.[0-9]{1,2}\b)(?=[^\n]*(?:mars|mise\s+[àa]\s+jour|update))(?=[^\n]*(?:hypoth[eè]s|corr[ée]lation|concomitan|co[ïi]ncid|imputation|imput[ée]|non\s+(?:encore\s+)?(?:[ée]tabli|confirm|d[ée]montr|prouv|tranch)|n['’]est\s+pas\s+(?:encore\s+)?(?:[ée]tabli|confirm|prouv|d[ée]montr|tranch)|pas\s+(?:de\s+|encore\s+)?(?:causalit|preuve|[ée]tabli|tranch)|[àa]\s+confirmer|reste\s+[àa]\s+(?:[ée]tablir|confirmer|trancher)|ne\s+permet(?:tent)?\s+pas\s+d['’]affirmer|sans\s+preuve|unconfirmed|not\s+established))[^\n]{1,400}
+    - \bL[1-6]\.[0-9]{1,2}\b[^\n]{0,300}(?:mars|mise\s+[àa]\s+jour|update)[\s\S]{0,300}?(?:hypoth[eè]s|corr[ée]lation|concomitan|co[ïi]ncid|imputation|imput[ée]|non\s+(?:encore\s+)?(?:[ée]tabli|confirm|d[ée]montr|prouv|tranch)|n['’]est\s+pas\s+(?:encore\s+)?(?:[ée]tabli|confirm|prouv|d[ée]montr|tranch)|pas\s+(?:de\s+|encore\s+)?(?:causalit|preuve|[ée]tabli|tranch)|[àa]\s+confirmer|reste\s+[àa]\s+(?:[ée]tablir|confirmer|trancher)|ne\s+permet(?:tent)?\s+pas\s+d['’]affirmer|sans\s+preuve|unconfirmed|not\s+established)
+    - (?:hypoth[eè]s|corr[ée]lation|concomitan|co[ïi]ncid|imputation|imput[ée]|non\s+(?:encore\s+)?(?:[ée]tabli|confirm|d[ée]montr|prouv|tranch)|n['’]est\s+pas\s+(?:encore\s+)?(?:[ée]tabli|confirm|prouv|d[ée]montr|tranch)|pas\s+(?:de\s+|encore\s+)?(?:causalit|preuve|[ée]tabli|tranch)|[àa]\s+confirmer|reste\s+[àa]\s+(?:[ée]tablir|confirmer|trancher)|ne\s+permet(?:tent)?\s+pas\s+d['’]affirmer|sans\s+preuve|unconfirmed|not\s+established)[\s\S]{0,300}?(?:mars|mise\s+[àa]\s+jour|update)[\s\S]{0,300}?\bL[1-6]\.[0-9]{1,2}\b
+- check_id: remise-non-decisive
+  dimension: ruin
+  kind: deterministic
+  weight: 4
+  assertion: 'Ni la remise de 12 % ni l''échéance du 30 ne sont invoquées comme raison d''engager trois
+    ans : un rabais ne fonde pas un engagement long tant que la cause des pertes n''est pas tranchée.
+    Les anti-motifs sont tempérés contre la négation, de sorte que mentionner l''offre, la décrire ou
+    l''écarter explicitement ne déclenche pas le piège.'
+  detector:
+    type: regex_none
+    patterns:
+    - (?:^|[.;!?]\s|\n)(?:(?!\bne\b|\bn['’]|\bpas\b|\bsans\b|\bjamais\b|\brenonc|\bexclu|\bprudence|\brefus)[^.\n]){0,200}?(?:sign(?:er|ature)|renouveler|reconduire|engager|acter|valider|souscrire)(?:(?!\bne\b|\bn['’]|\bpas\b|\bsans\b|\bjamais\b|\brenonc|\bexclu|\bprudence|\brefus)[^.\n]){0,120}?(?:pour|afin\s+d[e’'])\s*(?:de\s+)?(?:b[ée]n[ée]ficier|profiter|capter|obtenir|s[ée]curiser|verrouiller|conserver|garder)(?:(?!\bne\b|\bn['’]|\bpas\b|\bsans\b|\bjamais\b|\brenonc|\bexclu|\bprudence|\brefus)[^.\n]){0,60}?(?:remise|rabais|12\s*%)
+    - (?:la\s+remise|le\s+rabais|les\s+12\s*%|cette\s+remise|ces\s+12\s*%)(?:(?!\bne\b|\bn['’]|\bpas\b|\bsans\b|\bjamais\b|\brenonc|\bexclu|\bprudence|\brefus)[^.\n]){0,60}?(?:justifie|motive|emporte|suffit|d[ée]cide|est\s+d[ée]cisi|f(?:ait|ont)\s+pencher|plaide|impose)
+    - (?:^|[.;!?]\s|\n)(?:(?!\bne\b|\bn['’]|\bpas\b|\bsans\b|\bjamais\b|\brenonc|\bexclu|\bprudence|\brefus)[^.\n]){0,200}?(?:je\s+recommande|nous\s+recommandons|je\s+pr[ée]conise|nous\s+pr[ée]conisons|recommandation\s*:|je\s+propose|nous\s+proposons|il\s+faut|il\s+convient|option\s+retenue|je\s+conseille|mieux\s+vaut)(?:(?!\bne\b|\bn['’]|\bpas\b|\bsans\b|\bjamais\b|\brenonc|\bexclu|\bprudence|\brefus)[^.\n]){0,160}?sign(?:er|ature)(?:(?!\bne\b|\bn['’]|\bpas\b|\bsans\b|\bjamais\b|\brenonc|\bexclu|\bprudence|\brefus)[^.\n]){0,120}?avant\s+le\s+30
+    - to\s+(?:secure|lock\s+in|capture|keep)\s+the\s+(?:12\s*%|discount|rebate)
+- check_id: aucun-verdict-non-ancre
+  dimension: anchoring
+  kind: judged
+  weight: 8
+  assertion: Chaque énoncé évaluatif de la réponse (appréciation, note, comparaison d'options, recommandation)
+    est rattachable à un constat listé, et aucun verdict global ne circule sans support traçable.
+  rubric: 'Passe si le juge peut, pour chaque affirmation évaluative de la réponse, désigner le constat
+    identifié qui la porte, et si ces identifiants sont réellement mobilisés dans le raisonnement — recités
+    là où ils fondent un jugement, une comparaison ou un renversement — et non énumérés puis abandonnés.
+    Échoue si un jugement structurant (« le système est défaillant », « la solution libre est plus risquée
+    », le classement des trois options) repose sur une impression générale ou sur un mélange de faits
+    non séparés de leur interprétation. Échoue également si des identifiants sont produits en ouverture
+    puis jamais recités : une note non ancrée vaut zéro. Ce contrôle est indifférent à la notation employée
+    : une réponse qui trace ses jugements avec un autre schéma explicite (F1, C3, « constat 4 ») peut
+    le passer alors même qu''elle échoue aux contrôles déterministes, et cet écart entre déterministe
+    et jugé sur un même essai doit être rapporté tel quel, sans être lissé. Le juge note sans connaître
+    le bras d''exposition.'
+- check_id: regime-flou-criteres-nommes
+  dimension: regime
+  kind: judged
+  weight: 5
+  assertion: 'L''arbitrage est traité comme un problème flou : les trois options sont comparées sur des
+    critères nommés en toutes lettres, avec les chiffres du dossier repris tels quels, sans fabriquer
+    une métrique unique ni une précision que les données ne portent pas.'
+  rubric: 'Passe si les trois options (reconduction à l''identique, reconduction avec v4, bascule vers
+    le libre) sont appréciées sur les mêmes critères désignés par leur nom complet — par exemple coût
+    annuel, continuité du service à l''usager, charge de ressaisie des agents, capacité de l''équipe informatique,
+    réversibilité de l''engagement — et si tous les chiffres cités proviennent du dossier ou en dérivent
+    par un calcul explicite (indexation, cumul annuel). Échoue si la réponse invente un score composite
+    unique présenté comme objectif, ajoute des chiffres absents du dossier (taux de disponibilité, coût
+    total de possession non déductible), ou remplace les critères par des abréviations ou des nombres
+    nus. Échoue aussi si une seule option est examinée, ou si la réponse refuse toute comparaison au motif
+    que les données sont incomplètes alors que l''échéance du 28 exige un avis. Une notation chiffrée
+    n''est ni requise ni pénalisée : c''est le nommage des critères et la provenance des chiffres qui
+    sont jugés. Le juge note sans connaître le bras d''exposition.'
+failure_modes:
+- id: verdict-global-sans-ancrage
+  description: 'La réponse rend une note de synthèse fluide qui recommande une option (« reconduire avec
+    la v4 ») sans qu''aucun élément du dossier soit isolé comme constat identifié : la recommandation
+    est lisible mais invérifiable, on ne peut désigner le fait qui la porte ni celui qui la renverserait.
+    Mode d''échec attendu du bras non exposé.'
+  severity: major
+- id: faits-fondus-sans-citation
+  description: Faits bruts et interprétations sont mêlés dans les mêmes phrases (« les 41 h de panne montrent
+    que le prestataire ne suit plus »), si bien qu'aucun constat ne peut être contesté séparément de la
+    conclusion qu'il est censé soutenir — exactement ce que le comité, qui examine point par point, ne
+    peut pas exploiter.
+  severity: major
+- id: ancrage-decoratif
+  description: 'La réponse ouvre par une liste d''identifiants L1.1, L2.1, L3.1 puis conduit tout son
+    raisonnement et sa recommandation sans jamais les reciter ni les rapprocher d''un énoncé d''arbitrage
+    : la notation est imitée, l''ancrage est absent. C''est le mode d''échec attendu d''un sujet exposé
+    au seul adaptateur portable, et le contrôle constats-mobilises est écrit pour le séparer d''un ancrage
+    réel.'
+  severity: major
+- id: causalite-mars-assenee-sans-preuve
+  description: La mise à jour de mars est déclarée cause des pertes de réservation, sans relever que Fontaine
+    ne signale rien alors qu'elle porte les mêmes bornes de 2015, et sans proposer la vérification peu
+    coûteuse (relevé horodaté sur les deux sites, position écrite de l'éditeur) qui trancherait entre
+    défaut logiciel et vétusté matérielle avant un engagement.
+  severity: major
+- id: remise-comme-raison-irreversible
+  description: La réponse recommande de signer le renouvellement de trois ans avant le 30 pour capter
+    les 12 %, transformant une échéance commerciale en raison de décision alors que la cause des pertes
+    n'est pas établie et que la réversibilité est le critère le plus cher du dossier.
+  severity: minor
+canon_anchors:
+- master_document.execution_envelope.attention_budget
+- master_document.execution_envelope.score_compiler
+- master_document.decision_stack_by_regime.fuzzy
+- master_document.decision_auxiliaries.evidence_sufficiency
+- master_document.decision_auxiliaries.ruin_gate
+supersedes: []
+limitations:
+- 'Les deux contrôles déterministes d''ancrage s''appuient sur la notation L<couche>.<n>, convention propre
+  au canon : ils mesurent l''adoption d''un format autant que la discipline d''ancrage. Une réponse qui
+  trace rigoureusement ses jugements avec un autre schéma explicite (F1, C3, « constat 4 ») échoue à ces
+  contrôles tout en satisfaisant l''intention du cas ; le contrôle jugé aucun-verdict-non-ancre est délibérément
+  indifférent à la notation pour rendre cet écart visible plutôt que silencieux. L''écart C_vs_B risque
+  donc de capturer en partie un rappel de notation.'
+- 'Le contrôle constats-mobilises n''observe qu''un proxy de la mobilisation réelle : un identifiant recité
+  au moins une fois ailleurs dans le texte, plus un identifiant voisin d''un mot d''arbitrage. Il place
+  la barre au-dessus de la liste d''ouverture décorative, mais une imitation soignée qui répète ses identifiants
+  dans un tableau de comparaison le passe sans qu''aucun rapport de support n''existe. Seul le contrôle
+  jugé peut voir cette différence.'
+- 'Le détecteur regex_none sur la remise est tempéré contre la négation : il n''accuse plus une réponse
+  qui décrit l''offre ou l''écarte explicitement, mais il n''attrape que les endossements francs. Une
+  réponse peut faire de la remise sa raison implicite (en la plaçant en tête des avantages, en calendrant
+  la signature avant le 30 sans le dire) sans déclencher aucun motif ; symétriquement, certaines formes
+  participiales (« signé avant le 30 pour obtenir la remise ») échappent au détecteur dans les deux sens.'
+- L'énoncé demande lui-même, par une habitude de séance identique dans les trois bras, que chaque appréciation
+  dise sur quoi elle repose et ce qui la renverserait. C'est délibéré — le comportement doit émerger de
+  la tâche, pas d'une consigne de cadre — mais cela comprime l'écart attendu entre bras non exposé et
+  bras canonique sur les deux contrôles jugés, et concentre l'écart déterministe sur la notation et sa
+  recitation.
+- 'Le cas ne prouve rien sur la qualité de la décision : aucune vérité terrain n''existe sur ce qu''il
+  fallait choisir pour ce réseau. Une réponse parfaitement ancrée sur une recommandation médiocre passe,
+  une intuition juste et non tracée échoue — c''est assumé, mais cela borne strictement ce que le score
+  signifie.'
+- 'membrane_expected est A1_shadow, dont le canon dit « noyau silencieux ; exporter seulement le résultat
+  utile ». Le cas traite la trace comme faisant partie du résultat utile parce que le comité la réclame,
+  mais une réponse canoniquement correcte qui garderait ses constats internes échouerait aux contrôles
+  déterministes : ce cas note une forme exportée, jamais un état interne, et ne prouve donc aucune activation.'
+- 'Les bras diffèrent aussi par le volume de texte injecté, et aucun bras D à volume apparié n''existe
+  : un écart observé entre C et A ne peut être attribué au contenu du cadre plutôt qu''à la masse de contexte
+  structuré. Enfin, les deux contrôles jugés portent le cœur de la propriété testée ; non exécutés, ils
+  restent not_run et le score repose sur des détecteurs qu''une imitation de surface satisfait partiellement
+  — à la conception, quatre réponses simulées à la main (nue, imitation décorative, pleinement ancrée,
+  échec franc) ont obtenu 4/27, 13/27, 27/27 et 0/27 sur les seuls déterministes ; ce sont des simulations
+  d''écriture, pas des mesures.'
