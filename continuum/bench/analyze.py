@@ -25,7 +25,15 @@ sys.path.insert(0, str(BENCH_ROOT))
 
 import validate as v  # noqa: E402
 
-ARMS = ["A_placebo", "B_adapter", "C_canonical", "D_candidate"]
+ARMS = ["A_placebo", "B_adapter", "C_canonical", "D_candidate", "D2_candidate"]
+DELTA_SPECS = (
+    ("D2_vs_C", "D2_candidate", "C_canonical"),
+    ("D2_vs_D", "D2_candidate", "D_candidate"),
+    ("D_vs_C", "D_candidate", "C_canonical"),
+    ("C_vs_B", "C_canonical", "B_adapter"),
+    ("C_vs_A", "C_canonical", "A_placebo"),
+    ("B_vs_A", "B_adapter", "A_placebo"),
+)
 # Familles où le cadre doit RETENIR plutôt que déployer : y progresser en score
 # tout en sur-activant serait une régression déguisée en progrès.
 GUARD_FAMILIES = {
@@ -113,10 +121,9 @@ def build_report(data: dict) -> dict:
                 "judged_ruled": sum(c["judged_ruled"] for c in cells),
                 "judged_total": sum(c["judged_total"] for c in cells),
             }
-        a, b, c, d = (row["arms"][arm]["deterministic_mean"] for arm in ARMS)
+        means = {arm: row["arms"][arm]["deterministic_mean"] for arm in ARMS}
         row["deltas"] = {
-            "D_vs_C": delta(d, c), "C_vs_B": delta(c, b),
-            "C_vs_A": delta(c, a), "B_vs_A": delta(b, a),
+            name: delta(means[left], means[right]) for name, left, right in DELTA_SPECS
         }
         by_scenario[sid] = row
 
@@ -138,10 +145,7 @@ def build_report(data: dict) -> dict:
             means[arm] = round(statistics.fmean(values), 4) if values else None
         family["arms"] = means
         family["deltas"] = {
-            "C_vs_B": delta(means["C_canonical"], means["B_adapter"]),
-            "D_vs_C": delta(means["D_candidate"], means["C_canonical"]),
-            "C_vs_A": delta(means["C_canonical"], means["A_placebo"]),
-            "B_vs_A": delta(means["B_adapter"], means["A_placebo"]),
+            name: delta(means[left], means[right]) for name, left, right in DELTA_SPECS
         }
 
     # Santé de l'instrument : un contrôle jamais réussi ou toujours réussi ne
@@ -224,8 +228,8 @@ def render(report: dict, aggregate: dict | None) -> str:
         "",
         "## Par famille",
         "",
-        "| Famille | Garde | A placebo | B adaptateur | C canon | D candidat | D−C | C−B | C−A |",
-        "|---|---|---|---|---|---|---|---|---|",
+        "| Famille | Garde | A | B | C | D | D2 | D2−C | D2−D | C−B |",
+        "|---|---|---|---|---|---|---|---|---|---|",
     ]
 
     def cell(value: float | None) -> str:
@@ -234,13 +238,13 @@ def render(report: dict, aggregate: dict | None) -> str:
     for name, family in sorted(report["by_family"].items()):
         arms, deltas = family["arms"], family["deltas"]
         lines.append(
-            f"| {name} | {'oui' if family['guard'] else ''} | {cell(arms['A_placebo'])} | "
-            f"{cell(arms['B_adapter'])} | {cell(arms['C_canonical'])} | {cell(arms['D_candidate'])} | "
-            f"{cell(deltas['D_vs_C'])} | {cell(deltas['C_vs_B'])} | {cell(deltas['C_vs_A'])} |"
+            f"| {name} | {'oui' if family['guard'] else ''} | "
+            + " | ".join(cell(arms[arm]) for arm in ARMS)
+            + f" | {cell(deltas['D2_vs_C'])} | {cell(deltas['D2_vs_D'])} | {cell(deltas['C_vs_B'])} |"
         )
 
     lines += ["", "## Par scénario", "",
-              "| Scénario | Membrane | n/bras | A | B | C | D | D−C | C−A |",
+              "| Scénario | Membrane | n/bras | A | B | C | D | D2 | D2−C |",
               "|---|---|---|---|---|---|---|---|---|"]
     for sid, row in sorted(report["by_scenario"].items()):
         arms = row["arms"]
@@ -248,7 +252,7 @@ def render(report: dict, aggregate: dict | None) -> str:
         lines.append(
             f"| {sid} | {row['membrane']} | {counts} | "
             + " | ".join(cell(arms[arm]["deterministic_mean"]) for arm in ARMS)
-            + f" | {cell(row['deltas']['D_vs_C'])} | {cell(row['deltas']['C_vs_A'])} |"
+            + f" | {cell(row['deltas']['D2_vs_C'])} |"
         )
 
     lines += ["", "## Santé de l'instrument", ""]
@@ -267,11 +271,10 @@ def render(report: dict, aggregate: dict | None) -> str:
     triggered = {k: vv for k, vv in report["failure_modes"].items() if sum(vv.values())}
     lines += ["", "## Modes d'échec déclenchés", ""]
     if triggered:
-        lines += ["| Mode | A | B | C | D |", "|---|---|---|---|---|"]
+        lines += ["| Mode | A | B | C | D | D2 |", "|---|---|---|---|---|---|"]
         for key, counts in sorted(triggered.items(), key=lambda kv: -sum(kv[1].values()))[:25]:
             lines.append(
-                f"| `{key}` | {counts['A_placebo']} | {counts['B_adapter']} | "
-                f"{counts['C_canonical']} | {counts['D_candidate']} |"
+                "| `" + key + "` | " + " | ".join(str(counts[arm]) for arm in ARMS) + " |"
             )
         lines += ["", "Rappel : l'association contrôle→mode est heuristique et non normative."]
     else:

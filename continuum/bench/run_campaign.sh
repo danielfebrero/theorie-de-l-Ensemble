@@ -49,6 +49,20 @@ run_cell() {
           --model "$MODEL" --disable-slash-commands --allowedTools "" \
           --append-system-prompt "$(cat "$REPO/CLAUDE.md")" ) > "$target" 2>&1
       ;;
+    D2_candidate)
+      # L'en-tête de commentaires est retiré : un corps qui se déclare candidat
+      # s'invoque mal comme verrou (mesuré en v2.2) ; la vérité de dépôt reste
+      # dans le fichier, la transformation est déclarée dans arms.yaml.
+      ( cd "$neutral" && claude -p "Document de référence master.yaml (autorité opérationnelle) :
+
+$(grep -v '^#' "$REPO/continuum/weights/proposal/bench_informed_v2_3_0-candidate.yaml")
+
+---
+
+$(cat "$prompt_file")" \
+          --model "$MODEL" --disable-slash-commands --allowedTools "" \
+          --append-system-prompt "$(cat "$REPO/CLAUDE.md")" ) > "$target" 2>&1
+      ;;
     D_candidate)
       ( cd "$neutral" && claude -p "Document de référence master.yaml (autorité opérationnelle) :
 
@@ -106,7 +120,7 @@ print(f"{len(scenarios)} énoncé(s) extraits")
 PY
 
 mapfile -t SCENARIOS < <(ls "$OUT/prompts" | sed 's/\.txt$//' | sort)
-ARMS=(A_placebo B_adapter C_canonical D_candidate)
+ARMS=(A_placebo B_adapter C_canonical D_candidate D2_candidate)
 
 total=$(( ${#SCENARIOS[@]} * ${#ARMS[@]} * REPLICATES ))
 echo "cellules : $total  ·  workers : $WORKERS  ·  modèle : $MODEL"

@@ -35,11 +35,16 @@ AGGREGATE_PATH = validate.BENCH_ROOT / "results" / "aggregate.yaml"
 SPLITS_PATH = validate.BENCH_ROOT / "splits.yaml"
 CHECKER = "m3c3_bench_aggregate"
 
-ARMS_ORDER = ("A_placebo", "B_adapter", "C_canonical", "D_candidate")
+ARMS_ORDER = ("A_placebo", "B_adapter", "C_canonical", "D_candidate", "D2_candidate")
 COMPARISONS = (
     # D_vs_C isole le contenu du candidat : les deux bras reçoivent un
     # document d'autorité de volume comparable (écart 1,6 %), donc un écart
     # ne peut pas s'expliquer par la masse de contexte comme C_vs_A le peut.
+    # D2 est l'itération garde-première du candidat. D2_vs_C est sa comparaison
+    # décisive ; D2_vs_D mesure si l'itération a réparé ce que la v2.2 a dégradé
+    # — les deux sont contrôlées en volume (matière M3C3 des deux côtés).
+    ("D2_vs_C", "D2_candidate", "C_canonical"),
+    ("D2_vs_D", "D2_candidate", "D_candidate"),
     ("D_vs_C", "D_candidate", "C_canonical"),
     ("C_vs_B", "C_canonical", "B_adapter"),
     ("C_vs_A", "C_canonical", "A_placebo"),
