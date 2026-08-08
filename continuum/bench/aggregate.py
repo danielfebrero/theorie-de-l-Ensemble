@@ -10,6 +10,10 @@ Le point sensible du dispositif n'est pas le calcul, c'est la conclusion. Tant
 que toutes les cellules ne sont pas au minimum préenregistré, conclusion_guard
 ramène tout verdict de comparaison à insufficient_data : la porte est appliquée
 au résultat, pas seulement écrite à côté.
+
+Les verdicts jugés viennent de judgements/, jamais des fichiers d'essai : la
+fusion est faite ici, à la lecture. Un essai reste donc immuable quand un juge
+passe, et aucun fichier de trials/ n'est réécrit par cet agrégateur.
 """
 
 from __future__ import annotations
@@ -64,10 +68,18 @@ EXPORT_DIMENSION = "export"
 SPLIT_VALUES = ("eval", "train")
 ASSIGNED_SPLIT_STATUS = "assigned"
 
+JUDGED_KIND = "judged"
+VERDICT_PASS = "pass"
+VERDICT_FAIL = "fail"
+RULED_VERDICTS = (VERDICT_PASS, VERDICT_FAIL)
+FULL_COVERAGE = 1.0
+BLINDING_FIELDS = ("arm_withheld", "subject_withheld", "other_arms_withheld")
+
 STATUS_RULE = (
     "aucun essai => not_run ; au moins un essai mais une cellule "
-    "(scenario × bras) sous minimum_trials_per_cell, un bras absent ou un split "
-    "non assigné => partial ; toutes les cellules au minimum requis => complete"
+    "(scenario × bras) sous minimum_trials_per_cell, un bras absent, un split "
+    "non assigné ou une couverture de jugement < 1.0 => partial ; toutes les "
+    "cellules au minimum requis et tout contrôle jugé tranché => complete"
 )
 
 GUARD_RULE = (
@@ -82,10 +94,10 @@ GUARD_CLOSED = (
     "capacité » ni « l'adaptateur suffit »."
 )
 GUARD_OPEN = (
-    "Porte ouverte : toutes les cellules atteignent minimum_trials_per_cell et "
-    "les splits sont prononcés. Les verdicts restent des écarts de taux sans "
-    "test de significativité, et C_vs_A demeure confondu avec le volume de "
-    "contexte tant que le bras D n'existe pas."
+    "Porte ouverte : toutes les cellules atteignent minimum_trials_per_cell, "
+    "les splits sont prononcés et tout contrôle jugé a été tranché. Les verdicts "
+    "restent des écarts de taux sans test de significativité, et C_vs_A demeure "
+    "confondu avec le volume de contexte tant que le bras D n'existe pas."
 )
 GUARD_REASON = "porte de conclusion : statut de l'agrégat != complete"
 
@@ -95,7 +107,13 @@ LIMITATIONS = (
     "Les taux sont des moyennes de ratios par essai, arrondies à 4 décimales ; "
     "un taux null signifie « pas de dénominateur », jamais « zéro ».",
     "Un contrôle jugé non exécuté reste not_run : il est reporté dans "
-    "judged_not_run et n'améliore aucun taux.",
+    "judged_not_run, il pèse dans le dénominateur jugé et n'améliore aucun taux.",
+    "Les taux jugés fusionnent judgements/ dans les essais à la lecture ; aucun "
+    "fichier de trials/ n'est modifié, et un essai déjà publié ne change pas "
+    "quand un juge passe.",
+    "judgement_coverage compte des contrôles, pas des poids : une couverture de "
+    "0.5 ne dit pas quelle fraction du poids jugé a été tranchée, seulement "
+    "quelle fraction des contrôles l'a été.",
     "over_activation_rate, false_veto_rate, honesty_violation_rate et "
     "export_completeness reposent sur les dimensions, familles et identifiants "
     "déclarés par les scénarios ; ce sont des rapprochements de forme, pas des "
@@ -309,10 +327,68 @@ def _tally_ratio(tally: Any) -> float | None:
     return score / maximum
 
 
-def measure_trial(trial: dict[str, Any], scenario: dict[str, Any]) -> dict[str, Any]:
+def judged_checks(scenario: dict[str, Any]) -> list[tuple[str, int]]:
+    """Contrôles jugés déclarés par le scénario : (check_id, poids)."""
+    checks: list[tuple[str, int]] = []
+    raw_checks = _mapping(scenario).get("checks")
+    for raw_check in raw_checks if isinstance(raw_checks, list) else []:
+        check = _mapping(raw_check)
+        if check.get("kind") != JUDGED_KIND:
+            continue
+        check_id = check.get("check_id")
+        if not isinstance(check_id, str):
+            continue
+        weight = check.get("weight")
+        checks.append((check_id, weight if _is_int(weight) else 0))
+    return checks
+
+
+def merge_judged(
+    trial: dict[str, Any],
+    scenario: dict[str, Any],
+    judgements: dict[tuple[str, str], dict[str, Any]],
+) -> dict[str, Any]:
+    """Total jugé d'un essai, reconstruit depuis judgements/ sans toucher l'essai.
+
+    weighted_max porte tous les contrôles jugés du scénario, y compris ceux
+    qu'aucun juge n'a tranchés : les retirer du dénominateur ferait monter le
+    taux d'un essai simplement parce qu'on ne l'a pas jugé.
+    """
+    trial_id = str(trial.get("trial_id"))
+    weighted_score = 0
+    weighted_max = 0
+    ruled = 0
+    not_run = 0
+    attached: list[dict[str, Any]] = []
+    checks = judged_checks(scenario)
+    for check_id, weight in checks:
+        weighted_max += weight
+        judgement = judgements.get((trial_id, check_id))
+        if judgement is not None:
+            attached.append(judgement)
+        verdict = _mapping(judgement).get("verdict")
+        if verdict in RULED_VERDICTS:
+            ruled += 1
+            if verdict == VERDICT_PASS:
+                weighted_score += weight
+        else:
+            not_run += 1
+    return {
+        "ratio": (weighted_score / weighted_max) if weighted_max > 0 else None,
+        "checks_total": len(checks),
+        "checks_ruled": ruled,
+        "not_run": not_run,
+        "judgements": attached,
+    }
+
+
+def measure_trial(
+    trial: dict[str, Any],
+    scenario: dict[str, Any],
+    judgements: dict[tuple[str, str], dict[str, Any]],
+) -> dict[str, Any]:
     scoring = _mapping(trial.get("scoring"))
-    judged = _mapping(scoring.get("judged"))
-    judged_not_run = judged.get("not_run")
+    judged = merge_judged(trial, scenario, judgements)
     results = dimension_results(trial, check_dimensions(scenario))
     export_results = results.get(EXPORT_DIMENSION, [])
     return {
@@ -321,8 +397,11 @@ def measure_trial(trial: dict[str, Any], scenario: dict[str, Any]) -> dict[str, 
         "family": _mapping(scenario).get("family"),
         "membrane_expected": _mapping(scenario).get("membrane_expected"),
         "deterministic_ratio": _tally_ratio(scoring.get("deterministic")),
-        "judged_ratio": _tally_ratio(scoring.get("judged")),
-        "judged_not_run": judged_not_run if _is_int(judged_not_run) else 0,
+        "judged_ratio": judged["ratio"],
+        "judged_checks_total": judged["checks_total"],
+        "judged_checks_ruled": judged["checks_ruled"],
+        "judgements": judged["judgements"],
+        "judged_not_run": judged["not_run"],
         "sft": _mapping(trial.get("corpus_eligibility")).get("sft") is True,
         "activation_failed": "fail" in results.get(ACTIVATION_DIMENSION, []),
         "ruin_failed": "fail" in results.get(RUIN_DIMENSION, []),
@@ -396,6 +475,14 @@ def build_arms(measures: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
                     if measure["deterministic_ratio"] is not None
                 ]
             ),
+            "judged_pass_rate": _mean(
+                [
+                    measure["judged_ratio"]
+                    for measure in group
+                    if measure["judged_ratio"] is not None
+                ]
+            ),
+            "judged_not_run": sum(measure["judged_not_run"] for measure in group),
             "over_activation_rate": _ratio(
                 sum(1 for measure in dormant if measure["activation_failed"]), len(dormant)
             ),
@@ -414,6 +501,39 @@ def build_arms(measures: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
     return arms
 
 
+def build_judgement_coverage(measures: list[dict[str, Any]]) -> dict[str, Any]:
+    """Part des contrôles jugés réellement tranchée, et par qui.
+
+    Sans ce bloc, un taux jugé élevé pourrait venir d'un seul contrôle tranché
+    sur douze : la couverture est la seule façon de lire le taux honnêtement.
+    """
+    total = sum(measure["judged_checks_total"] for measure in measures)
+    ruled = sum(measure["judged_checks_ruled"] for measure in measures)
+    attached = [
+        judgement for measure in measures for judgement in measure["judgements"]
+    ]
+    judges = sorted(
+        {
+            name
+            for judgement in attached
+            for name in [_mapping(judgement.get("judge")).get("name")]
+            if isinstance(name, str) and name.strip()
+        }
+    )
+    all_blinded = bool(attached) and all(
+        _mapping(judgement.get("blinding")).get(field) is True
+        for judgement in attached
+        for field in BLINDING_FIELDS
+    )
+    return {
+        "judged_checks_total": total,
+        "judged_checks_ruled": ruled,
+        "coverage": _ratio(ruled, total),
+        "judges": judges,
+        "all_blinded": all_blinded,
+    }
+
+
 def resolve_status(
     trial_count: int,
     cells: list[dict[str, Any]],
@@ -421,6 +541,7 @@ def resolve_status(
     minimum: Any,
     splits_assigned: bool,
     split_detail: str,
+    coverage: float | None,
 ) -> tuple[str, list[str]]:
     """Applique la règle de statut telle qu'elle est écrite dans STATUS_RULE."""
     if trial_count == 0:
@@ -449,10 +570,18 @@ def resolve_status(
         reasons.append(f"bras absent(s) : {', '.join(absent)}")
     if not splits_assigned:
         reasons.append(split_detail)
+    if coverage is not None and coverage < FULL_COVERAGE:
+        reasons.append(
+            f"couverture des contrôles jugés {coverage} < 1.0 : une part du poids "
+            "jugé n'a jamais été tranchée, la campagne n'est pas complète"
+        )
 
     if reasons:
         return STATUS_PARTIAL, reasons
-    return STATUS_COMPLETE, ["toutes les cellules atteignent minimum_trials_per_cell"]
+    return STATUS_COMPLETE, [
+        "toutes les cellules atteignent minimum_trials_per_cell et tout contrôle "
+        "jugé a été tranché"
+    ]
 
 
 def build_comparisons(
@@ -514,6 +643,8 @@ def expected_aggregate() -> tuple[dict[str, Any], list[validate.ValidationError]
     errors.extend(scenario_errors)
     trials, trial_errors = validate.load_trials()
     errors.extend(trial_errors)
+    judgements, judgement_errors = validate.load_judgements()
+    errors.extend(judgement_errors)
     plan, split_status, plan_errors = load_plan()
     errors.extend(plan_errors)
     known_confound, confound_errors = load_known_confound()
@@ -522,14 +653,16 @@ def expected_aggregate() -> tuple[dict[str, Any], list[validate.ValidationError]
     errors.extend(split_errors)
 
     index = validate.scenario_index(scenarios)
+    by_check = validate.judgement_index(judgements)
     measures = [
-        measure_trial(trial, index[str(trial.get("scenario_id"))])
+        measure_trial(trial, index[str(trial.get("scenario_id"))], by_check)
         for trial in trials
         if str(trial.get("scenario_id")) in index
     ]
     scenario_ids = sorted(index)
     cells = build_cells(scenario_ids, measures)
     arms = build_arms(measures)
+    judgement_coverage = build_judgement_coverage(measures)
 
     measured_scenarios = sorted({str(measure["scenario_id"]) for measure in measures})
     unassigned = [
@@ -553,6 +686,7 @@ def expected_aggregate() -> tuple[dict[str, Any], list[validate.ValidationError]
         plan["minimum_trials_per_cell"],
         splits_assigned,
         split_detail,
+        judgement_coverage["coverage"],
     )
     comparisons = build_comparisons(arms, plan["marginal_delta"])
     conclusion_guard = apply_conclusion_guard(comparisons, status)
@@ -566,8 +700,10 @@ def expected_aggregate() -> tuple[dict[str, Any], list[validate.ValidationError]
         "primary_metric": PRIMARY_METRIC,
         "scenarios": len(scenario_ids),
         "trials": len(trials),
+        "judgements": len(judgements),
         "plan": plan,
         "splits_assigned": splits_assigned,
+        "judgement_coverage": judgement_coverage,
         "cells": cells,
         "arms": arms,
         "comparisons": comparisons,
@@ -614,6 +750,12 @@ def render_text(result: dict[str, Any]) -> str:
     ]
     for reason in result["status_reasons"]:
         lines.append(f"  · {reason}")
+    coverage = result["judgement_coverage"]
+    lines.append(
+        f"  jugements : {coverage['judged_checks_ruled']}/{coverage['judged_checks_total']} "
+        f"contrôle(s) tranché(s), couverture={coverage['coverage']}, "
+        f"juges={', '.join(coverage['judges']) or '—'}, aveuglés={coverage['all_blinded']}"
+    )
     for comparison_id in sorted(result["comparisons"]):
         comparison = result["comparisons"][comparison_id]
         lines.append(
@@ -661,6 +803,8 @@ def main(argv: list[str] | None = None) -> int:
         "status_reasons": aggregate["status_reasons"],
         "scenarios": aggregate["scenarios"],
         "trials": aggregate["trials"],
+        "judgements": aggregate["judgements"],
+        "judgement_coverage": aggregate["judgement_coverage"],
         "comparisons": aggregate["comparisons"],
         "conclusion_guard": aggregate["conclusion_guard"],
         "detail": detail,

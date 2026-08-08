@@ -539,8 +539,13 @@ class EmptyRegistryTests(unittest.TestCase):
         self.root = Path(temporary.name)
         self.scenarios_dir = self.root / "scenarios"
         self.trials_dir = self.root / "trials"
+        # Les trois répertoires d'enregistrements sont isolés ensemble : en
+        # laisser un pointer vers le dépôt ferait juger des essais réels contre
+        # un registre vide, et le test mesurerait le dépôt au lieu du code.
+        self.judgements_dir = self.root / "judgements"
         self.scenarios_dir.mkdir()
         self.trials_dir.mkdir()
+        self.judgements_dir.mkdir()
         self.corpus_root = self.root / "corpus"
         self.records_dir = self.corpus_root / "records"
         self.export_dir = self.corpus_root / "export"
@@ -549,6 +554,7 @@ class EmptyRegistryTests(unittest.TestCase):
         patches = [
             mock.patch.object(validate, "SCENARIOS_DIR", self.scenarios_dir),
             mock.patch.object(validate, "TRIALS_DIR", self.trials_dir),
+            mock.patch.object(validate, "JUDGEMENTS_DIR", self.judgements_dir),
             mock.patch.object(build_index, "SCENARIO_INDEX_PATH", self.scenarios_dir / "index.yaml"),
             mock.patch.object(build_index, "TRIAL_INDEX_PATH", self.trials_dir / "index.yaml"),
             mock.patch.object(build_index, "SPLITS_PATH", self.root / "splits.yaml"),

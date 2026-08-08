@@ -37,6 +37,7 @@ BENCH_ROOT = Path(__file__).resolve().parent
 REPO_ROOT = BENCH_ROOT.parents[1]
 SCENARIOS_DIR = BENCH_ROOT / "scenarios"
 TRIALS_DIR = BENCH_ROOT / "trials"
+JUDGEMENTS_DIR = BENCH_ROOT / "judgements"
 ARMS_PATH = BENCH_ROOT / "arms.yaml"
 ANALYSIS_PLAN_PATH = BENCH_ROOT / "analysis-plan.yaml"
 
@@ -79,11 +80,16 @@ ARMS = {"A_placebo", "B_adapter", "C_canonical"}
 EXPOSURE_CHANNELS = {"none", "context", "instruction", "skill", "rag", "finetuning", "unknown"}
 RESULTS = {"pass", "fail", "not_run"}
 JUDGE_KINDS = {"model", "human", "ensemble"}
+JUDGE_MATERIALS = {"task_prompt", "response_text", "rubric", "assertion"}
+# On ne juge pas une réponse qu'on n'a pas lue, ni contre une grille qu'on n'a
+# pas reçue : ces deux matières sont le minimum d'un jugement recevable.
+MANDATORY_JUDGE_MATERIALS = {"response_text", "rubric"}
 
 MINIMUM_DETERMINISTIC_CHECKS = 2
 
 SCENARIO_ID_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{7,127}$")
 TRIAL_ID_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{7,127}$")
+JUDGEMENT_ID_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{7,127}$")
 LOCAL_ID_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{2,63}$")
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
@@ -133,6 +139,32 @@ TRIAL_KEYS = {
     "limitations",
 }
 TALLY_KEYS = {"passed", "failed", "not_run", "weighted_score", "weighted_max"}
+
+# Un jugement est ADDITIF : il porte l'analyse, l'essai porte la mesure. Aucun
+# champ ci-dessous ne réécrit un essai, ce qui laisse l'essai immuable quand un
+# juge passe et permet à plusieurs juges de juger le même contrôle.
+JUDGEMENT_KEYS = {
+    "schema_version",
+    "kind",
+    "judgement_id",
+    "created_at",
+    "trial_id",
+    "scenario_id",
+    "check_id",
+    "response_sha256",
+    "judge",
+    "blinding",
+    "verdict",
+    "rationale",
+    "supersedes",
+    "limitations",
+}
+JUDGEMENT_REQUIRED = JUDGEMENT_KEYS - {"supersedes"}
+JUDGE_REQUIRED = {"kind", "name", "harness"}
+JUDGE_KEYS = JUDGE_REQUIRED | {"model_version"}
+BLINDING_ATTESTATIONS = ("arm_withheld", "subject_withheld", "other_arms_withheld")
+BLINDING_REQUIRED = set(BLINDING_ATTESTATIONS) | {"material_supplied"}
+BLINDING_KEYS = BLINDING_REQUIRED | {"framework_material_withheld"}
 
 # ANTI-CONTAMINATION. Le même énoncé est remis aux trois bras : une consigne
 # d'application du protocole dans task.prompt exposerait le bras A_placebo au
@@ -743,6 +775,15 @@ def scenario_index(scenarios: Iterable[dict[str, Any]]) -> dict[str, dict[str, A
     return index
 
 
+def trial_index(trials: Iterable[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    index: dict[str, dict[str, Any]] = {}
+    for trial in trials:
+        trial_id = trial.get("trial_id")
+        if isinstance(trial_id, str) and trial_id not in index:
+            index[trial_id] = trial
+    return index
+
+
 def _expected_tally(
     checks: list[dict[str, Any]], kind: str
 ) -> dict[str, int]:
@@ -1235,12 +1276,389 @@ def load_trials() -> tuple[list[dict[str, Any]], list[ValidationError]]:
     return trials, arm_errors + errors
 
 
+def validate_judgement_document(
+    judgement: Any,
+    source: str,
+    trials: dict[str, dict[str, Any]],
+    scenarios: dict[str, dict[str, Any]],
+) -> tuple[dict[str, Any] | None, list[ValidationError]]:
+    errors: list[ValidationError] = []
+    top = mapping(judgement, source, JUDGEMENT_REQUIRED, JUDGEMENT_KEYS, errors)
+    if top is None:
+        return None, errors
+
+    if judgement.get("schema_version") != 1 or isinstance(judgement.get("schema_version"), bool):
+        error(errors, "schema_version", f"{source}.schema_version", "must equal integer 1")
+    if judgement.get("kind") != "m3c3_bench_judgement":
+        error(errors, "kind", f"{source}.kind", "must equal m3c3_bench_judgement")
+
+    judgement_id = judgement.get("judgement_id")
+    if not isinstance(judgement_id, str) or not JUDGEMENT_ID_RE.fullmatch(judgement_id):
+        error(errors, "judgement_id", f"{source}.judgement_id", "invalid judgement id")
+        judgement_id = None
+    parse_instant(judgement.get("created_at"), f"{source}.created_at", errors)
+
+    trial_id = judgement.get("trial_id")
+    if not isinstance(trial_id, str) or not TRIAL_ID_RE.fullmatch(trial_id):
+        error(errors, "trial_id", f"{source}.trial_id", "invalid trial id")
+        trial_id = None
+    trial = trials.get(trial_id) if trial_id is not None else None
+    if trial_id is not None and trial is None:
+        error(errors, "unknown_trial", f"{source}.trial_id", trial_id)
+
+    scenario_id = judgement.get("scenario_id")
+    if not isinstance(scenario_id, str) or not SCENARIO_ID_RE.fullmatch(scenario_id):
+        error(errors, "scenario_id", f"{source}.scenario_id", "invalid scenario id")
+        scenario_id = None
+    trial_scenario_id = trial.get("scenario_id") if trial is not None else None
+    if scenario_id is not None and isinstance(trial_scenario_id, str) and scenario_id != trial_scenario_id:
+        error(
+            errors,
+            "judgement_scenario_mismatch",
+            f"{source}.scenario_id",
+            f"l'essai {trial_id} porte {trial_scenario_id}",
+        )
+    resolved_scenario_id = trial_scenario_id if isinstance(trial_scenario_id, str) else scenario_id
+    scenario = scenarios.get(resolved_scenario_id) if isinstance(resolved_scenario_id, str) else None
+
+    check_id = judgement.get("check_id")
+    if not isinstance(check_id, str) or not LOCAL_ID_RE.fullmatch(check_id):
+        error(errors, "check_id", f"{source}.check_id", "invalid check id")
+        check_id = None
+    if check_id is not None and scenario is not None:
+        declared = next(
+            (
+                check
+                for check in scenario.get("checks") or []
+                if isinstance(check, dict) and check.get("check_id") == check_id
+            ),
+            None,
+        )
+        if declared is None:
+            error(
+                errors,
+                "unknown_check",
+                f"{source}.check_id",
+                f"{check_id} absent du scénario {resolved_scenario_id}",
+            )
+        elif declared.get("kind") != "judged":
+            error(
+                errors,
+                "judgement_on_deterministic_check",
+                f"{source}.check_id",
+                f"{check_id} est {declared.get('kind')} : juger un contrôle déterministe "
+                "remplacerait une mesure reproductible par une opinion",
+            )
+
+    digest = judgement.get("response_sha256")
+    if not isinstance(digest, str) or not SHA256_RE.fullmatch(digest):
+        error(errors, "sha256", f"{source}.response_sha256", "expected lowercase SHA-256")
+    elif trial is not None:
+        response = trial.get("response")
+        measured = response.get("text_sha256") if isinstance(response, dict) else None
+        if isinstance(measured, str) and digest != measured:
+            error(
+                errors,
+                "judged_response_mismatch",
+                f"{source}.response_sha256",
+                f"l'essai {trial_id} porte {measured} : un jugement ne migre pas vers une autre réponse",
+            )
+
+    judge = mapping(judgement.get("judge"), f"{source}.judge", JUDGE_REQUIRED, JUDGE_KEYS, errors)
+    if judge is not None:
+        string_enum(judge.get("kind"), JUDGE_KINDS, f"{source}.judge.kind", errors)
+        nonempty_string(judge.get("name"), f"{source}.judge.name", errors)
+        nonempty_string(judge.get("harness"), f"{source}.judge.harness", errors)
+        if "model_version" in judge:
+            nonempty_string(judge.get("model_version"), f"{source}.judge.model_version", errors)
+
+    blinding = mapping(
+        judgement.get("blinding"), f"{source}.blinding", BLINDING_REQUIRED, BLINDING_KEYS, errors
+    )
+    if blinding is not None:
+        for key in BLINDING_ATTESTATIONS:
+            if blinding.get(key) is not True:
+                error(
+                    errors,
+                    "blinding_not_attested",
+                    f"{source}.blinding.{key}",
+                    "doit valoir exactement true : un juge qui connaît le bras confirme "
+                    "une attente au lieu de mesurer une réponse",
+                )
+        if "framework_material_withheld" in blinding:
+            boolean(
+                blinding.get("framework_material_withheld"),
+                f"{source}.blinding.framework_material_withheld",
+                errors,
+            )
+        supplied = blinding.get("material_supplied")
+        mpath = f"{source}.blinding.material_supplied"
+        if not isinstance(supplied, list) or not supplied:
+            error(errors, "insufficient_judge_material", mpath, "expected non-empty list")
+        else:
+            materials: list[str] = []
+            for index, material in enumerate(supplied):
+                if string_enum(material, JUDGE_MATERIALS, f"{mpath}[{index}]", errors):
+                    materials.append(str(material))
+            if len(set(materials)) != len(materials):
+                error(errors, "unique", mpath, "duplicate material")
+            missing = sorted(MANDATORY_JUDGE_MATERIALS - set(materials))
+            if missing:
+                error(
+                    errors,
+                    "insufficient_judge_material",
+                    mpath,
+                    f"matière manquante : {', '.join(missing)} — on ne juge pas une réponse "
+                    "qu'on n'a pas lue, ni contre une grille qu'on n'a pas reçue",
+                )
+
+    string_enum(judgement.get("verdict"), RESULTS, f"{source}.verdict", errors)
+    nonempty_string(judgement.get("rationale"), f"{source}.rationale", errors)
+
+    if "supersedes" in judgement:
+        supersedes = judgement.get("supersedes")
+        if not isinstance(supersedes, list) or not all(
+            isinstance(item, str) and JUDGEMENT_ID_RE.fullmatch(item) for item in supersedes
+        ):
+            error(errors, "supersedes", f"{source}.supersedes", "expected list of judgement ids")
+        elif len(set(supersedes)) != len(supersedes):
+            error(errors, "unique", f"{source}.supersedes", "duplicate judgement ids")
+        elif judgement_id is not None and judgement_id in supersedes:
+            error(
+                errors,
+                "supersedes_self",
+                f"{source}.supersedes",
+                "un jugement ne peut pas se remplacer lui-même",
+            )
+
+    limitations = judgement.get("limitations")
+    if not isinstance(limitations, list) or not limitations:
+        error(errors, "limitations", f"{source}.limitations", "at least one limitation is mandatory")
+    else:
+        for index, limitation in enumerate(limitations):
+            nonempty_string(limitation, f"{source}.limitations[{index}]", errors)
+
+    return judgement, errors
+
+
+def _superseded_ids(judgements: Iterable[dict[str, Any]]) -> set[str]:
+    targets: set[str] = set()
+    for judgement in judgements:
+        for target in judgement.get("supersedes") or []:
+            if isinstance(target, str) and target != judgement.get("judgement_id"):
+                targets.add(target)
+    return targets
+
+
+def _check_supersedes_cycles(
+    by_id: dict[str, dict[str, Any]], errors: list[ValidationError]
+) -> None:
+    graph = {
+        judgement_id: [
+            target
+            for target in judgement.get("supersedes") or []
+            if isinstance(target, str) and target != judgement_id and target in by_id
+        ]
+        for judgement_id, judgement in by_id.items()
+    }
+    state: dict[str, int] = {}
+    reported: set[frozenset[str]] = set()
+
+    def visit(node: str, stack: list[str]) -> None:
+        state[node] = 1
+        stack.append(node)
+        for target in graph[node]:
+            if state.get(target) == 1:
+                cycle = stack[stack.index(target) :]
+                key = frozenset(cycle)
+                if key not in reported:
+                    reported.add(key)
+                    error(
+                        errors,
+                        "supersedes_cycle",
+                        by_id[node]["__path__"],
+                        " → ".join([*cycle, target]),
+                    )
+            elif state.get(target, 0) == 0:
+                visit(target, stack)
+        stack.pop()
+        state[node] = 2
+
+    for judgement_id in sorted(graph):
+        if state.get(judgement_id, 0) == 0:
+            visit(judgement_id, [])
+
+
+def validate_judgement_files(
+    paths: Iterable[Path],
+    trials: dict[str, dict[str, Any]],
+    scenarios: dict[str, dict[str, Any]],
+) -> tuple[list[dict[str, Any]], list[ValidationError]]:
+    errors: list[ValidationError] = []
+    judgements: list[dict[str, Any]] = []
+    for path in sorted(Path(item) for item in paths):
+        try:
+            document = load_path(path)
+        except (OSError, yaml.YAMLError) as exc:
+            error(errors, "yaml_input", str(path), str(exc))
+            continue
+        judgement, judgement_errors = validate_judgement_document(
+            document, str(path), trials, scenarios
+        )
+        errors.extend(judgement_errors)
+        if judgement is None:
+            continue
+        judgement["__path__"] = str(path)
+        judgements.append(judgement)
+
+    by_id: dict[str, dict[str, Any]] = {}
+    for judgement in judgements:
+        judgement_id = judgement.get("judgement_id")
+        path = Path(judgement["__path__"])
+        if not isinstance(judgement_id, str):
+            continue
+        if judgement_id in by_id:
+            error(
+                errors,
+                "duplicate_judgement_id",
+                str(path),
+                f"already declared in {by_id[judgement_id]['__path__']}",
+            )
+        else:
+            by_id[judgement_id] = judgement
+        if path.name != f"{judgement_id}.yaml":
+            error(
+                errors,
+                "filename_judgement_id",
+                str(path),
+                "filename must equal judgement_id.yaml",
+            )
+
+    ignored: list[ValidationError] = []
+    for judgement in judgements:
+        source = judgement["__path__"]
+        judgement_id = judgement.get("judgement_id")
+        targets = judgement.get("supersedes")
+        if not isinstance(targets, list):
+            continue
+        own_key = (judgement.get("trial_id"), judgement.get("check_id"))
+        own_instant = parse_instant(judgement.get("created_at"), source, ignored)
+        for index, target in enumerate(targets):
+            tpath = f"{source}.supersedes[{index}]"
+            if not isinstance(target, str) or target == judgement_id:
+                continue
+            other = by_id.get(target)
+            if other is None:
+                error(errors, "supersedes_missing", tpath, f"{target} n'existe pas")
+                continue
+            if (other.get("trial_id"), other.get("check_id")) != own_key:
+                error(
+                    errors,
+                    "supersedes_target_mismatch",
+                    tpath,
+                    f"{target} vise {other.get('trial_id')} / {other.get('check_id')}",
+                )
+            other_instant = parse_instant(other.get("created_at"), tpath, ignored)
+            if own_instant is not None and other_instant is not None and other_instant >= own_instant:
+                error(
+                    errors,
+                    "supersedes_time",
+                    tpath,
+                    f"{target} n'est pas antérieur : {other.get('created_at')} "
+                    f"contre {judgement.get('created_at')}",
+                )
+
+    _check_supersedes_cycles(by_id, errors)
+
+    # Deux verdicts vivants du même juge sur le même contrôle rendraient
+    # l'agrégation ambiguë ; une révision passe par supersedes.
+    superseded = _superseded_ids(judgements)
+    active: dict[tuple[str, str, str], str] = {}
+    for judgement in judgements:
+        judgement_id = judgement.get("judgement_id")
+        if not isinstance(judgement_id, str) or by_id.get(judgement_id) is not judgement:
+            continue
+        if judgement_id in superseded:
+            continue
+        judgement_trial_id = judgement.get("trial_id")
+        judgement_check_id = judgement.get("check_id")
+        judge = judgement.get("judge")
+        judge_name = judge.get("name") if isinstance(judge, dict) else None
+        if not (
+            isinstance(judgement_trial_id, str)
+            and isinstance(judgement_check_id, str)
+            and isinstance(judge_name, str)
+        ):
+            continue
+        key = (judgement_trial_id, judgement_check_id, judge_name)
+        if key in active:
+            error(
+                errors,
+                "duplicate_active_judgement",
+                judgement["__path__"],
+                f"{active[key]} juge déjà {judgement_check_id} de {judgement_trial_id} "
+                f"au nom de {judge_name} sans être remplacé",
+            )
+        else:
+            active[key] = judgement["__path__"]
+
+    return judgements, errors
+
+
+def judgement_index(
+    judgements: Iterable[dict[str, Any]],
+) -> dict[tuple[str, str], dict[str, Any]]:
+    """Index (trial_id, check_id) → jugement actif.
+
+    Un jugement remplacé via supersedes est écarté ; à clé égale, le plus récent
+    l'emporte, puis le plus grand identifiant. L'index ne dépend donc pas de
+    l'ordre de lecture des fichiers.
+    """
+    items = list(judgements)
+    superseded = _superseded_ids(items)
+    ignored: list[ValidationError] = []
+    floor = datetime.min.replace(tzinfo=timezone.utc)
+    index: dict[tuple[str, str], dict[str, Any]] = {}
+    ranks: dict[tuple[str, str], tuple[datetime, str]] = {}
+    for judgement in items:
+        judgement_id = judgement.get("judgement_id")
+        judgement_trial_id = judgement.get("trial_id")
+        judgement_check_id = judgement.get("check_id")
+        if not (
+            isinstance(judgement_id, str)
+            and isinstance(judgement_trial_id, str)
+            and isinstance(judgement_check_id, str)
+        ):
+            continue
+        if judgement_id in superseded:
+            continue
+        key = (judgement_trial_id, judgement_check_id)
+        instant = parse_instant(judgement.get("created_at"), "", ignored) or floor
+        rank = (instant, judgement_id)
+        if key not in ranks or rank > ranks[key]:
+            ranks[key] = rank
+            index[key] = judgement
+    return index
+
+
+def load_judgements() -> tuple[list[dict[str, Any]], list[ValidationError]]:
+    scenarios, _ = load_scenarios()
+    arms, _ = load_arms()
+    trials, _ = validate_trial_files(
+        record_paths(TRIALS_DIR), scenario_index(scenarios), arms
+    )
+    return validate_judgement_files(
+        record_paths(JUDGEMENTS_DIR), trial_index(trials), scenario_index(scenarios)
+    )
+
+
 def check_immutability(base_ref: str) -> tuple[dict[str, Any], list[ValidationError]]:
     errors: list[ValidationError] = []
     empty = {"base_ref": base_ref, "unchanged": [], "new": [], "deleted": [], "modified": []}
     kinds = {
         SCENARIOS_DIR.relative_to(REPO_ROOT).as_posix(): "scenario",
         TRIALS_DIR.relative_to(REPO_ROOT).as_posix(): "trial",
+        JUDGEMENTS_DIR.relative_to(REPO_ROOT).as_posix(): "judgement",
     }
     listed = git("ls-tree", "-r", "--name-only", base_ref, "--", *sorted(kinds), check=False)
     if listed.returncode:
@@ -1252,7 +1670,7 @@ def check_immutability(base_ref: str) -> tuple[dict[str, Any], list[ValidationEr
         if line.endswith((".yaml", ".yml")) and Path(line).name not in INDEX_FILENAMES
     }
     current_paths: set[str] = set()
-    for directory in (SCENARIOS_DIR, TRIALS_DIR):
+    for directory in (SCENARIOS_DIR, TRIALS_DIR, JUDGEMENTS_DIR):
         current_paths.update(
             path.relative_to(REPO_ROOT).as_posix() for path in record_paths(directory)
         )
@@ -1299,6 +1717,10 @@ def validate_registry(base_ref: str | None = None) -> dict[str, Any]:
         record_paths(TRIALS_DIR), scenario_index(scenarios), arms
     )
     errors.extend(trial_errors)
+    judgements, judgement_errors = validate_judgement_files(
+        record_paths(JUDGEMENTS_DIR), trial_index(trials), scenario_index(scenarios)
+    )
+    errors.extend(judgement_errors)
     immutability = None
     if base_ref:
         immutability, immutable_errors = check_immutability(base_ref)
@@ -1308,6 +1730,7 @@ def validate_registry(base_ref: str | None = None) -> dict[str, Any]:
         "ok": not errors,
         "scenarios": len(scenarios),
         "trials": len(trials),
+        "judgements": len(judgements),
         "base_ref_diff": immutability,
         "errors": [item.as_dict() for item in errors],
     }
@@ -1315,9 +1738,10 @@ def validate_registry(base_ref: str | None = None) -> dict[str, Any]:
 
 def partition_paths(
     paths: Iterable[Path], errors: list[ValidationError]
-) -> tuple[list[Path], list[Path]]:
+) -> tuple[list[Path], list[Path], list[Path]]:
     scenario_paths: list[Path] = []
     trial_paths: list[Path] = []
+    judgement_paths: list[Path] = []
     for path in sorted(Path(item) for item in paths):
         try:
             document = load_path(path)
@@ -1329,14 +1753,16 @@ def partition_paths(
             scenario_paths.append(path)
         elif kind == "m3c3_bench_trial":
             trial_paths.append(path)
+        elif kind == "m3c3_bench_judgement":
+            judgement_paths.append(path)
         else:
             error(errors, "unknown_kind", str(path), f"kind={kind!r}")
-    return scenario_paths, trial_paths
+    return scenario_paths, trial_paths, judgement_paths
 
 
 def validate_paths(paths: Iterable[Path]) -> dict[str, Any]:
     errors: list[ValidationError] = []
-    scenario_paths, trial_paths = partition_paths(paths, errors)
+    scenario_paths, trial_paths, judgement_paths = partition_paths(paths, errors)
     scenarios, scenario_errors = validate_scenario_files(scenario_paths)
     errors.extend(scenario_errors)
     arms, arm_errors = load_arms()
@@ -1348,11 +1774,19 @@ def validate_paths(paths: Iterable[Path]) -> dict[str, Any]:
     index.update(scenario_index(scenarios))
     trials, trial_errors = validate_trial_files(trial_paths, index, arms)
     errors.extend(trial_errors)
+    # Même raison pour un jugement : son essai reste résoluble via le registre
+    # même s'il n'est pas passé en argument, et les essais explicites priment.
+    registry_trials, _ = validate_trial_files(record_paths(TRIALS_DIR), index, arms)
+    trials_by_id = trial_index(registry_trials)
+    trials_by_id.update(trial_index(trials))
+    judgements, judgement_errors = validate_judgement_files(judgement_paths, trials_by_id, index)
+    errors.extend(judgement_errors)
     return {
         "checker": CHECKER,
         "ok": not errors,
         "scenarios": len(scenarios),
         "trials": len(trials),
+        "judgements": len(judgements),
         "base_ref_diff": None,
         "errors": [item.as_dict() for item in errors],
     }
@@ -1367,7 +1801,10 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
 
 
 def render_text(result: dict[str, Any]) -> str:
-    lines = [f"Scénarios : {result['scenarios']} · essais : {result['trials']}"]
+    lines = [
+        f"Scénarios : {result['scenarios']} · essais : {result['trials']} "
+        f"· jugements : {result['judgements']}"
+    ]
     if result["base_ref_diff"] is not None:
         diff = result["base_ref_diff"]
         lines.append(

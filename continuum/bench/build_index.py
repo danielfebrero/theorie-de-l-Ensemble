@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 """Construit ou vérifie les index déterministes de M3C3-bench.
 
-Deux index sont dérivés des fichiers réellement présents : celui des scénarios
-et celui des essais. Ils ne sont jamais écrits à la main et ne sont écrits que
-si la validation du registre passe : un index qui décrit un bench invalide
-donnerait l'apparence d'un dispositif vérifié.
+Trois index sont dérivés des fichiers réellement présents : celui des scénarios,
+celui des essais et celui des jugements. Ils ne sont jamais écrits à la main et
+ne sont écrits que si la validation du registre passe : un index qui décrit un
+bench invalide donnerait l'apparence d'un dispositif vérifié.
+
+L'index des jugements est distinct de celui des essais parce que les deux
+enregistrements le sont : un jugement s'ajoute, il ne retouche pas la mesure
+qu'il analyse. Un index de jugements vide est un état légitime — il dit qu'aucun
+juge n'est passé, ce qui n'est pas la même chose qu'un juge favorable.
 """
 
 from __future__ import annotations
@@ -24,6 +29,7 @@ import validate  # noqa: E402
 
 SCENARIO_INDEX_PATH = validate.SCENARIOS_DIR / "index.yaml"
 TRIAL_INDEX_PATH = validate.TRIALS_DIR / "index.yaml"
+JUDGEMENT_INDEX_PATH = validate.JUDGEMENTS_DIR / "index.yaml"
 SPLITS_PATH = validate.BENCH_ROOT / "splits.yaml"
 SPLIT_VALUES = {"train", "eval"}
 # Tant que la séparation train/eval n'est pas prononcée, la seule valeur honnête
@@ -31,7 +37,7 @@ SPLIT_VALUES = {"train", "eval"}
 # qui n'existe pas — analysis-plan.yaml#corpus_gate.anti_leak.
 UNASSIGNED_SPLIT = "unassigned"
 CHECKER = "m3c3_bench_index"
-INDEX_PATHS = {SCENARIO_INDEX_PATH, TRIAL_INDEX_PATH}
+INDEX_PATHS = {SCENARIO_INDEX_PATH, TRIAL_INDEX_PATH, JUDGEMENT_INDEX_PATH}
 
 
 def _mapping(value: Any) -> dict[str, Any]:
@@ -188,6 +194,42 @@ def expected_trial_index() -> tuple[dict[str, Any], list[validate.ValidationErro
     }, errors
 
 
+def expected_judgement_index() -> tuple[dict[str, Any], list[validate.ValidationError]]:
+    judgements, errors = validate.load_judgements()
+    judgements = [
+        judgement
+        for judgement in judgements
+        if Path(judgement["__path__"]).resolve() not in INDEX_PATHS
+    ]
+    # Même définition du remplacement que judgement_index : deux lectures de
+    # « actif » divergeraient tôt ou tard, et l'index cesserait de décrire ce
+    # que l'agrégateur compte.
+    replaced = validate._superseded_ids(judgements)
+    entries: list[dict[str, Any]] = []
+    for judgement in sorted(judgements, key=lambda item: str(item.get("judgement_id", ""))):
+        path = Path(judgement["__path__"])
+        judge = _mapping(judgement.get("judge"))
+        entries.append(
+            {
+                "judgement_id": judgement.get("judgement_id"),
+                "path": _relative_to_bench(path),
+                "file_sha256": validate.file_sha256(path),
+                "created_at": judgement.get("created_at"),
+                "trial_id": judgement.get("trial_id"),
+                "check_id": judgement.get("check_id"),
+                "judge_name": judge.get("name"),
+                "verdict": judgement.get("verdict"),
+                "superseded": str(judgement.get("judgement_id")) in replaced,
+            }
+        )
+    return {
+        "schema_version": 1,
+        "kind": "m3c3_bench_judgement_index",
+        "judgements_sha256": validate.sha256_text(validate.canonical_json(entries)),
+        "judgements": entries,
+    }, errors
+
+
 def dump_index(index: dict[str, Any]) -> str:
     return yaml.safe_dump(index, allow_unicode=True, sort_keys=False, width=1000)
 
@@ -233,16 +275,24 @@ def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv or sys.argv[1:])
     scenario_index, scenario_errors = expected_scenario_index()
     trial_index, trial_errors = expected_trial_index()
+    judgement_index, judgement_errors = expected_judgement_index()
     registry = validate.validate_registry()
     validation_errors = dedupe(
         [item.as_dict() for item in scenario_errors]
         + [item.as_dict() for item in trial_errors]
+        + [item.as_dict() for item in judgement_errors]
         + list(registry.get("errors") or [])
     )
     counts = {
         "scenarios": len(scenario_index["scenarios"]),
         "trials": len(trial_index["trials"]),
+        "judgements": len(judgement_index["judgements"]),
     }
+    targets = (
+        (scenario_index, SCENARIO_INDEX_PATH),
+        (trial_index, TRIAL_INDEX_PATH),
+        (judgement_index, JUDGEMENT_INDEX_PATH),
+    )
 
     if validation_errors:
         result = {
@@ -253,37 +303,34 @@ def main(argv: list[str] | None = None) -> int:
             "errors": validation_errors,
         }
     elif args.write:
-        write_index(scenario_index, SCENARIO_INDEX_PATH)
-        write_index(trial_index, TRIAL_INDEX_PATH)
+        for index, path in targets:
+            write_index(index, path)
         result = {
             "checker": CHECKER,
             "ok": True,
             **counts,
-            "detail": f"écrit {_display(SCENARIO_INDEX_PATH)} et {_display(TRIAL_INDEX_PATH)}",
+            "detail": "écrit " + ", ".join(_display(path) for _, path in targets),
             "errors": [],
         }
     elif args.check:
-        scenario_ok, scenario_detail = check_index(scenario_index, SCENARIO_INDEX_PATH)
-        trial_ok, trial_detail = check_index(trial_index, TRIAL_INDEX_PATH)
+        outcomes = [(path, *check_index(index, path)) for index, path in targets]
         stale = [
             {"code": "stale_index", "path": _display(path), "detail": detail}
-            for ok, detail, path in (
-                (scenario_ok, scenario_detail, SCENARIO_INDEX_PATH),
-                (trial_ok, trial_detail, TRIAL_INDEX_PATH),
-            )
+            for path, ok, detail in outcomes
             if not ok
         ]
         result = {
             "checker": CHECKER,
-            "ok": scenario_ok and trial_ok,
+            "ok": all(ok for _, ok, _ in outcomes),
             **counts,
-            "detail": f"{scenario_detail} ; {trial_detail}",
+            "detail": " ; ".join(detail for _, _, detail in outcomes),
             "errors": stale,
         }
     else:
-        print(dump_index(scenario_index), end="")
-        print("---")
-        print(dump_index(trial_index), end="")
+        for position, (index, _) in enumerate(targets):
+            if position:
+                print("---")
+            print(dump_index(index), end="")
         return 0
 
     if args.format == "json":
@@ -292,7 +339,8 @@ def main(argv: list[str] | None = None) -> int:
         prefix = "OK" if result["ok"] else "FAIL"
         print(
             f"INDEX {prefix} — {result['detail']} "
-            f"({result['scenarios']} scénario(s), {result['trials']} essai(s))"
+            f"({result['scenarios']} scénario(s), {result['trials']} essai(s), "
+            f"{result['judgements']} jugement(s))"
         )
         for item in result["errors"]:
             print(f"  ✗ {item['code']} [{item['path']}] — {item['detail']}")

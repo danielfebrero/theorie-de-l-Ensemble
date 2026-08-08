@@ -1,0 +1,115 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://github.com/danielfebrero/theorie-de-l-Ensemble/continuum/bench/schema/judgement-v1.yaml"
+title: M3C3-bench judgement
+description: >
+  Verdict d'un juge sur UN contrôle jugé d'UN essai. Enregistrement distinct et
+  additif : l'essai porte la mesure (la réponse du sujet), le jugement porte
+  l'analyse. Séparer les deux est une correction de conception issue du premier
+  pilote, où les verdicts jugés ne pouvaient être ajoutés qu'en réécrivant une
+  mesure déjà publiée ou en dupliquant la cellule — les deux étant interdits.
+
+  Conséquences voulues de la séparation :
+    - un essai reste immuable et n'est jamais retouché quand un juge passe ;
+    - plusieurs juges peuvent juger le même contrôle du même essai, ce qui rend
+      un ensemble ou un désaccord représentable au lieu d'être écrasé ;
+    - un jugement se rattache au texte exact jugé par son empreinte, donc un
+      jugement ne peut pas migrer silencieusement vers une autre réponse.
+
+  L'aveuglement est déclaré et vérifiable, pas promis en prose : le juge ne
+  reçoit ni l'étiquette de bras, ni l'identité du sujet, ni les réponses des
+  autres bras. Un jugement qui ne peut pas l'attester est refusé.
+type: object
+additionalProperties: false
+required:
+  - schema_version
+  - kind
+  - judgement_id
+  - created_at
+  - trial_id
+  - scenario_id
+  - check_id
+  - response_sha256
+  - judge
+  - blinding
+  - verdict
+  - rationale
+  - limitations
+properties:
+  schema_version:
+    const: 1
+  kind:
+    const: m3c3_bench_judgement
+  judgement_id:
+    type: string
+    pattern: "^[a-z0-9][a-z0-9._-]{7,127}$"
+  created_at:
+    type: string
+    format: date-time
+  trial_id:
+    type: string
+    pattern: "^[a-z0-9][a-z0-9._-]{7,127}$"
+  scenario_id:
+    type: string
+    pattern: "^[a-z0-9][a-z0-9._-]{7,127}$"
+  check_id:
+    description: >
+      Doit désigner un contrôle de kind judged du scénario de l'essai. Juger un
+      contrôle déterministe serait remplacer une mesure reproductible par une
+      opinion.
+    type: string
+    pattern: "^[a-z0-9][a-z0-9._-]{2,63}$"
+  response_sha256:
+    description: >
+      Empreinte du texte réellement soumis au juge. Doit égaler
+      response.text_sha256 de l'essai référencé.
+    type: string
+    pattern: "^[0-9a-f]{64}$"
+  judge:
+    type: object
+    additionalProperties: false
+    required: [kind, name, harness]
+    properties:
+      kind: {enum: [model, human, ensemble]}
+      name: {type: string, minLength: 1}
+      harness: {type: string, minLength: 1}
+      model_version: {type: string, minLength: 1}
+  blinding:
+    description: >
+      Chaque champ atteste qu'une information n'a pas été transmise au juge.
+      arm_withheld et subject_withheld doivent valoir true : un juge qui connaît
+      le bras ne mesure plus la réponse, il confirme une attente.
+    type: object
+    additionalProperties: false
+    required: [arm_withheld, subject_withheld, other_arms_withheld, material_supplied]
+    properties:
+      arm_withheld: {const: true}
+      subject_withheld: {const: true}
+      other_arms_withheld: {const: true}
+      framework_material_withheld:
+        description: >
+          true si le juge n'a reçu aucune matière M3C3. Un juge exposé au cadre
+          note contre le cadre plutôt que contre la grille du scénario.
+        type: boolean
+      material_supplied:
+        description: Ce que le juge a effectivement reçu, exhaustivement.
+        type: array
+        minItems: 1
+        uniqueItems: true
+        items:
+          enum: [task_prompt, response_text, rubric, assertion]
+  verdict:
+    description: >
+      not_run est une valeur légitime : un juge qui n'a pas tranché ne compte
+      jamais comme réussi.
+    enum: [pass, fail, not_run]
+  rationale:
+    type: string
+    minLength: 1
+  supersedes:
+    type: array
+    uniqueItems: true
+    items: {type: string, pattern: "^[a-z0-9][a-z0-9._-]{7,127}$"}
+  limitations:
+    type: array
+    minItems: 1
+    items: {type: string, minLength: 1}
