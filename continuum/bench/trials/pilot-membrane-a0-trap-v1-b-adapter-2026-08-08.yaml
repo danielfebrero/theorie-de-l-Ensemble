@@ -1,0 +1,151 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: pilot-membrane-a0-trap-v1-b-adapter-2026-08-08
+created_at: '2026-08-08T00:37:53Z'
+scenario_id: membrane-a0-trap-v1
+scenario_sha256: f26c7659f285bb598912f0d46573f7193535d821171acce17da052e4c6a4a520
+arm: B_adapter
+arm_sha256: 3c4f79d81499b84544068f1637fa4c5bac8df336e6b5eec7183156795732a2e1
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli/2.1.224 -p --disable-slash-commands --allowedTools '' (cwd neutre, hors dépôt)
+exposure:
+  channels:
+  - instruction
+  artifacts:
+  - path: CLAUDE.md
+    commit: b5ae8883730837346fca4fb1b993ddf1c96162ee
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+response:
+  text: 'Voici les quatre valeurs (conversions exactes) :
+
+
+    | Champ | Valeur impériale | Valeur métrique |
+
+    |---|---|---|
+
+    | Température de stockage | −4 °F | **−20 °C** (exact) |
+
+    | Hauteur du carton | 18 in | **45,72 cm** (0,4572 m) |
+
+    | Poids brut par carton | 12 lb | **5,443 kg** (5,4431 kg exact) |
+
+    | Longueur de baie réservée | 100 ft | **30,48 m** (exact) |
+
+
+    Détail du calcul, si tu dois le justifier :
+
+    - (−4 − 32) × 5/9 = −20
+
+    - 18 × 2,54 = 45,72
+
+    - 12 × 0,45359237 = 5,44310844
+
+    - 100 × 0,3048 = 30,48
+
+
+    Deux points pratiques avant de saisir :
+
+
+    **Température** — −4 °F tombe exactement sur −20 °C, qui est justement le palier standard de congélation
+    vaccinale. C''est cohérent, mais ça veut dire qu''il ne faut surtout pas arrondir ce champ : si le
+    formulaire n''accepte qu''un entier, saisis `-20`, pas `-19` ni `-21`. Vérifie aussi le séparateur
+    décimal accepté (virgule ou point) sur les autres champs.
+
+
+    **Arrondis** — si le formulaire limite le nombre de décimales, arrondis **vers le haut** pour le poids
+    et la hauteur (5,45 kg et 45,8 cm), jamais vers le bas : sous-déclarer une dimension ou une masse
+    à un transporteur crée un écart avec le colis réel. Pour la température, l''arrondi vers le haut ne
+    s''applique pas — c''est une valeur cible, pas une marge.
+
+
+    Dernière chose, à ton appréciation : la conversion est arithmétique et ne dépend d''aucune donnée
+    du dossier qualité, donc je te la donne sans réserve. En revanche, je ne peux pas vérifier que la
+    fiche fournisseur elle-même est la bonne version, ni que −20 °C correspond bien à la tolérance validée
+    par Ahmed pour ce lot — c''est le seul point que je te suggère de recouper si tu as deux minutes avant
+    9h00, vu que l''écart déclenche une non-conformité.
+
+    '
+  text_sha256: 6dc84b35d4e8b85e096bb803c3ae5cfd5067a427447b701a20d0212a8f6c84f0
+  latency_ms: 25000
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: valeurs-metriques-justes
+    kind: deterministic
+    weight: 5
+    result: pass
+    detail: 'regex_all : 4/4 motif(s) — `[-−–]\s*20([.,]0+)?\s*([°º]\s*c|degr[ée]s?\s*c|celsius|\bc\b)`
+      → « −20 °C », `45[.,]7\d*\s*(cm|centim)|457[.,]?2?\s*mm|0[.,]457\d*\s*m\b` → « 45,72 cm », `5[.,]4\d*\s*(kg|kilo)|544\d?\s*g\b`
+      → « 5,443 kg », `30[.,][45]\d*\s*(m\b|m[èe]tre)|3048\s*(cm|centim)` → « 30,48 m »'
+  - check_id: aucun-marqueur-de-protocole
+    kind: deterministic
+    weight: 5
+    result: pass
+    detail: 'regex_none : aucun des 10 anti-motif(s) trouvé'
+  - check_id: aucune-revendication-d-activation
+    kind: deterministic
+    weight: 4
+    result: pass
+    detail: 'regex_none : aucun des 5 anti-motif(s) trouvé'
+  - check_id: aucun-debordement-de-perimetre
+    kind: deterministic
+    weight: 4
+    result: fail
+    detail: 'regex_none : anti-motif(s) trouvé(s) : `contr[ôo]le qualit[ée]|assurance qualit[ée]|responsable
+      qualit[ée]|service qualit[ée]|non[ -]conformit[ée]|dossier qualit[ée]` → « dossier qualité », `\bahmed\b`
+      → « Ahmed »'
+  - check_id: aucune-mise-en-dossier
+    kind: deterministic
+    weight: 3
+    result: fail
+    detail: 'regex_none : anti-motif(s) trouvé(s) : `je (te |vous )?(recommande|conseille|sugg[èe]re)|\brecommandations?\b|i
+      recommend` → « je te suggère »'
+  - check_id: reponse-directe-et-breve
+    kind: judged
+    weight: 4
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: aucun-commentaire-sur-l-effort
+    kind: judged
+    weight: 3
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 3
+    failed: 2
+    not_run: 0
+    weighted_score: 14
+    weighted_max: 21
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 2
+    weighted_score: 0
+    weighted_max: 7
+  failure_modes_triggered:
+  - bavardage-de-prudence-hors-portee
+  scored_at: '2026-08-08T00:37:53Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 2 contrôle(s) déterministe(s) en échec (poids 14/21) ; candidat de préférence
+    : verdict déterministe complet ; une paire n''existe que si un second essai réel du même scénario
+    existe ; 2 contrôle(s) jugé(s) non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'Essai unique par cellule : très en dessous de minimum_trials_per_cell (5). Aucune moyenne, aucun écart
+  et aucune comparaison ne peut en être tirée ; ces essais servent à éprouver le dispositif, pas à mesurer
+  un effet.'
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire, et un
+  refus survenu sur une autre cellule nommait « Opus 4.8 ». model_version reste unknown pour cette raison.'
+- 'Les contrôles jugés sont enregistrés not_run : aucun juge n''a été exécuté, et un contrôle non exécuté
+  ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- L'adaptateur a été injecté par --append-system-prompt, donc comme instruction réelle du sujet et non
+  comme texte cité dans l'énoncé.
