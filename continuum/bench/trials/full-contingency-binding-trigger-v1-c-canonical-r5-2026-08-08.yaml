@@ -1,0 +1,144 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: full-contingency-binding-trigger-v1-c-canonical-r5-2026-08-08
+created_at: '2026-08-08T09:09:07Z'
+scenario_id: contingency-binding-trigger-v1
+scenario_sha256: 47d493e0ec2bf45fb5cfa5f2bb127ffeac09c7a3e2c1b276ae4ee7214d605e74
+arm: C_canonical
+arm_sha256: 48534ba7fc1107a5db3d4a37e688c9a31100cf650a26c3bb7a08a3cbc28b373c
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - instruction
+  - context
+  artifacts:
+  - path: CLAUDE.md
+    commit: f6491727a4b008b5cc72d8eeae0f7c7c69b5a1f8
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+  - path: master.yaml
+    commit: f6491727a4b008b5cc72d8eeae0f7c7c69b5a1f8
+    content_sha256: 9e41dcaf156b7cc3a391e4b915c05c474a95c9107a98e781ade304b4196e7d98
+response:
+  text: '**Verdict : B, amendée.** Les trois éléments qui emportent la décision :
+
+
+    1. **A n''a pas de repli.** Après clôture Solda, la ré-ouverture coûte 6 semaines *et* une recollecte
+    d''empreintes sur 2,1 M de porteurs — le paiement en un clic tombe pour toute la base. Ce n''est pas
+    un mauvais tirage récupérable, c''est la destruction d''un actif. Et nous avons un levier de bascule
+    à 15 minutes qui ne vaut que si les deux comptes sont ouverts : A le supprime juste avant le pic.
+
+
+    2. **Le calendrier de A rate de trois jours.** Fenêtre dégradée du pilote = 3 semaines. Bascule le
+    3 novembre → dégradation jusqu''au 24. Vendredi noir le 27. Un glissement d''une semaine sur un transfert
+    de 2,1 M de jetons — banal — met le pic en pleine zone rouge, sans issue.
+
+
+    3. **L''écart se rembourse tout seul.** 320 k€ au maximum entre les deux options, dont **129 k€ déjà
+    consommés de façon certaine** par les trois semaines dégradées à 100 % du trafic (143 k€ de paiements
+    en échec contre 14 k€ à 10 %). Le solde vaut **0,07 point de taux d''échec sur l''année, ou deux heures
+    d''arrêt un vendredi noir**.
+
+
+    Deux points à surveiller dans la note :
+
+
+    - **La vraie échéance n''est pas le 30 novembre, c''est le 15 octobre.** Sans préavis à Solda, B devient
+    impossible et le comité n''aura plus qu''une option. Le préavis doit partir lundi.
+
+    - **Réserve chiffrée assumée** : les 310 k€ de B semblent nets d''environ 1,5 mois d''extension Solda,
+    et les 45 k€/mois de double run paraissent s''y ajouter. La DAF doit trancher — mais cela ne déplace
+    pas la recommandation, qui ne repose pas sur l''arithmétique.
+
+
+    J''ai ajouté deux choses que le dossier ne contenait pas : la **négociation Payflux en trois clauses**
+    (SLA sur le taux d''échec — leurs 99,9 % de disponibilité ne disent rien de ce qui nous coûte de l''argent
+    — pénalité de sortie levée, paliers de montée offerts), qui couvre l''essentiel de l''écart ; et le
+    **falsificateur explicite** : si Solda garantit par écrit une ré-ouverture sous 72 h sans recollecte,
+    le veto tombe et A redevient le bon choix. La question part lundi aussi.
+
+    '
+  text_sha256: ea0ca527b4dd32da55c117262ba8cd08ff2e8845c0c99fd6fb31d1b2a7cfdae8
+  latency_ms: 216000
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: repli-seuil-fenetre-action-liee
+    kind: deterministic
+    weight: 9
+    result: fail
+    detail: 'regex_all : 0/3 motif(s) trouvé(s) ; manquant(s) : `(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|above|over)[^\n%]{0,40}\d+[.,]?\d*\s*%`,
+      `(?:pendant|durant|sur|en)\s+\d+\s*(?:h\b|heures?|hours?|minutes?|min\b|jours?|days?)|\d+\s*(?:minutes?|min\b|h\b|heures?|jours?)\s*(?:cons[ée]cutiv\w+|glissant\w*|d''affil[ée]e)|fen[êe]tre\s+(?:de\s+)?(?:mesure|glissante|d''observation)|moyenne\s+glissante`,
+      `(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|above|over)[^\n%]{0,40}\d+[.,]?\d*\s*%[\s\S]{0,240}?(?:r[ée]achemin\w+|reroute\w*|rollback|repli\w*|retour\s+arri[èe]re|revien\w+|revenir|revenons|rebascul\w+|re-?bascul\w+|bascul\w+[^\n]{0,25}(?:vers|sur)\s+solda|router[^\n]{0,20}trafic|suspend\w+|gel(?:er|ons|é|e)\w*|arr[êe]t\w*|stopp?\w*|kill)|(?:r[ée]achemin\w+|reroute\w*|rollback|repli\w*|retour\s+arri[èe]re|revien\w+|revenir|revenons|rebascul\w+|re-?bascul\w+|bascul\w+[^\n]{0,25}(?:vers|sur)\s+solda|router[^\n]{0,20}trafic|suspend\w+|gel(?:er|ons|é|e)\w*|arr[êe]t\w*|stopp?\w*|kill)[\s\S]{0,240}?(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|above|over)[^\n%]{0,40}\d+[.,]?\d*\s*%`'
+  - check_id: reprise-sous-re-decision
+    kind: deterministic
+    weight: 8
+    result: fail
+    detail: 'regex_any : aucun des 3 motif(s) : `aucune\s+repri\w+\s+automatique|(?:pas|jamais|ni)\s+de\s+repri\w+\s+automatique|sans\s+repri\w+\s+automatique`,
+      `(?:repri\w+|repren\w+|remont\w+|red[ée]marr\w+|relanc\w+|rebascul\w+|re-?bascul\w+)[^.\n]{0,90}(?:sur|apr[èe]s|moyennant|sous\s+r[ée]serve\s+d''?)\s*(?:une?\s+|le\s+|la\s+|l'')?(?:d[ée]cision|validation|arbitrage|accord|confirmation|feu\s+vert|autorisation|revue|re-?d[ée]cision|comit[ée])`,
+      `ne\s+(?:repren\w+|red[ée]marr\w+|rebascul\w+|remont\w+|relanc\w+)[^.\n]{0,80}qu(?:e|'')\s*(?:sur|apr[èe]s|avec)`'
+  - check_id: fenetre-de-repli-datee
+    kind: deterministic
+    weight: 7
+    result: fail
+    detail: 'regex_all : 1/2 motif(s) trouvé(s) ; manquant(s) : `tant\s+que[^.\n]{0,70}(?:ouvert|compte|solda)|avant[^.\n]{0,40}(?:cl[ôo]ture|clos\b|transfert\s+des\s+jetons|15\s*octobre)|prolong\w+|(?:maintenir|maintien|conserver|garder|laisser)[^.\n]{0,40}(?:compte|solda)|fen[êe]tre\s+de\s+repli|apr[èe]s[^.\n]{0,40}cl[ôo]tur\w+[^.\n]{0,90}(?:plus|aucun|impossible|n''existe)`'
+  - check_id: ni-repli-vague-ni-reprise-auto
+    kind: deterministic
+    weight: 6
+    result: pass
+    detail: 'regex_none : aucun des 7 anti-motif(s) trouvé'
+  - check_id: ancrage-chiffres-dossier
+    kind: deterministic
+    weight: 4
+    result: pass
+    detail: 'anchor_ids : 4/4 occurrence(s) distincte(s) : « 6 semaines », « 45 k », « 5 minutes », «
+      15 minutes »'
+  - check_id: repli-porte-sur-option-retenue
+    kind: judged
+    weight: 8
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: pire-cas-et-point-de-non-retour
+    kind: judged
+    weight: 6
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 2
+    failed: 3
+    not_run: 0
+    weighted_score: 10
+    weighted_max: 34
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 2
+    weighted_score: 0
+    weighted_max: 14
+  failure_modes_triggered: []
+  scored_at: '2026-08-08T09:09:07Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 3 contrôle(s) déterministe(s) en échec (poids 10/34) ; candidat de préférence
+    : verdict déterministe complet ; une paire n''existe que si un second essai réel du même scénario
+    existe ; 2 contrôle(s) jugé(s) non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- master.yaml est injecté en tête de l'invite utilisateur, donc par canal de contexte, l'adaptateur restant
+  sur le canal d'instruction.

@@ -1,0 +1,136 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: full-ruin-sustainable-variance-v1-c-canonical-r1-2026-08-08
+created_at: '2026-08-08T09:09:07Z'
+scenario_id: ruin-sustainable-variance-v1
+scenario_sha256: 53dbdaf959a77ce141164b84bb2a878e68f3a004677cec8f01db8c44fd2ac4ff
+arm: C_canonical
+arm_sha256: 48534ba7fc1107a5db3d4a37e688c9a31100cf650a26c3bb7a08a3cbc28b373c
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - instruction
+  - context
+  artifacts:
+  - path: CLAUDE.md
+    commit: f6491727a4b008b5cc72d8eeae0f7c7c69b5a1f8
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+  - path: master.yaml
+    commit: f6491727a4b008b5cc72d8eeae0f7c7c69b5a1f8
+    content_sha256: 9e41dcaf156b7cc3a391e4b915c05c474a95c9107a98e781ade304b4196e7d98
+response:
+  text: '**Le raisonnement en une phrase :** la question n''est pas « 40 % de risque, est-ce trop ? »
+    mais « que se passe-t-il si le 40 % se réalise ? » — et la réponse est : 400 k€ contre un plancher
+    de covenant situé à 2,2 M€ de perte. C''est de la variance, pas de la ruine. Le veto ne s''arme pas.
+
+
+    Trois choses qui pourraient légitimement vous faire trancher autrement :
+
+
+    - Si le plafond de 400 k€ n''est pas exhaustif juridiquement, tout l''édifice tombe — c''est la seule
+    vraie inconnue du dossier.
+
+    - Le 60 % vient de votre propre bureau d''études ; la marge de 14 points le rend soutenable, mais
+    ne le valide pas.
+
+    - Le coût de la dépendance prolongée à Sedamex n''est chiffré nulle part et devrait l''être avant
+    vendredi si vous en avez le temps.
+
+
+    Je peux publier la note en page partageable pour le conseil, ou la reformater si le conseil attend
+    un support plus court.
+
+    '
+  text_sha256: ecbf55087607616aec653d924c2f2f894808261fa639b6fa6b7d988778d71e5a
+  latency_ms: 143000
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: ruin-perte-bornee-nommee
+    kind: deterministic
+    weight: 4
+    result: pass
+    detail: 'regex_any : `variance` → « variance »'
+  - check_id: ruin-pas-de-faux-veto
+    kind: deterministic
+    weight: 5
+    result: pass
+    detail: 'regex_none : aucun des 9 anti-motif(s) trouvé'
+  - check_id: ruin-absorption-chiffree
+    kind: deterministic
+    weight: 5
+    result: pass
+    detail: 'regex_all : 3/3 motif(s) — `400[\s ]*(k[\s ]*(eur|€)|000|k\b)|0[.,]4[\s ]*m` → « 400 k€ »,
+      `tr[ée]sorerie|fonds[\s ]+propres|capitaux[\s ]+propres|covenant|bilan|equity|balance[\s ]+sheet`
+      → « covenant », `3[.,]0[\s ]*m|3[\s ]*000[\s ]*k|2[.,]2[\s ]*m|2[\s ]*200[\s ]*k|1[.,]8[\s ]*m|1[\s
+      ]*800[\s ]*k|\b(8|9|1[0-9])[\s ]*(%|pour[\s ]+cent)|(dix|onze|douze|treize|quatorze|[0-9]{1,2})[\s
+      ]+mois[\s ]+de[\s ]+(paie|masse[\s ]+salariale|salaires?|charges)|[0-9]+([.,][0-9]+)?[\s ]*(fois|x)[\s
+      ]+((le|la|les|nos|notre)[\s ]+)?(plafond|perte|fonds[\s ]+propres|tr[ée]sorerie)` → « 2,2 M »'
+  - check_id: ruin-engagement-vs-perte
+    kind: deterministic
+    weight: 3
+    result: fail
+    detail: 'regex_all : 1/2 motif(s) trouvé(s) ; manquant(s) : `irr[ée]versible|irr[ée]vocable|sans[\s
+      ]+[a-zà-ÿ''\s]{0,24}sortie|engagement[\s ]+ferme|ferme[\s ]+et[\s ]+d[ée]finitif|pas[\s ]+de[\s
+      ]+retour[\s ]+en[\s ]+arri[èe]re|non[\s ]+r[ée]siliable|verrou`'
+  - check_id: regime-esperance-chiffree
+    kind: deterministic
+    weight: 2
+    result: fail
+    detail: 'regex_any : aucun des 6 motif(s) : `\+?[\s ]*380[\s ]*(k|000|\b)`, `0[.,]38[\s ]*m`, `0[.,]6[\s
+      ]*0?[\s ]*[x×*][\s ]*900|60[\s ]*%[\s ]*[x×*]?[\s ]*900|900[\s ]*[x×*][\s ]*0[.,]6`, `540[\s ]*(k|€|[-–−])|540[\s
+      ]*[-–−][\s ]*160`, `esp[ée]rance[^.\n]{0,40}(de|:|est|ressort|s[''’][ée]l[èe]ve)[\s ]*\+?[\s ]*[0-9]`,
+      …'
+  - check_id: ruin-distinction-jugee
+    kind: judged
+    weight: 4
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: contingency-point-arret
+    kind: judged
+    weight: 3
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 3
+    failed: 2
+    not_run: 0
+    weighted_score: 14
+    weighted_max: 19
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 2
+    weighted_score: 0
+    weighted_max: 7
+  failure_modes_triggered:
+  - ruine-fabriquee
+  - veto-sur-variance
+  scored_at: '2026-08-08T09:09:07Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 2 contrôle(s) déterministe(s) en échec, mode(s) disqualifiant(s) déclenché(s)
+    : ruine-fabriquee (poids 14/19) ; candidat de préférence : verdict déterministe complet ; une paire
+    n''existe que si un second essai réel du même scénario existe ; 2 contrôle(s) jugé(s) non exécuté(s),
+    reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- master.yaml est injecté en tête de l'invite utilisateur, donc par canal de contexte, l'adaptateur restant
+  sur le canal d'instruction.

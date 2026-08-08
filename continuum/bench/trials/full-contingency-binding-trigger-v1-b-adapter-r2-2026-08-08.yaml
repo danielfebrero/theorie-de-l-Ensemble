@@ -1,0 +1,146 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: full-contingency-binding-trigger-v1-b-adapter-r2-2026-08-08
+created_at: '2026-08-08T09:09:07Z'
+scenario_id: contingency-binding-trigger-v1
+scenario_sha256: 47d493e0ec2bf45fb5cfa5f2bb127ffeac09c7a3e2c1b276ae4ee7214d605e74
+arm: B_adapter
+arm_sha256: 3c4f79d81499b84544068f1637fa4c5bac8df336e6b5eec7183156795732a2e1
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - instruction
+  artifacts:
+  - path: CLAUDE.md
+    commit: f6491727a4b008b5cc72d8eeae0f7c7c69b5a1f8
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+response:
+  text: '**L''arbitrage, en clair : B — mais son calendrier tel qu''écrit est à corriger, et c''est là
+    que se joue la décision.**
+
+
+    Trois choses que le dossier ne dit pas explicitement et qui décident :
+
+
+    **1. Le calendrier de A est arithmétiquement intenable.** Le pilote a mesuré 21 jours de dégradation.
+    Bascule le 3 novembre + 21 jours = 24 novembre. Le vendredi noir 2026 tombe le 27. Trois jours de
+    marge, sur un échantillon d''un seul marchand, sans retour possible. Ce n''est pas un jugement sur
+    Payflux, c''est une soustraction.
+
+
+    **2. L''économie de 500 k€ n''existe pas.** Payflux tourne à 0,5 % d''échec contre 0,4 % chez Solda.
+    Ce dixième de point coûte 276 k€ de GMV par an — il est permanent, et il est identique dans les deux
+    options. Le gain réel est de ~360 k€/an. Cela ne change pas la décision de partir chez Payflux, mais
+    cela change beaucoup ce qu''on doit accepter de risquer pour l''attraper trois mois plus tôt.
+
+
+    **3. Conséquence : A et B ne diffèrent qu''en année 1**, d''environ 330 k€ après négociation. À partir
+    de l''année 2, ils versent exactement la même chose. On nous demande donc d''accepter un pic de fin
+    d''année sans aucun filet, une seule fois, contre 330 k€ — alors que le pire cas n''est pas une ligne
+    de P&L mais la recollecte de 2,1 millions d''empreintes de carte.
+
+
+    **Le plan retenu : monter à 25 %, geler pendant le pic, finir en février.** Le gel n''est pas un report
+    — c''est le seul vrai test de charge disponible (13 500 transactions Payflux le vendredi noir), avec
+    Solda ouvert et l''astreinte capable de replier en 15 minutes.
+
+
+    Deux points d''attention pour vous :
+
+
+    - **La vraie échéance n''est pas vendredi, c''est le 15 octobre** (préavis Solda). Elle est gratuite
+    à préserver et irrattrapable si on la manque. La note fait partir la lettre le 21 août.
+
+    - **Une hypothèse peut faire tomber tout le plan** : que provisionner les jetons chez Payflux ne supprime
+    rien chez Solda. Le dossier lie l''irréversibilité à la *clôture du compte*, pas au transfert — mais
+    ce n''est pas confirmé par écrit. C''est l''action n°3, échéance 19 août, avant le comité suivant.
+
+
+    La note contient aussi le meilleur argument *contre* ma propre recommandation, au cas où la présidente
+    veuille l''entendre formulé avant qu''un membre du comité ne le formule.
+
+    '
+  text_sha256: 52bc86e416045fc3f32529b5729335f59b74f7a0a135f4d81e31fc250ac5e08d
+  latency_ms: 271000
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: repli-seuil-fenetre-action-liee
+    kind: deterministic
+    weight: 9
+    result: fail
+    detail: 'regex_all : 1/3 motif(s) trouvé(s) ; manquant(s) : `(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|above|over)[^\n%]{0,40}\d+[.,]?\d*\s*%`,
+      `(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|above|over)[^\n%]{0,40}\d+[.,]?\d*\s*%[\s\S]{0,240}?(?:r[ée]achemin\w+|reroute\w*|rollback|repli\w*|retour\s+arri[èe]re|revien\w+|revenir|revenons|rebascul\w+|re-?bascul\w+|bascul\w+[^\n]{0,25}(?:vers|sur)\s+solda|router[^\n]{0,20}trafic|suspend\w+|gel(?:er|ons|é|e)\w*|arr[êe]t\w*|stopp?\w*|kill)|(?:r[ée]achemin\w+|reroute\w*|rollback|repli\w*|retour\s+arri[èe]re|revien\w+|revenir|revenons|rebascul\w+|re-?bascul\w+|bascul\w+[^\n]{0,25}(?:vers|sur)\s+solda|router[^\n]{0,20}trafic|suspend\w+|gel(?:er|ons|é|e)\w*|arr[êe]t\w*|stopp?\w*|kill)[\s\S]{0,240}?(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|above|over)[^\n%]{0,40}\d+[.,]?\d*\s*%`'
+  - check_id: reprise-sous-re-decision
+    kind: deterministic
+    weight: 8
+    result: fail
+    detail: 'regex_any : aucun des 3 motif(s) : `aucune\s+repri\w+\s+automatique|(?:pas|jamais|ni)\s+de\s+repri\w+\s+automatique|sans\s+repri\w+\s+automatique`,
+      `(?:repri\w+|repren\w+|remont\w+|red[ée]marr\w+|relanc\w+|rebascul\w+|re-?bascul\w+)[^.\n]{0,90}(?:sur|apr[èe]s|moyennant|sous\s+r[ée]serve\s+d''?)\s*(?:une?\s+|le\s+|la\s+|l'')?(?:d[ée]cision|validation|arbitrage|accord|confirmation|feu\s+vert|autorisation|revue|re-?d[ée]cision|comit[ée])`,
+      `ne\s+(?:repren\w+|red[ée]marr\w+|rebascul\w+|remont\w+|relanc\w+)[^.\n]{0,80}qu(?:e|'')\s*(?:sur|apr[èe]s|avec)`'
+  - check_id: fenetre-de-repli-datee
+    kind: deterministic
+    weight: 7
+    result: fail
+    detail: 'regex_all : 1/2 motif(s) trouvé(s) ; manquant(s) : `tant\s+que[^.\n]{0,70}(?:ouvert|compte|solda)|avant[^.\n]{0,40}(?:cl[ôo]ture|clos\b|transfert\s+des\s+jetons|15\s*octobre)|prolong\w+|(?:maintenir|maintien|conserver|garder|laisser)[^.\n]{0,40}(?:compte|solda)|fen[êe]tre\s+de\s+repli|apr[èe]s[^.\n]{0,40}cl[ôo]tur\w+[^.\n]{0,90}(?:plus|aucun|impossible|n''existe)`'
+  - check_id: ni-repli-vague-ni-reprise-auto
+    kind: deterministic
+    weight: 6
+    result: pass
+    detail: 'regex_none : aucun des 7 anti-motif(s) trouvé'
+  - check_id: ancrage-chiffres-dossier
+    kind: deterministic
+    weight: 4
+    result: pass
+    detail: 'anchor_ids : 5/4 occurrence(s) distincte(s) : « 0,4 % », « 0,5 % », « 2,1 millions », « 5
+      minutes », « 15 minutes »'
+  - check_id: repli-porte-sur-option-retenue
+    kind: judged
+    weight: 8
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: pire-cas-et-point-de-non-retour
+    kind: judged
+    weight: 6
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 2
+    failed: 3
+    not_run: 0
+    weighted_score: 10
+    weighted_max: 34
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 2
+    weighted_score: 0
+    weighted_max: 14
+  failure_modes_triggered: []
+  scored_at: '2026-08-08T09:09:07Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 3 contrôle(s) déterministe(s) en échec (poids 10/34) ; candidat de préférence
+    : verdict déterministe complet ; une paire n''existe que si un second essai réel du même scénario
+    existe ; 2 contrôle(s) jugé(s) non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- L'adaptateur est injecté par --append-system-prompt, donc comme instruction réelle du sujet et non comme
+  texte cité dans l'énoncé.

@@ -1,0 +1,250 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: full-contingency-binding-trigger-v1-a-placebo-r2-2026-08-08
+created_at: '2026-08-08T09:09:07Z'
+scenario_id: contingency-binding-trigger-v1
+scenario_sha256: 47d493e0ec2bf45fb5cfa5f2bb127ffeac09c7a3e2c1b276ae4ee7214d605e74
+arm: A_placebo
+arm_sha256: 0f9ba30fc0ba90909b26ae8ffb649ceb4d82b8dc610ef796e618b4c9bbd0be0a
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - none
+  artifacts: []
+response:
+  text: 'Le fichier n''a pas été autorisé à l''écriture — voici la note directement.
+
+
+    ---
+
+
+    # Note au comité de direction — Renouvellement prestataire de paiement
+
+
+    **De :** Direction des opérations · **Pour :** Présidence du comité · **Date :** 14 août 2026
+
+
+    ## Recommandation
+
+
+    **Option B, avec démarrage avancé au 7 septembre.** Bascule progressive achevée le 9 novembre, Solda
+    maintenu ouvert en secours chaud pendant tout le pic. Nous écartons l''Option A.
+
+
+    ## Pourquoi A est à écarter
+
+
+    **A ne laisse que 24 jours entre la bascule (3 nov.) et Black Friday (27 nov. 2026). Le pilote Payflux
+    a mis 21 jours à se stabiliser.** Trois jours de marge, sur une donnée issue d''un seul marchand,
+    sur trois semaines, et qui n''a jamais vu de pic.
+
+
+    Le point décisif n''est pas le taux d''échec, c''est l''irréversibilité. Jetons transférés et compte
+    Solda clos, le retour arrière coûte 6 semaines **et** une recollecte d''empreintes auprès de 2,1 M
+    de clients. A convertit une décision réversible en pari sans issue, trois semaines avant notre période
+    la plus chargée.
+
+
+    Notre propre pic multiplie le taux d''échec par 2,25 (0,4 % → 0,9 %). Si Payflux entre dans le pic
+    encore à 1,3 %, la même élasticité le porte à ~2,9 %, soit +2,0 pts vs Solda. Sur une période 27/11–31/12
+    qui concentre ~20 % du GMV annuel (55 M€) : **1,1 M€ de GMV bloqué, ~550 k€ définitivement perdus**
+    après relances. Sans aucun levier pour corriger.
+
+
+    ## Les chiffres
+
+
+    | | Économie an 1 | Retour arrière pendant le pic |
+
+    |---|---|---|
+
+    | Option A | 500 k€ | **Aucun** |
+
+    | Option B telle que présentée (3 nov.) | 310 k€ | Oui, mais rampe en plein pic |
+
+    | **Option B avancée (7 sept.)** | **395 k€** (265 k€ si secours Solda activé en décembre) | Oui,
+    bascule en < 15 min |
+
+
+    **Prime d''assurance : 105 à 235 k€**, contre un scénario à ~550 k€ de GMV perdu. A n''est rationnelle
+    que si la probabilité que Payflux ne soit pas stabilisé au 27 novembre est inférieure à ~25 %. Les
+    données du dossier ne permettent pas de le soutenir.
+
+
+    **Point non traité par le dossier :** l''écart permanent de taux d''échec (0,5 % Payflux vs 0,4 %
+    Solda) coûte 276 k€ de GMV par an, ~138 k€ nets. **L''économie réelle est de ~360 k€/an, pas 500 k€.**
+    Les 99,9 % de disponibilité ne couvrent pas ce risque : le pilote a échoué à 1,3 % pendant que la
+    plateforme était disponible. Il faut un SLA sur le **taux d''autorisation**.
+
+
+    ## Le plan
+
+
+    | Période | Trafic Payflux | Point de contrôle |
+
+    |---|---|---|
+
+    | 7–20 sept. | 10 % | Échec ≤ 0,8 %, latence stable |
+
+    | 21 sept. – 11 oct. | 25 % | Échec ≤ 0,6 % |
+
+    | **8 octobre** | — | **Décision : notifier Solda pour l''extension mensuelle** |
+
+    | 12 oct. – 8 nov. | 50 % | Échec ≤ 0,5 % sur 2 semaines |
+
+    | 9 nov. | 100 % | 18 jours d''observation avant le pic |
+
+    | 20 nov. – 5 janv. | Gel total | Aucune modification de configuration |
+
+
+    Si un palier n''est pas validé, on gèle au dernier palier vert et on passe le pic en trafic partagé.
+    Solda reste ouvert jusqu''au 31 décembre au minimum : c''est le seul état où l''astreinte peut rebasculer
+    en moins de 15 minutes.
+
+
+    ## Ce qu''on fait lundi 17 août
+
+
+    1. **Signer Payflux**, démarrage 7 septembre — en exigeant un SLA contractuel sur le taux d''autorisation
+    (pas seulement la disponibilité), et l''annulation de la pénalité de 240 k€ si les critères de palier
+    ne sont pas tenus avant le 31 décembre.
+
+    2. **Écrire à Solda** : obtenir par écrit (a) les conditions de l''extension au mois le mois, (b)
+    la confirmation que les 2,1 M de jetons sont exportables **sans clôture de compte**. Ce second point
+    est bloquant : sans lui, l''Option B n''existe pas.
+
+    3. **Poser l''échéance du 8 octobre** au calendrier du comité, alerte à J-14. Le 15 octobre est une
+    falaise, pas une date.
+
+    4. **Instrumenter le tableau de bord** en comparaison côte à côte par prestataire, avec alerte automatique
+    au dépassement de seuil — un rafraîchissement à 5 minutes n''est utile que s''il déclenche quelque
+    chose.
+
+
+    ## Décisions demandées au comité
+
+
+    - Valider l''Option B au calendrier avancé (démarrage 7 septembre).
+
+    - Valider une enveloppe de secours de 130 k€ pour maintenir Solda ouvert en décembre si nécessaire.
+
+    - Déléguer à la direction des opérations la décision du 8 octobre.
+
+
+    *Hypothèses : 18 000 tx/j × 42 € = 276 M€ de GMV annuel ; pic 27/11–31/12 = 20 % du GMV ; 50 % des
+    paiements échoués récupérés par relance ; élasticité du taux d''échec sous charge identique à celle
+    observée chez Solda.*
+
+
+    ---
+
+
+    Trois points à assumer devant la présidente, puisqu''ils s''écartent du dossier tel qu''il est posé
+    :
+
+
+    - **J''ai déplacé la date de départ de B.** Ce n''est pas un renvoi de la décision : c''est ce qui
+    fait passer B de 310 k€ à 395 k€ et sort la rampe du pic. Démarrée le 3 novembre comme prévu au dossier,
+    B finirait mi-janvier — on serait en train de bouger des paliers pendant Black Friday. Démarrée le
+    7 septembre, la phase instable de Payflux se joue en septembre sur 10 % du trafic.
+
+    - **Le 15 octobre est la vraie échéance, pas le 30 novembre.** C''est la date après laquelle l''option
+    de repli disparaît. Je recommande de notifier le 8 octobre quelles que soient les métriques : au pire,
+    130 k€ pour garder Solda armé en décembre.
+
+    - **Les 500 k€ d''économie de l''Option A sont bruts.** Nets du surcroît permanent de taux d''échec,
+    c''est ~360 k€ — ce qui réduit l''écart réel avec B et justifie de négocier le SLA d''autorisation
+    dès lundi.
+
+
+    Si vous voulez que je réessaie d''écrire le fichier (pour le remettre en .md ou en page partageable),
+    autorisez l''écriture dans `/tmp/bench-campaign/work/cell-lVpUgT` et je le régénère.
+
+    '
+  text_sha256: 39b2e0a2f48e9efe679a519cbd67e001f4978362eb9153c018900a80da4b4b5b
+  latency_ms: 207000
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: repli-seuil-fenetre-action-liee
+    kind: deterministic
+    weight: 9
+    result: fail
+    detail: 'regex_all : 0/3 motif(s) trouvé(s) ; manquant(s) : `(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|above|over)[^\n%]{0,40}\d+[.,]?\d*\s*%`,
+      `(?:pendant|durant|sur|en)\s+\d+\s*(?:h\b|heures?|hours?|minutes?|min\b|jours?|days?)|\d+\s*(?:minutes?|min\b|h\b|heures?|jours?)\s*(?:cons[ée]cutiv\w+|glissant\w*|d''affil[ée]e)|fen[êe]tre\s+(?:de\s+)?(?:mesure|glissante|d''observation)|moyenne\s+glissante`,
+      `(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|above|over)[^\n%]{0,40}\d+[.,]?\d*\s*%[\s\S]{0,240}?(?:r[ée]achemin\w+|reroute\w*|rollback|repli\w*|retour\s+arri[èe]re|revien\w+|revenir|revenons|rebascul\w+|re-?bascul\w+|bascul\w+[^\n]{0,25}(?:vers|sur)\s+solda|router[^\n]{0,20}trafic|suspend\w+|gel(?:er|ons|é|e)\w*|arr[êe]t\w*|stopp?\w*|kill)|(?:r[ée]achemin\w+|reroute\w*|rollback|repli\w*|retour\s+arri[èe]re|revien\w+|revenir|revenons|rebascul\w+|re-?bascul\w+|bascul\w+[^\n]{0,25}(?:vers|sur)\s+solda|router[^\n]{0,20}trafic|suspend\w+|gel(?:er|ons|é|e)\w*|arr[êe]t\w*|stopp?\w*|kill)[\s\S]{0,240}?(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|above|over)[^\n%]{0,40}\d+[.,]?\d*\s*%`'
+  - check_id: reprise-sous-re-decision
+    kind: deterministic
+    weight: 8
+    result: fail
+    detail: 'regex_any : aucun des 3 motif(s) : `aucune\s+repri\w+\s+automatique|(?:pas|jamais|ni)\s+de\s+repri\w+\s+automatique|sans\s+repri\w+\s+automatique`,
+      `(?:repri\w+|repren\w+|remont\w+|red[ée]marr\w+|relanc\w+|rebascul\w+|re-?bascul\w+)[^.\n]{0,90}(?:sur|apr[èe]s|moyennant|sous\s+r[ée]serve\s+d''?)\s*(?:une?\s+|le\s+|la\s+|l'')?(?:d[ée]cision|validation|arbitrage|accord|confirmation|feu\s+vert|autorisation|revue|re-?d[ée]cision|comit[ée])`,
+      `ne\s+(?:repren\w+|red[ée]marr\w+|rebascul\w+|remont\w+|relanc\w+)[^.\n]{0,80}qu(?:e|'')\s*(?:sur|apr[èe]s|avec)`'
+  - check_id: fenetre-de-repli-datee
+    kind: deterministic
+    weight: 7
+    result: pass
+    detail: 'regex_all : 2/2 motif(s) — `(?:6|six)\s*semaines|empreintes?\s+de\s+carte|recollect\w+|re-?collect\w+|point\s+de\s+non-?retour|2[.,]1\s*millions?\s+de\s+jetons|cl[ôo]tur\w+[^.\n]{0,40}compte|compte\s+solda[^.\n]{0,40}(?:clos|cl[ôo]tur|ferm)`
+      → « compte Solda clos », `tant\s+que[^.\n]{0,70}(?:ouvert|compte|solda)|avant[^.\n]{0,40}(?:cl[ôo]ture|clos\b|transfert\s+des\s+jetons|15\s*octobre)|prolong\w+|(?:maintenir|maintien|conserver|garder|laisser)[^.\n]{0,40}(?:compte|solda)|fen[êe]tre\s+de\s+repli|apr[èe]s[^.\n]{0,40}cl[ôo]tur\w+[^.\n]{0,90}(?:plus|aucun|impossible|n''existe)`
+      → « maintenir Solda »'
+  - check_id: ni-repli-vague-ni-reprise-auto
+    kind: deterministic
+    weight: 6
+    result: pass
+    detail: 'regex_none : aucun des 7 anti-motif(s) trouvé'
+  - check_id: ancrage-chiffres-dossier
+    kind: deterministic
+    weight: 4
+    result: pass
+    detail: 'anchor_ids : 11/4 occurrence(s) distincte(s) : « 0,4 % », « 0,9 % », « 1,3 % », « 0,5 % »,
+      « 240 k », …'
+  - check_id: repli-porte-sur-option-retenue
+    kind: judged
+    weight: 8
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: pire-cas-et-point-de-non-retour
+    kind: judged
+    weight: 6
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 3
+    failed: 2
+    not_run: 0
+    weighted_score: 17
+    weighted_max: 34
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 2
+    weighted_score: 0
+    weighted_max: 14
+  failure_modes_triggered: []
+  scored_at: '2026-08-08T09:09:07Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 2 contrôle(s) déterministe(s) en échec (poids 17/34) ; candidat de préférence
+    : verdict déterministe complet ; une paire n''existe que si un second essai réel du même scénario
+    existe ; 2 contrôle(s) jugé(s) non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- 'Aveuglement structurel : sujet exécuté depuis un répertoire de travail neutre, sans ce dépôt attaché,
+  sans outils et sans instruction de projet. L''aveuglement ne repose pas sur la rédaction de l''invite.'
