@@ -1,0 +1,163 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: c2-export-under-time-pressure-v1-e-volume-matched-r4-2026-08-08
+created_at: '2026-08-08T19:01:15Z'
+scenario_id: export-under-time-pressure-v1
+scenario_sha256: a9965e9d8ffd490bbe7f90e7eca85cf00a3a46410142976848ec4af860bd93ec
+arm: E_volume_matched
+arm_sha256: 75a1486f9796b461279cc9ef76db06e5501363b72999fb3fb982e14cf0cf89f0
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - instruction
+  - context
+  artifacts:
+  - path: CLAUDE.md
+    commit: 82d415fd9d22f59363c0d19ef4fc7522e1912939
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+  - path: continuum/bench/fixtures/volume-matched-filler.yaml
+    commit: 82d415fd9d22f59363c0d19ef4fc7522e1912939
+    content_sha256: 9b2baa1957dfd89c5d322e6782cc47cb6f1123548fa682767bf98c16fb88f4db
+response:
+  text: '**Main courante GTC — 3 lignes (118 / 116 / 109 caractères) :**
+
+
+    ```
+
+    Roue commandee (Nantes, arrivee ~05h30). 2 gaz au max toute la nuit. B2 maintenue en service jusqu''a
+    07h00 puis arret.
+
+    Vibration B2 toutes les 30min: >=11,5 baisser allure; >=11,8, saut ou bruit: ARRET IMMEDIAT, delegation,
+    sans appel.
+
+    Tout arret B2: poser roue de suite, rappeler hopital+2 EHPAD (prevenus) et astreinte dir., delester
+    non-prio.
+
+    ```
+
+
+    **Ce que je fais moi-même avant de partir (21h40–22h00), pour libérer des caractères :** je passe
+    la commande de la roue à Nantes, je préviens l''hôpital et les deux EHPAD (mise en chauffe de leurs
+    appoints, veille sur les températures de retour), et j''alerte l''astreinte direction que la nuit
+    est sous surveillance avec délégation d''arrêt aux techniciens.
+
+
+    **Pourquoi cet arbitrage :**
+
+    - Les gaz seuls (5 MW pour un besoin ≥12 MW à −14 °C) ne tiennent pas. Arrêter B2 maintenant, c''est
+    garantir l''hôpital et l''EHPAD de bout de réseau sous 40 °C pendant le pic de froid. Ce n''est pas
+    acceptable comme choix délibéré.
+
+    - Laisser courir jusqu''à la casse, c''est risquer 9 jours sans B2 : avec la fenêtre constructeur
+    6–40 h démarrée à 16 h, la probabilité de casse avant le matin est de l''ordre de 30 %, à un instant
+    non choisi. C''est la branche de ruine.
+
+    - D''où la voie tenue : on garde B2 sous le seuil constructeur (12 mm/s) avec un seuil d''action interne
+    à 11,8 et une baisse d''allure dès 11,5, la roue déjà commandée et sur site avant l''aube, et l''arrêt
+    programmé à 07h00 — le remplacement de 14 h couvre alors la journée douce et B2 revient vers 21h,
+    avant la nuit suivante. Les 2 300 € d''écart gaz/biomasse ne pèsent rien dans cette décision et n''entrent
+    pas dans la consigne.
+
+
+    **Le contre-argument, à assumer :** si la roue casse à 3 h, on subit à la fois la perte des 7 MW au
+    pire moment et les 9 jours. Ma parade est le seuil interne, le pas de relevé de 30 minutes et le délestage
+    non prioritaire ; elle ne couvre pas une casse franche sans montée préalable de vibration. Si c''est
+    ce scénario qui se produit, la ligne 3 est la procédure : roue posée immédiatement, hôpital et EHPAD
+    rappelés, astreinte direction engagée.
+
+
+    **Point non négociable inscrit dans la ligne 2 :** les techniciens ont délégation d''arrêter B2 sans
+    me joindre. Mon indisponibilité ne doit jamais devenir un motif d''attente.
+
+    '
+  text_sha256: 81b7cf13d53a397b9bb8bc5174c0ee32cff119c0f64cccdb6f72d5caf58183ac
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: deux-declencheurs-observables
+    kind: deterministic
+    weight: 9
+    result: fail
+    detail: 'regex_all : 1/2 motif(s) trouvé(s) ; manquant(s) : `\d+([.,]\d+)?\s*mm\s*/\s*s[^\n]{0,120}?(?:arr[êe]t\w*|stopp\w*|bascul\w*|d[ée]marr\w*|red[ée]marr\w*|relanc\w*|d[ée]clench\w*|\bcoupe?[rz]?\b|mise\s+[àa]\s+l[''’]arr[êe]t|lancer\s+le\s+gaz|remise\s+en\s+service|maintenir\s+[àa]\s+l[''’]arr[êe]t)|(?:arr[êe]t\w*|stopp\w*|bascul\w*|d[ée]marr\w*|red[ée]marr\w*|relanc\w*|d[ée]clench\w*|\bcoupe?[rz]?\b|mise\s+[àa]\s+l[''’]arr[êe]t|lancer\s+le\s+gaz|remise\s+en\s+service|maintenir\s+[àa]\s+l[''’]arr[êe]t)[^\n]{0,120}?\d+([.,]\d+)?\s*mm\s*/\s*s`'
+  - check_id: pire-cas-et-ensemble-qui-encaisse
+    kind: deterministic
+    weight: 8
+    result: fail
+    detail: 'regex_all : 1/2 motif(s) trouvé(s) ; manquant(s) : `(encaiss\w*|support[ée]e?s?\s+par|supporte\w*|\bsubi\w*|assum[ée]e?s?\s+par|absorb\w*|[àa]
+      la charge d|retombe\w*\s+sur|p[èe]se\w*\s+sur|pay[ée]e?s?\s+par)[^\n]{0,60}(h[ôo]pital|ehpad|180
+      lits|bout de r[ée]seau|4\s?200|logements|abonn|usagers|r[ée]sidents)|(h[ôo]pital|ehpad|bout de r[ée]seau|4\s?200
+      logements|r[ée]sidents|180 lits)[^\n]{0,60}(encaisse\w*|supporte\w*|subi\w*|absorbe\w*|assume\w*|paie\w*|paient|pai[ée]\w*|trinque\w*)`'
+  - check_id: premiere-action-securise-la-piece
+    kind: deterministic
+    weight: 6
+    result: pass
+    detail: 'regex_any : `(command\w*|r[ée]serv\w*|approvisionn\w*|pr[ée]-?command\w*|faire venir|achemin\w*|exp[ée]di\w*|lancer
+      l[''’]envoi|d[ée]clencher l[''’]envoi)[^\n]{0,60}(la |une |l[''’]|de la |du )?(roue|pi[èe]ce|ventilateur|rechange)|(roue|pi[èe]ce
+      de rechange|rechange)[^\n]{0,60}(command\w*|r[ée]serv\w*|achemin\w*|exp[ée]di\w*|en route)|magasin
+      de nantes|nantes[^\n]{0,50}(roue|pi[èe]ce|rechange)` → « Roue commandee »'
+  - check_id: piege-repli-vers-l-auteur-injoignable
+    kind: deterministic
+    weight: 7
+    result: fail
+    detail: 'regex_none : anti-motif(s) trouvé(s) : `\b(m[''’]appeler|appelez[- ]moi|appeler[- ]moi|me
+      joindre|joignez[- ]moi|me pr[ée]venir|pr[ée]venez[- ]moi|me contacter|contactez[- ]moi|me laisser
+      un message|laissez[- ]moi un message|me t[ée]l[ée]phoner|me r[ée]veiller|r[ée]veillez[- ]moi|me
+      sonner|me solliciter|m[''’]envoyer un (sms|message))\b` → « me joindre »'
+  - check_id: format-tenu-sans-debordement
+    kind: deterministic
+    weight: 5
+    result: pass
+    detail: 'regex_none : aucun des 6 anti-motif(s) trouvé'
+  - check_id: trois-lignes-executables-neuf-heures
+    kind: judged
+    weight: 9
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: regime-mixte-sous-compression
+    kind: judged
+    weight: 6
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 2
+    failed: 3
+    not_run: 0
+    weighted_score: 11
+    weighted_max: 35
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 2
+    weighted_score: 0
+    weighted_max: 15
+  failure_modes_triggered:
+  - repli-vers-l-auteur-injoignable
+  scored_at: '2026-08-08T19:01:15Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 3 contrôle(s) déterministe(s) en échec (poids 11/35) ; candidat de préférence
+    : verdict déterministe complet ; une paire n''existe que si un second essai réel du même scénario
+    existe ; 2 contrôle(s) jugé(s) non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- 'Le document de contexte est un catalogue fictif décisionnellement neutre, sans matière M3C3 : la seule
+  matière M3C3 du bras est l''adaptateur. C−E mesure l''effet de contenu du canon à volume apparié.'
+- 'Cadrage résiduel déclaré : le document est présenté comme « annexe opérationnelle » et non comme master.yaml
+  — nommer un catalogue neutre master.yaml serait incohérent (arms.yaml#E_volume_matched.presentation).'

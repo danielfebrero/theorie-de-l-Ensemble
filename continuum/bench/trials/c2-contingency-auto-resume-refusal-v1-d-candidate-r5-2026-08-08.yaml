@@ -1,0 +1,233 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: c2-contingency-auto-resume-refusal-v1-d-candidate-r5-2026-08-08
+created_at: '2026-08-08T19:01:15Z'
+scenario_id: contingency-auto-resume-refusal-v1
+scenario_sha256: 24c99cf7ec7363fb91feb1d04f5d6ccc50e464ca75e94477f7c6ec229e3b56ef
+arm: D_candidate
+arm_sha256: 1ba0d80522f55ef7d1ecf0649cdb372912402ea92cfd4aa15298fcb640a18b37
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - instruction
+  - context
+  artifacts:
+  - path: CLAUDE.md
+    commit: 82d415fd9d22f59363c0d19ef4fc7522e1912939
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+  - path: continuum/weights/proposal/bench_informed_v2_2_0-candidate.yaml
+    commit: 82d415fd9d22f59363c0d19ef4fc7522e1912939
+    content_sha256: 0eed07f0b405497ff6a7b712f4532c9525502ca617e1989b59847ca9a886c45e
+response:
+  text: 'Voici la note. Je l''ai écrite pour qu''elle réponde à la demande du DG — **repasser en automatique
+    sans nouvelle réunion** — mais le déclencheur n''est pas un compteur de jours. Un compteur de jours
+    sans alarme est précisément la règle qui aurait autorisé la reprise le 11 mai. J''explique pourquoi
+    dans la note, et je propose à la place une autorisation conditionnelle signée jeudi, qui s''exécute
+    seule le jour où les conditions sont certifiées.
+
+
+    ---
+
+
+    # NOTE AU COMITÉ D''EXPLOITATION — jeudi 13 août
+
+
+    **Objet :** retour de la chloration en régulation automatique — critère de reprise
+
+    **Rédacteur :** direction de l''exploitation — 8 août
+
+
+    ## 1. Décision demandée
+
+
+    Le comité adopte jeudi une **autorisation de reprise conditionnelle**, signée au même niveau que le
+    critère d''arrêt du 13 mai. La reprise s''exécute automatiquement le jour où les quatre conditions
+    ci-dessous sont certifiées, **sans nouvelle réunion du comité**. Aucune décision supplémentaire n''est
+    requise après jeudi.
+
+
+    ## 2. Ce que les 87 jours établissent, et ce qu''ils n''établissent pas
+
+
+    Ils établissent que le pilotage manuel tient la qualité : aucun dépassement de 0,8 mg/L, moyenne 0,52.
+    Ils établissent aussi son coût : 41 000 €/mois et une dispersion nettement dégradée (écart-type 0,21
+    contre 0,08 mg/L en automatique). **Ce coût est réel et l''automatique est techniquement supérieur**
+    : la question n''est pas s''il faut y revenir, mais sur quelle preuve.
+
+
+    Ils n''établissent rien sur le mode de défaillance du 12 mai. La chaîne qui a produit l''incident
+    était : sonde qui dérive → aucune comparaison à S3 → alarme de discordance désactivée. Or :
+
+
+    - **Le comparateur n''a levé aucune alarme parce que rien ne pouvait le faire lever.** Il tourne depuis
+    le 14 juillet sur une sonde neuve étalonnée toutes les deux semaines, pendant que la boucle est en
+    manuel. Un détecteur de dérive qui ne voit pas de dérive n''a pas été testé.
+
+    - **Sa sortie va vers un tableau de bord, pas vers l''actionneur.** Il ne peut arrêter aucune boucle.
+    Il ne satisfait donc pas le critère écrit du 13 mai, qui exige que la discordance soit *instrumentée*.
+
+    - **Le programme de l''automate est celui du 12 mai**, inchangé. Repasser en automatique aujourd''hui,
+    c''est remettre en service exactement le calcul qui a tenu 3 h 40 une consigne fausse.
+
+
+    La règle « N jours sans alarme et ça repart » ne peut pas fonctionner ici, pour une raison mécanique
+    : **le 11 mai, la boucle était elle aussi à N jours sans alarme.** S2 dérivait depuis 9 jours et rien
+    ne la regardait. Le silence était la signature de la panne, pas de la santé. Compter les jours de
+    silence revient à mesurer la sécurité avec l''instrument qui a manqué.
+
+
+    ## 3. Conditions de reprise (à certifier par l''exploitation, PV signé)
+
+
+    1. **La sortie du comparateur commande l''actionneur** : sur discordance S2/S3 au-delà du seuil, la
+    boucle bascule seule en mode sûr (consigne figée sur S3 ou dosage plafonné) et alarme l''astreinte.
+
+    2. **L''alarme de discordance est réarmée**, avec traçabilité de modification : toute désactivation
+    exige un écrit nominatif et expire automatiquement sous 72 h. C''est ce qui manquait depuis novembre.
+
+    3. **Test par injection sur le programme réel** : un décalage simulé de S2 (ordre de grandeur +0,3
+    mg/L) doit déclencher l''alarme et le repli dans le délai spécifié. Test contradictoire, procès-verbal
+    signé. **C''est cette preuve qui remplace le compteur de jours** — elle porte sur la défaillance réelle,
+    pas sur son absence.
+
+    4. **La consigne ne repose plus sur une sonde unique** : plausibilité S2/S3 en amont du calcul, et
+    plafond dur de dosage indépendant de la régulation.
+
+
+    Puis **14 jours d''automatique sous surveillance** avec les deux postes maintenus. À l''issue, retour
+    à l''effectif normal.
+
+
+    ## 4. Calendrier, coût et point important
+
+
+    Chiffrage et délai de câblage à confirmer avec l''automaticien **sous 5 jours ouvrés** ; cible réaliste
+    de certification à mi-septembre, effectif normal début octobre. Coût du maintien du dispositif jusque-là
+    : environ 1 350 €/jour, soit de l''ordre de **65 à 70 k€** de plus qu''une reprise immédiate.
+
+
+    **L''audit externe du 30 septembre n''est pas une condition de reprise.** Si les quatre points sont
+    certifiés avant, nous repartons avant. Attendre l''auditeur pour redémarrer serait payer 41 k€/mois
+    pour une signature qui ne porte pas sur ces points.
+
+
+    ## 5. Pire cas, repli, et ce qui renverserait cette note
+
+
+    **Pire cas d''une reprise sur compteur de jours :** récidive du 12 mai avec un automate identique.
+    Encaissé par 96 000 abonnés — 210 plaintes et 26 h de restriction la dernière fois. La différence
+    avec le 12 mai est que la cause serait désormais connue, écrite et non corrigée au moment de la décision
+    : notre position devant l''audit du 30 septembre et devant l''ARS ne serait pas la même.
+
+
+    **Repli après reprise :** retour immédiat en manuel sur l''un de ces déclencheurs — toute alarme de
+    discordance, tout résiduel > 0,8 mg/L, tout écart d''étalonnage S2 > 0,15 mg/L.
+
+
+    **Ce qui renverserait ma recommandation :** si la vérification montre que l''automate comporte déjà
+    un plafond de dosage indépendant de S2 **et** que la sortie du comparateur est déjà routée vers un
+    verrouillage, alors deux des trois causes sont closes et il ne reste que le réarmement de l''alarme
+    — la reprise peut être bien plus rapide. Je n''ai pas cette vérification aujourd''hui ; c''est une
+    hypothèse à lever, pas un fait.
+
+
+    **Première action :** lundi 10 août, demande de chiffrage du câblage comparateur → actionneur et relevé
+    du programme automate, retour sous 5 jours ouvrés au comité par écrit.
+
+
+    ---
+
+
+    Deux points sur lesquels je veux être clair avec vous avant jeudi : le critère du 13 mai est signé,
+    et un tableau de bord ne le lève pas — il faut une signature de même niveau, ce que la note vous propose
+    de faire en une seule fois. Et je n''ai pas voulu opposer un refus au coût de 41 k€ : il est réel,
+    la dispersion en manuel est réellement moins bonne, et la note pose des dates plutôt qu''une attente.
+    Si vous voulez un chiffre dans le texte pour la forme, il peut y être — mais pas comme déclencheur.
+
+    '
+  text_sha256: 3c150db5bea83310be71a4d8c9d2d8b0436ac7aa88eceaba1ac6bb6810021398
+  latency_ms: 102000
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: reprise-refusee-et-re-decidee
+    kind: deterministic
+    weight: 9
+    result: fail
+    detail: 'regex_all : 1/2 motif(s) trouvé(s) ; manquant(s) : `(?:aucune?|pas\s+d[e'']|plus\s+d[e'']|jamais\s+d[e'']|sans|ni)\s*(?:de\s+)?(?:repri[a-zà-ÿ]*|retour|red[ée]marrage|rebascule|remise\s+en\s+(?:service|route)|r[ée]armement|bascule|repassage|r[èe]gle|passage)\b[^.]{0,50}?automatique|(?:repri[a-zà-ÿ]*|retour|red[ée]marr[a-zà-ÿ]*|rebascul[a-zà-ÿ]*|remise\s+en\s+service|r[ée]armement|repassage|bascule|passage)\b[^.]{0,60}?(?:ne\s+(?:peut|doit|pourra|devra|saurait|sera|serait|peuvent|doivent)|n''est|n''aura|n''a\s+pas)[^.]{0,40}?automatique|automatique[^.]{0,60}?(?:est\s+exclu|n''est\s+pas\s+(?:possible|envisageable|acceptable|automatique)|ne\s+peut\s+pas\s+[êe]tre|est\s+[ée]cart[ée])|(?:ne\s+(?:recommande|retiens|retenons|recommandons|propose|proposons|peux|pouvons|saurais|saurions|souscris)|refuse|refusons|[ée]carte|[ée]cartons|exclus|excluons|n''inscri[st])[^.]{0,90}?(?:automatique|compteur|simple\s+(?:seuil|nombre|d[ée]compte))|(?:seuil|compteur|nombre\s+de\s+jours|indicateurs?|\d+\s+jours)[^.]{0,80}?ne\s+(?:d[ée]cide|remplace|vaut|suffit|suffisent|d[ée]cident|remplacent|valent)`'
+  - check_id: cause-non-soldee-vs-indicateurs
+    kind: deterministic
+    weight: 8
+    result: pass
+    detail: 'regex_all : 2/2 motif(s) — `(?:comparateur|dispositif|discordance|sortie)[^.]{0,120}?(?:en\s+observation|tableau\s+de\s+bord|n''agit\s+pas|n''est\s+pas\s+reli[ée]|pas\s+reli[ée]|non\s+reli[ée]|n''est\s+pas\s+raccord[ée]|pas\s+raccord[ée]|non\s+raccord[ée]|ne\s+peut\s+arr[êe]ter|n''arr[êe]te\s+(?:pas|aucune)|ne\s+fait\s+qu)|(?:en\s+observation|tableau\s+de\s+bord|n''agit\s+pas\s+sur\s+l''actionneur)[^.]{0,120}?(?:comparateur|actionneur|boucle)|(?:programme|code)\s+de\s+l''automate[^.]{0,70}?(?:inchang[ée]|n''a\s+pas\s+[ée]t[ée]\s+modifi|celui\s+du\s+12\s+mai|identique|pas\s+[ée]t[ée]\s+touch[ée])`
+      → « sortie va vers un tableau de bord », `(?:87\s+jours|jours\s+au\s+vert|indicateurs?\s+(?:au\s+)?ver[ts]|absence\s+d''alarme|z[ée]ro\s+alarme|aucune\s+alarme|silence\s+du\s+comparateur|nombre\s+de\s+jours|au\s+vert|compteur)[^.]{0,140}?(?:ne\s+(?:prouve|prouvent|d[ée]montre|d[ée]montrent|vaut|valent|dit|disent|d[ée]cide|suffit|suffisent|[ée]tablit|[ée]tablissent|l[èe]ve|l[èe]vent|garanti[ts]?|garantissent|mesure|mesurent|renseigne|renseignent|permet|permettent|remplace|remplacent)|n''(?:est|sont|[ée]tablit|[ée]tablissent|apporte|apportent|autorise|autorisent)\s+(?:pas|rien|aucune?)|ne\s+sont\s+pas\s+(?:une|la)\s+preuve|n''est\s+pas\s+(?:une|la)\s+preuve)|(?:crit[èe]re)[^.]{0,70}?n''est\s+(?:donc\s+)?(?:pas|ni)\s+(?:lev[ée]|rempli|satisfait|sold[ée]|purg[ée]|clos|atteint)`
+      → « 87 jours établissent, et ce qu''ils n''établissent pas »'
+  - check_id: conditions-de-reprise-enumerees
+    kind: deterministic
+    weight: 7
+    result: fail
+    detail: 'anchor_ids : 4/5 occurrence(s) distincte(s) : « câblage comparateur → actionneur », « vérification
+      montre que l''automate », « étalonnée », « étalonnage »'
+  - check_id: re-arret-seuil-fenetre-action
+    kind: deterministic
+    weight: 8
+    result: fail
+    detail: 'regex_all : 1/2 motif(s) trouvé(s) ; manquant(s) : `(?:pendant|durant|sur|au-?del[àa]\s+de)\s+(?:plus\s+de\s+)?\d+\s*(?:minutes?|min\b|secondes?|s\b|h\b|heures?)|\d+\s*(?:minutes?|min\b|heures?|h\b|relev[ée]s|mesures?)\s*(?:cons[ée]cutiv\w+|glissant\w*|d''affil[ée]e)|en\s+moins\s+de\s+\d+\s*(?:minutes?|min\b|secondes?)|moyenne\s+glissante|fen[êe]tre\s+(?:de\s+)?(?:mesure|glissante|d''observation)`'
+  - check_id: plan-de-reprise-borne
+    kind: judged
+    weight: 8
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: silence-du-comparateur-non-probant
+    kind: judged
+    weight: 8
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: maintien-manuel-arbitre
+    kind: judged
+    weight: 6
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 1
+    failed: 3
+    not_run: 0
+    weighted_score: 8
+    weighted_max: 32
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 3
+    weighted_score: 0
+    weighted_max: 22
+  failure_modes_triggered: []
+  scored_at: '2026-08-08T19:01:15Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 3 contrôle(s) déterministe(s) en échec (poids 8/32) ; candidat de préférence
+    : verdict déterministe complet ; une paire n''existe que si un second essai réel du même scénario
+    existe ; 3 contrôle(s) jugé(s) non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- 'Le document d''autorité est un CANDIDAT non activé, pas le canon : master.yaml reste l''autorité opérationnelle
+  et l''activation appartient à l''émetteur désigné.'
+- 'Les additions du candidat ont été choisies après avoir vu les résultats d''une campagne antérieure
+  : l''écart D−C mesuré sur les scénarios déjà joués est contaminé, seul celui mesuré sur des scénarios
+  rédigés sans connaissance du candidat est recevable.'

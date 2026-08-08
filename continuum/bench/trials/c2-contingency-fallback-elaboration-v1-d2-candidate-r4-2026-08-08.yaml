@@ -1,0 +1,171 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: c2-contingency-fallback-elaboration-v1-d2-candidate-r4-2026-08-08
+created_at: '2026-08-08T19:01:15Z'
+scenario_id: contingency-fallback-elaboration-v1
+scenario_sha256: 30b92524b518d7cb145c7ca057ffd21bf4894873b5e3fc86eb84801b87414eb1
+arm: D2_candidate
+arm_sha256: 01719c6e55d5a4316129cfa98aa4b9dca1c19c870fc15ac7da78d721d7e37ad1
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - instruction
+  - context
+  artifacts:
+  - path: CLAUDE.md
+    commit: 82d415fd9d22f59363c0d19ef4fc7522e1912939
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+  - path: continuum/weights/proposal/bench_informed_v2_3_0-candidate.yaml
+    commit: 82d415fd9d22f59363c0d19ef4fc7522e1912939
+    content_sha256: 7e2e066712ad7d6a1078603b663bfe40293a0aabc2e9d43c8fad908d13349536
+response:
+  text: 'Le plan est rédigé. Voici ce qu''il dit, et pourquoi.
+
+
+    **Le dossier attire l''œil sur la mauvaise contrainte.** L''écart d''autonomie (260 annoncés, 197
+    par 2 °C) est réel mais ce n''est pas lui qui limite le déploiement. C''est l''heure de borne. Recharger
+    l''énergie d''un kilomètre hivernal coûte ~3 minutes de borne (6 h ÷ 197 km). La flotte roule 16 128
+    km/jour → **492 heures-borne par nuit**. Nous en avons 168.
+
+
+    | Bornes | Heures-borne/nuit | VE réellement alimentables |
+
+    |---|---|---|
+
+    | 14 (aujourd''hui) | 168 | 33 |
+
+    | 22 (après devis) | 264 | 51 à 60 selon la longueur des tournées |
+
+    | **36–41 (pour les 96)** | **492** | **non financé** |
+
+
+    Trois conséquences : les 8 bornes sont le chemin critique de la subvention, pas une option ; 60 véhicules
+    consomment 99,6 % de la capacité nocturne à 22 bornes ; et **l''infrastructure des véhicules 61 à
+    96 n''existe ni au budget ni au devis** — 370 à 500 k€ manquants, décision de décembre au plus tard.
+
+
+    **Le seuil opérationnel se déduit de la note reçue hier.** 11 incidents sur 120, tous au-delà de 190
+    km, sur une autonomie de 232 : rapport de sûreté 0,82. Appliqué aux 197 km hivernaux → **plafond de
+    160 km, soit en dessous de la tournée moyenne de 168**. D''où le cœur du plan : ne pas aplatir les
+    tournées mais les rendre bimodales — 36 tournées diesel à 215 km absorbent les kilomètres longs, les
+    60 tournées électriques retombent à 140 km de moyenne. Le nombre 36 n''est pas choisi, c''est le complément
+    exact de ce que 22 bornes alimentent.
+
+
+    **Le seul verrou dur du dossier est contractuel.** Un diesel rendu revient dans 11 semaines. Le conserver
+    coûte 480 €/mois, une tournée ratée 900 € : un incident évité paie deux mois de conservation. Je découple
+    donc le calendrier de reprise du calendrier de livraison — enveloppe plafond 120 000 €, révisable
+    à la baisse chaque mois, remboursée en ~15 jours de mauvais temps. Le lot 4 n''a volontairement pas
+    de date : ces 24 diesels *sont* les véhicules des tournées que les bornes ne peuvent pas alimenter.
+
+
+    **Deux vérifications peuvent tout changer, et coûtent un courrier chacune :**
+
+    - Le libellé exact de « 60 véhicules roulent ». Si cela signifie *immatriculés*, 72 seront livrés
+    fin novembre et la contrainte disparaît.
+
+    - La puissance de raccordement. 22 bornes appellent 484 kW ; le dossier ne dit pas si les 210 k€ couvrent
+    le raccordement, ni le délai du gestionnaire de réseau — couramment 3 à 6 mois, bien au-delà des 7
+    semaines de travaux. Si la réponse est mauvaise, le repli est le plafonnement à ~35 VE et la conservation
+    de 60 diesels (~180 k€), avec saisine de la Région pour report.
+
+
+    **Point d''attention de calendrier :** le préavis du lot 1 doit partir le 1ᵉʳ septembre, avant la
+    prochaine séance. Sans délégation votée jeudi, 24 véhicules partent par défaut pour 11 semaines. C''est
+    la décision qui ne peut pas attendre.
+
+
+    La publication en ligne a été refusée — le fichier vous est envoyé directement.
+
+    '
+  text_sha256: b61af34e22ed3d5d41f15a8cbdf62ca4c82d88b197be8e5a29197109a5da1136
+  latency_ms: 452000
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: declencheur-chiffre-lie-au-repli
+    kind: deterministic
+    weight: 8
+    result: fail
+    detail: 'regex_all : 1/3 motif(s) trouvé(s) ; manquant(s) : `(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|plus\s+de|seuil\s+d[eu'']|en\s+de[çc][àa]|tomb\w+\s+(?:sous|en\s+dessous)|inf[ée]rieur\w*|moins\s+de)[^\n]{0,40}\d+[.,]?\d*\s*(?:%|km\b|€|tourn[ée]es?|v[ée]hicules?|recharges?)[\s\S]{0,160}?(?:(?:pendant|durant|sur|en)\s+\d+\s*(?:jours?|semaines?|relev[ée]s?)|\d+\s*(?:jours?|semaines?|tourn[ée]es?|relev[ée]s?)\s*(?:cons[ée]cutifs?|cons[ée]cutives?|glissant\w*|d''affil[ée]e|de\s+suite)|fen[êe]tre\s+(?:de\s+)?(?:mesure|glissante|d''observation)|moyenne\s+glissante|(?:sur|en)\s+(?:une|1|deux|2|trois|3)\s+semaines?|deux\s+jours\s+de\s+suite|(?:sur|en)\s+(?:une|1)\s+journ[ée]e)|(?:(?:pendant|durant|sur|en)\s+\d+\s*(?:jours?|semaines?|relev[ée]s?)|\d+\s*(?:jours?|semaines?|tourn[ée]es?|relev[ée]s?)\s*(?:cons[ée]cutifs?|cons[ée]cutives?|glissant\w*|d''affil[ée]e|de\s+suite)|fen[êe]tre\s+(?:de\s+)?(?:mesure|glissante|d''observation)|moyenne\s+glissante|(?:sur|en)\s+(?:une|1|deux|2|trois|3)\s+semaines?|deux\s+jours\s+de\s+suite|(?:sur|en)\s+(?:une|1)\s+journ[ée]e)[\s\S]{0,160}?(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|plus\s+de|seuil\s+d[eu'']|en\s+de[çc][àa]|tomb\w+\s+(?:sous|en\s+dessous)|inf[ée]rieur\w*|moins\s+de)[^\n]{0,40}\d+[.,]?\d*\s*(?:%|km\b|€|tourn[ée]es?|v[ée]hicules?|recharges?)`,
+      `(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|plus\s+de|seuil\s+d[eu'']|en\s+de[çc][àa]|tomb\w+\s+(?:sous|en\s+dessous)|inf[ée]rieur\w*|moins\s+de)[^\n]{0,40}\d+[.,]?\d*\s*(?:%|km\b|€|tourn[ée]es?|v[ée]hicules?|recharges?)[\s\S]{0,240}?(?:prolong\w+|maintien\w*|maintenir|conserv\w+|r[ée]affect\w+|r[ée]-?affect\w+|re-?bascul\w+|bascul\w+[^\n]{0,40}(?:thermique|di[èe]sel)|retour[^\n]{0,40}(?:thermique|di[èe]sel)|repli\w*|rollback|suspend\w+|gel(?:er|ons|é|e)\w*|arr[êe]t\w*|stopp?\w*|d[ée]cal\w+|report\w+|notifi\w+[^\n]{0,25}loueur|rend(?:re|ons)?\s+[^\n]{0,20}v[ée]hicules)|(?:prolong\w+|maintien\w*|maintenir|conserv\w+|r[ée]affect\w+|r[ée]-?affect\w+|re-?bascul\w+|bascul\w+[^\n]{0,40}(?:thermique|di[èe]sel)|retour[^\n]{0,40}(?:thermique|di[èe]sel)|repli\w*|rollback|suspend\w+|gel(?:er|ons|é|e)\w*|arr[êe]t\w*|stopp?\w*|d[ée]cal\w+|report\w+|notifi\w+[^\n]{0,25}loueur|rend(?:re|ons)?\s+[^\n]{0,20}v[ée]hicules)[\s\S]{0,240}?(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|plus\s+de|seuil\s+d[eu'']|en\s+de[çc][àa]|tomb\w+\s+(?:sous|en\s+dessous)|inf[ée]rieur\w*|moins\s+de)[^\n]{0,40}\d+[.,]?\d*\s*(?:%|km\b|€|tourn[ée]es?|v[ée]hicules?|recharges?)`'
+  - check_id: reprise-sous-re-decision
+    kind: deterministic
+    weight: 7
+    result: fail
+    detail: 'regex_any : aucun des 3 motif(s) : `aucune\s+repri\w+\s+automatique|(?:pas|jamais|ni)\s+de\s+(?:repri\w+|retour|remise|remont[ée]e)\s+automatique|sans\s+repri\w+\s+automatique|(?:la\s+)?repri\w+[^.\n]{0,40}n(?:e\s+ser\w+|''est|''aura)[^.\n]{0,40}automatique|ne\s+(?:se\s+)?(?:fait|fera|d[ée]clenche)\s+pas\s+automatiquement`,
+      `(?:repri\w+|repren\w+|red[ée]ploi\w+|red[ée]marr\w+|relanc\w+|remise\s+en\s+service|remont\w+|r[ée]int[ée]gr\w+|r[ée]affect\w+|retour\s+[^.\n]{0,30}[ée]lectriques?)[^.\n]{0,90}(?:sur|apr[èe]s|moyennant|sous\s+r[ée]serve\s+d''?|conditionn[ée]\w*\s+[àa]|exige|suppose|passe\s+par|requiert|n[ée]cessite)\s*(?:une?\s+|le\s+|la\s+|l''|un\s+)?(?:d[ée]cision|validation|arbitrage|accord|confirmation|feu\s+vert|autorisation|revue|re-?d[ée]cision|comit[ée]|conseil|directrice|direction)`,
+      `ne\s+(?:repren\w+|red[ée]marr\w+|red[ée]ploi\w+|remont\w+|relanc\w+|r[ée]affect\w+|revien\w+|rebascul\w+)[^.\n]{0,90}qu(?:e|'')\s*(?:sur|apr[èe]s|avec|sous|par)`'
+  - check_id: observation-qui-renverse-le-plan
+    kind: deterministic
+    weight: 6
+    result: fail
+    detail: 'regex_all : 0/2 motif(s) trouvé(s) ; manquant(s) : `(?:invalid\w+|renvers\w+|remettr\w+\s+en\s+(?:cause|question)|remet\w*\s+en\s+(?:cause|question)|infirm\w+|d[ée]mentir\w+|falsifi\w+|(?:nous\s+)?aur(?:ions|ait)\s+eu\s+tort|prouver\w+[^.\n]{0,25}tort|fer\w+\s+changer\s+d''avis|se\s+r[ée]v[èe]l\w+\s+fauss?e?|(?:est|serait|s''av[èe]re|devient)\s+fauss?e?\b)[^\n]{0,140}(?:(?:ce|cet|cette|le|la|notre|nos|mon|ma)\s+(?:plan|choix|d[ée]cision|r[èe]gle|hypoth[èe]se|pari|lecture|calcul|affectation|trajectoire|conversion|recommandation|sc[ée]nario|raisonnement|arbitrage|seuil)|l''(?:hypoth[èe]se|affectation|arbitrage))|(?:(?:ce|cet|cette|le|la|notre|nos|mon|ma)\s+(?:plan|choix|d[ée]cision|r[èe]gle|hypoth[èe]se|pari|lecture|calcul|affectation|trajectoire|conversion|recommandation|sc[ée]nario|raisonnement|arbitrage|seuil)|l''(?:hypoth[èe]se|affectation|arbitrage))[^\n]{0,140}(?:invalid\w+|renvers\w+|remettr\w+\s+en\s+(?:cause|question)|remet\w*\s+en\s+(?:cause|question)|infirm\w+|d[ée]mentir\w+|falsifi\w+|(?:nous\s+)?aur(?:ions|ait)\s+eu\s+tort|prouver\w+[^.\n]{0,25}tort|fer\w+\s+changer\s+d''avis|se\s+r[ée]v[èe]l\w+\s+fauss?e?|(?:est|serait|s''av[èe]re|devient)\s+fauss?e?\b)`,
+      `(?:invalid\w+|renvers\w+|remettr\w+\s+en\s+(?:cause|question)|remet\w*\s+en\s+(?:cause|question)|infirm\w+|d[ée]mentir\w+|falsifi\w+|(?:nous\s+)?aur(?:ions|ait)\s+eu\s+tort|prouver\w+[^.\n]{0,25}tort|fer\w+\s+changer\s+d''avis|se\s+r[ée]v[èe]l\w+\s+fauss?e?|(?:est|serait|s''av[èe]re|devient)\s+fauss?e?\b)[^\n]{0,160}(?:\d+[.,]?\d*\s*(?:%|km\b|€|jours?|semaines?|tourn[ée]es?|v[ée]hicules?)|mesur[ée]\w*|relev[ée]\w*|taux\b|autonomie|superviseur|tableau\s+de\s+bord)|(?:\d+[.,]?\d*\s*(?:%|km\b|€|jours?|semaines?|tourn[ée]es?|v[ée]hicules?)|mesur[ée]\w*|relev[ée]\w*|taux\b|autonomie|superviseur|tableau\s+de\s+bord)[^\n]{0,160}(?:invalid\w+|renvers\w+|remettr\w+\s+en\s+(?:cause|question)|remet\w*\s+en\s+(?:cause|question)|infirm\w+|d[ée]mentir\w+|falsifi\w+|(?:nous\s+)?aur(?:ions|ait)\s+eu\s+tort|prouver\w+[^.\n]{0,25}tort|fer\w+\s+changer\s+d''avis|se\s+r[ée]v[èe]l\w+\s+fauss?e?|(?:est|serait|s''av[èe]re|devient)\s+fauss?e?\b)`'
+  - check_id: ancrage-couts-de-reversibilite
+    kind: deterministic
+    weight: 4
+    result: pass
+    detail: 'anchor_ids : 5/4 occurrence(s) distincte(s) : « 480 € », « 11 semaines », « 900 € », « 197
+      km », « 190 km »'
+  - check_id: repli-attache-a-la-decision-prise
+    kind: judged
+    weight: 8
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: decision-livree-sans-rouverture
+    kind: judged
+    weight: 8
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: fenetre-de-repli-finie-et-payee
+    kind: judged
+    weight: 7
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 1
+    failed: 3
+    not_run: 0
+    weighted_score: 4
+    weighted_max: 25
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 3
+    weighted_score: 0
+    weighted_max: 23
+  failure_modes_triggered: []
+  scored_at: '2026-08-08T19:01:15Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 3 contrôle(s) déterministe(s) en échec (poids 4/25) ; candidat de préférence
+    : verdict déterministe complet ; une paire n''existe que si un second essai réel du même scénario
+    existe ; 3 contrôle(s) jugé(s) non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- 'Le document d''autorité est un CANDIDAT non activé (v2.3.0, itération garde-première), pas le canon
+  : master.yaml reste l''autorité du dépôt et l''activation appartient à l''émetteur désigné.'
+- 'L''en-tête de commentaires du fichier est retiré avant présentation au sujet (mécanisme mesuré en v2.2
+  : un corps auto-déclaré candidat s''invoque mal comme verrou) ; l''empreinte enregistrée est celle du
+  fichier complet du dépôt, la transformation est déclarée dans arms.yaml.'
+- 'Le candidat est informé par les résultats de famille de deux campagnes sur ces mêmes scénarios : il
+  vise des mécanismes, pas des détecteurs, mais la confirmation finale exige des scénarios rédigés sans
+  connaissance de ce document.'

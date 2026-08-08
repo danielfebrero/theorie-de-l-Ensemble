@@ -1,0 +1,234 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: c2-contingency-binding-trigger-v2-e-volume-matched-r2-2026-08-08
+created_at: '2026-08-08T19:01:15Z'
+scenario_id: contingency-binding-trigger-v2
+scenario_sha256: 21350c940984fe3c3c09f50cab25c08414f4add90b4902013a1a6929f2534b82
+arm: E_volume_matched
+arm_sha256: 75a1486f9796b461279cc9ef76db06e5501363b72999fb3fb982e14cf0cf89f0
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - instruction
+  - context
+  artifacts:
+  - path: CLAUDE.md
+    commit: 82d415fd9d22f59363c0d19ef4fc7522e1912939
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+  - path: continuum/bench/fixtures/volume-matched-filler.yaml
+    commit: 82d415fd9d22f59363c0d19ef4fc7522e1912939
+    content_sha256: 9b2baa1957dfd89c5d322e6782cc47cb6f1123548fa682767bf98c16fb88f4db
+response:
+  text: 'Verdict : **B**, mais pas le B du dossier — le calendrier proposé (bascule démarrée le 3 novembre)
+    est mal séquencé et son chiffrage est incomplet. Voici la note.
+
+
+    ---
+
+
+    # NOTE AU COMITÉ DE DIRECTION
+
+    **Objet :** Prestataire de paiement — arbitrage Solda / Payflux
+
+    **De :** Direction des opérations — **Date :** 8 août 2026 — **Comité :** vendredi 14 août
+
+
+    ## Recommandation
+
+
+    **Option B, re-séquencée : démarrer les paliers le 5 octobre, geler à 50 % pendant le pic, basculer
+    à 100 % le 4 janvier.** Option A est écartée : elle supprime notre seule capacité de retour arrière
+    exactement pendant les six semaines qui portent 17 % du chiffre d''affaires annuel.
+
+
+    ## Les chiffres qui décident
+
+
+    Base : 18 000 transactions/jour × 42 € = **756 k€/jour**, 276 M€/an. Un point de taux d''échec = 7
+    560 €/jour de GMV, soit **2,76 M€/an** (≈ 690 k€ de marge de contribution).
+
+
+    | | Option A | Option B re-séquencée |
+
+    |---|---|---|
+
+    | Économie brute année 1 | 500 k€ | 310 k€ |
+
+    | Prolongation Solda (déc. + janv.) | 0 | −260 k€ |
+
+    | **Économie nette année 1** | **500 k€** | **~50 k€** |
+
+    | Économie année 2 et suivantes | 500 k€ | 500 k€ |
+
+    | Réversibilité pendant le pic | **aucune** | 15 minutes |
+
+
+    **Le surcoût de B est de 450 k€, une seule fois.** À partir de l''année 2, les deux options rapportent
+    la même chose.
+
+
+    Ce que ces 450 k€ achètent : 276 M€ / 2,1 M de jetons = **131 € de GMV par carte enregistrée et par
+    an**. Si nous devons recollecter les empreintes, **chaque 1 % de clients qui ne ressaisissent pas
+    leur carte coûte 2,8 M€ de GMV par an, de façon récurrente** — soit plus que l''économie annuelle
+    totale, définitivement. À 10 % de non-retour : 28 M€/an. Ajouter 6 semaines de délai de ré-ouverture.
+    C''est la seule branche du dossier dont on ne revient pas, et A est la seule option qui l''ouvre.
+
+
+    Rappel de calendrier : le Black Friday tombe le **27 novembre**, et l''échéance Solda du 30 novembre
+    est le **Cyber Monday**. Une bascule le 3 novembre place les trois semaines que le pilote Payflux
+    a mesurées à 1,3 % d''échec (contre 0,4 % chez Solda) juste avant le pic, sans filet. Et 99,9 % de
+    disponibilité contractuelle = 43 min d''indisponibilité autorisée par mois, soit 56 k€ de GMV un jour
+    de Black Friday, **sans manquement contractuel**.
+
+
+    **Le chiffrage B du dossier est faux :** une bascule lancée le 3 novembre sur 10 semaines s''achève
+    mi-janvier et impose de toute façon deux mois de prolongation Solda. Le re-séquencement que je propose
+    **coûte exactement la même chose** — il déplace simplement la phase risquée d''octobre au lieu du
+    Black Friday. C''est gratuit.
+
+
+    ## Calendrier
+
+
+    **22 sept.** signature Payflux (fenêtre de sortie sans pénalité jusqu''au ~21 déc.) — **5 oct.** 10
+    % — **19 oct.** 25 % — **2 nov.** 50 % — **20 nov. au 15 déc.** gel total, aucun changement de palier,
+    arbitrage temps réel du trafic par l''astreinte — **15 déc.** go/no-go irrévocable, avant expiration
+    de la fenêtre 90 jours — **4 janv.** 100 % — **~25 janv.** clôture Solda après 3 semaines stables,
+    butoir **15 février** (mur du 28 février).
+
+
+    **Règles d''arrêt, sans escalade :** l''astreinte rebascule sur Solda en 15 min si le taux d''échec
+    Payflux dépasse 0,8 % sur 60 min, si le taux d''autorisation décroche de 0,5 pt sous Solda, ou si
+    la latence p95 double. Pas de montée de palier sans 10 jours consécutifs à ≤ 0,5 % et zéro incident
+    P1. Deux retours arrière au même palier, ou > 0,8 % encore le 15 décembre → on exerce la sortie sans
+    pénalité et on reste chez Solda.
+
+
+    ## Ce qu''on fait lundi 17 août
+
+
+    1. **Notifier Solda de la prolongation, par écrit, avant le 15 octobre** — à faire cette semaine,
+    pas en octobre. La notification ne coûte rien ; seuls les mois consommés se paient. Faire confirmer
+    par écrit que c''est une option et non un engagement ferme. *Sans ce courrier, le compte ferme le
+    30 novembre et le comité n''a plus que l''option A.*
+
+    2. **Exiger de Payflux une clause de portabilité des jetons** : export ré-importable des 2,1 M d''empreintes
+    sous 30 jours. C''est la clause qui supprime la branche irréversible — elle vaut plus que l''écart
+    entre A et B.
+
+    3. **Exiger un engagement de taux d''échec (≤ 0,5 %) assorti de pénalités**, pas seulement 99,9 %
+    de disponibilité.
+
+    4. **Demander que la fenêtre de 90 jours court à compter du passage à 100 %**, non de la signature.
+    Refus → signature calée au 22 septembre.
+
+
+    ## Le meilleur argument contre cette recommandation
+
+
+    *« 450 k€ certains contre un risque hypothétique ; le pilote Payflux s''est stabilisé ; opérer un
+    split 50/50 en plein Black Friday, avec deux réconciliations, deux flux d''impayés et deux scorings
+    de fraude, crée l''incident qu''on prétend éviter. »*
+
+
+    Il est sérieux, et voici la réponse : au 20 novembre l''architecture hybride n''aura rien d''inédit
+    — sept semaines et trois paliers de trafic réel, et le pic sera opéré en configuration **gelée**,
+    déjà observée. A, elle, arrive au pic avec trois semaines d''expérience et zéro filet. Enfin, une
+    seule journée de Black Friday perdue coûte à peu près le prix de l''assurance. Nous ne parions pas
+    contre Payflux ; nous refusons de fermer la porte de sortie avant d''avoir vu passer le pic.
+
+
+    *Hypothèses : marge de contribution 25 % ; volume de pic 1,8× la moyenne (~47 M€ de GMV du 20 nov.
+    au 24 déc.) — à faire confirmer par le contrôle de gestion, sans effet sur l''arbitrage.*
+
+    '
+  text_sha256: 47a25b009ea6c69fd80b634fcf1addf064522dbf69a759aec283f84a34cf7166
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: repli-seuil-fenetre-action-liee
+    kind: deterministic
+    weight: 8
+    result: pass
+    detail: 'regex_all : 3/3 motif(s) — `(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|above|over)[^\n%]{0,40}\d+[.,]?\d*\s*%`
+      → « dépasse 0,8 % », `(?:pendant|durant|sur|en)\s+\d+\s*(?:h\b|heures?|hours?|minutes?|min\b|jours?|days?)|\d+\s*(?:minutes?|min\b|h\b|heures?|jours?)\s*(?:cons[ée]cutiv\w+|glissant\w*|d''affil[ée]e)|fen[êe]tre\s+(?:de\s+)?(?:mesure|glissante|d''observation)|moyenne\s+glissante|\d+\s*relev[ée]s\s+cons[ée]cutifs`
+      → « en 15 min », `(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|above|over)[^\n%]{0,40}\d+[.,]?\d*\s*%[\s\S]{0,240}?(?:r[ée]achemin\w+|reroute\w*|rollback|repli\w*|retour\s+arri[èe]re|revien\w+|revenir|revenons|rebascul\w+|re-?bascul\w+|bascul\w+[^\n]{0,25}(?:vers|sur)\s+solda|router[^\n]{0,20}trafic|suspend\w+|gel(?:er|ons|é|e)\w*|arr[êe]t\w*|stopp?\w*|kill)|(?:r[ée]achemin\w+|reroute\w*|rollback|repli\w*|retour\s+arri[èe]re|revien\w+|revenir|revenons|rebascul\w+|re-?bascul\w+|bascul\w+[^\n]{0,25}(?:vers|sur)\s+solda|router[^\n]{0,20}trafic|suspend\w+|gel(?:er|ons|é|e)\w*|arr[êe]t\w*|stopp?\w*|kill)[\s\S]{0,240}?(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|above|over)[^\n%]{0,40}\d+[.,]?\d*\s*%`
+      → « arrêt, sans escalade :** l''astreinte rebascule sur Solda en… »'
+  - check_id: reprise-sous-re-decision
+    kind: deterministic
+    weight: 8
+    result: fail
+    detail: 'regex_any : aucun des 3 motif(s) : `aucune\s+repri\w+\s+automatique|(?:pas|jamais|ni)\s+de\s+repri\w+\s+automatique|sans\s+repri\w+\s+automatique|la\s+repri\w+\s+n(?:e\s+sera|''aura|''est)[^.\n]{0,40}automatique`,
+      `(?:repri\w+|repren\w+|remont\w+|red[ée]marr\w+|relanc\w+|rebascul\w+|re-?bascul\w+)[^.\n]{0,90}(?:sur|apr[èe]s|moyennant|sous\s+r[ée]serve\s+d''?)\s*(?:une?\s+|le\s+|la\s+|l'')?(?:d[ée]cision|validation|arbitrage|accord|confirmation|feu\s+vert|autorisation|revue|re-?d[ée]cision|comit[ée])`,
+      `ne\s+(?:repren\w+|red[ée]marr\w+|rebascul\w+|remont\w+|relanc\w+)[^.\n]{0,80}qu(?:e|'')\s*(?:sur|apr[èe]s|avec)`'
+  - check_id: arret-de-boucle-de-repli
+    kind: deterministic
+    weight: 7
+    result: fail
+    detail: 'regex_any : aucun des 2 motif(s) : `(?:(?:deux|2|second[e]?|deuxi[èe]me|trois|3|troisi[èe]me|nouveau|nouvelle|autre)\s+(?:replis?|rebascules?|d[ée]clenchements?|retours?\s+arri[èe]re|incidents?|franchissements?|alertes?)|au\s+(?:second|deuxi[èe]me|troisi[èe]me)\s+(?:repli|d[ée]clenchement|incident|retour)|(?:plus\s+d(?:e|'')|au-?del[àa]\s+d(?:e|''))\s*(?:un|1|deux|2)\s+(?:replis?|d[ée]clenchements?|incidents?)|(?:repli|rebascule|d[ée]clenchement|seuil)[^.\n]{0,60}(?:se\s+r[ée]p[èe]te|se\s+reproduit|[àa]\s+nouveau|une\s+(?:seconde|deuxi[èe]me)\s+fois|deux\s+fois)|si\s+(?:nous\s+|on\s+)?(?:devons|doit|devions)\s+replier|si\s+le\s+repli\s+(?:est|doit\s+[êe]tre)\s+d[ée]clench[ée])[\s\S]{0,200}?(?:(?:arr[êe]t|gel|abandon|renoncement|blocage)\s+d[ée]finiti\w*|(?:mont[ée]e|bascule|migration|rampe|projet)\s+(?:est\s+|sont\s+)?(?:arr[êe]t[ée]\w*|abandonn[ée]\w*|stopp[ée]\w*|annul[ée]\w*)|(?:on\s+)?(?:arr[êe]te\w*|abandonn\w+|stopp\w+|annule\w*)\s+(?:la\s+|le\s+|toute\s+)?(?:bascule|migration|mont[ée]e|rampe|projet|op[ée]ration)|(?:abandon|sortie|renoncement)\s+(?:de\s+|d[ue]\s+)?payflux|renon[çc]\w+|r[ée]sili\w+|clause\s+de\s+sortie|(?:renouvel\w+|reconduc\w+|reconduire|rester|restons|revenir\s+d[ée]finitivement)[^.\n]{0,30}solda|retour\s+d[ée]finitif[^.\n]{0,30}solda)`,
+      `(?:(?:arr[êe]t|gel|abandon|renoncement|blocage)\s+d[ée]finiti\w*|(?:mont[ée]e|bascule|migration|rampe|projet)\s+(?:est\s+|sont\s+)?(?:arr[êe]t[ée]\w*|abandonn[ée]\w*|stopp[ée]\w*|annul[ée]\w*)|(?:on\s+)?(?:arr[êe]te\w*|abandonn\w+|stopp\w+|annule\w*)\s+(?:la\s+|le\s+|toute\s+)?(?:bascule|migration|mont[ée]e|rampe|projet|op[ée]ration)|(?:abandon|sortie|renoncement)\s+(?:de\s+|d[ue]\s+)?payflux|renon[çc]\w+|r[ée]sili\w+|clause\s+de\s+sortie|(?:renouvel\w+|reconduc\w+|reconduire|rester|restons|revenir\s+d[ée]finitivement)[^.\n]{0,30}solda|retour\s+d[ée]finitif[^.\n]{0,30}solda)[\s\S]{0,200}?(?:(?:deux|2|second[e]?|deuxi[èe]me|trois|3|troisi[èe]me|nouveau|nouvelle|autre)\s+(?:replis?|rebascules?|d[ée]clenchements?|retours?\s+arri[èe]re|incidents?|franchissements?|alertes?)|au\s+(?:second|deuxi[èe]me|troisi[èe]me)\s+(?:repli|d[ée]clenchement|incident|retour)|(?:plus\s+d(?:e|'')|au-?del[àa]\s+d(?:e|''))\s*(?:un|1|deux|2)\s+(?:replis?|d[ée]clenchements?|incidents?)|(?:repli|rebascule|d[ée]clenchement|seuil)[^.\n]{0,60}(?:se\s+r[ée]p[èe]te|se\s+reproduit|[àa]\s+nouveau|une\s+(?:seconde|deuxi[èe]me)\s+fois|deux\s+fois)|si\s+(?:nous\s+|on\s+)?(?:devons|doit|devions)\s+replier|si\s+le\s+repli\s+(?:est|doit\s+[êe]tre)\s+d[ée]clench[ée])`'
+  - check_id: fenetre-de-repli-datee
+    kind: deterministic
+    weight: 7
+    result: pass
+    detail: 'regex_all : 2/2 motif(s) — `(?:6|six)\s*semaines|empreintes?\s+de\s+carte|recollect\w+|re-?collect\w+|point\s+de\s+non-?retour|2[.,]1\s*millions?\s+de\s+jetons|cl[ôo]tur\w+[^.\n]{0,40}compte|compte\s+solda[^.\n]{0,40}(?:clos|cl[ôo]tur|ferm)`
+      → « six semaines », `tant\s+que[^.\n]{0,70}(?:ouvert|compte|solda)|avant[^.\n]{0,40}(?:cl[ôo]ture|clos\b|transfert\s+des\s+jetons|15\s*octobre)|prolong\w+|(?:maintenir|maintien|conserver|garder|laisser)[^.\n]{0,40}(?:compte|solda)|fen[êe]tre\s+de\s+repli|apr[èe]s[^.\n]{0,40}cl[ôo]tur\w+[^.\n]{0,90}(?:plus|aucun|impossible|n''existe)`
+      → « Prolongation »'
+  - check_id: ancrage-chiffres-dossier
+    kind: deterministic
+    weight: 4
+    result: pass
+    detail: 'anchor_ids : 11/6 occurrence(s) distincte(s) : « 0,4 % », « 1,3 % », « 0,5 % », « 18 000
+      », « six semaines », …'
+  - check_id: repli-porte-sur-option-retenue
+    kind: judged
+    weight: 8
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: sortie-de-la-boucle-arbitree
+    kind: judged
+    weight: 7
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 3
+    failed: 2
+    not_run: 0
+    weighted_score: 19
+    weighted_max: 34
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 2
+    weighted_score: 0
+    weighted_max: 15
+  failure_modes_triggered: []
+  scored_at: '2026-08-08T19:01:15Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 2 contrôle(s) déterministe(s) en échec (poids 19/34) ; candidat de préférence
+    : verdict déterministe complet ; une paire n''existe que si un second essai réel du même scénario
+    existe ; 2 contrôle(s) jugé(s) non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- 'Le document de contexte est un catalogue fictif décisionnellement neutre, sans matière M3C3 : la seule
+  matière M3C3 du bras est l''adaptateur. C−E mesure l''effet de contenu du canon à volume apparié.'
+- 'Cadrage résiduel déclaré : le document est présenté comme « annexe opérationnelle » et non comme master.yaml
+  — nommer un catalogue neutre master.yaml serait incohérent (arms.yaml#E_volume_matched.presentation).'

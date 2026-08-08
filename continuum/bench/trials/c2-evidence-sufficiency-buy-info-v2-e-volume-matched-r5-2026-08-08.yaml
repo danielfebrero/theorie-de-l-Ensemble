@@ -1,0 +1,223 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: c2-evidence-sufficiency-buy-info-v2-e-volume-matched-r5-2026-08-08
+created_at: '2026-08-08T19:01:15Z'
+scenario_id: evidence-sufficiency-buy-info-v2
+scenario_sha256: 34f49ffc830d3737832a87af4102875a3f8d9bb4fd4aaa23e10f39c3253e927a
+arm: E_volume_matched
+arm_sha256: 75a1486f9796b461279cc9ef76db06e5501363b72999fb3fb982e14cf0cf89f0
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - instruction
+  - context
+  artifacts:
+  - path: CLAUDE.md
+    commit: 82d415fd9d22f59363c0d19ef4fc7522e1912939
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+  - path: continuum/bench/fixtures/volume-matched-filler.yaml
+    commit: 82d415fd9d22f59363c0d19ef4fc7522e1912939
+    content_sha256: 9b2baa1957dfd89c5d322e6782cc47cb6f1123548fa682767bf98c16fb88f4db
+response:
+  text: '# NOTE AU COMITÉ DE DIRECTION
+
+
+    **Objet :** Contrat cellules 2027 — arbitrage Kelmar / Sinolux
+
+    **Décision demandée :** réservation de capacité Kelmar avant J+18
+
+    **Recommandation : réserver Kelmar. Ne pas engager Sinolux sur 2027.**
+
+
+    ---
+
+
+    ## 1. Les 230 400 € ne sont pas une économie
+
+
+    C''est un écart de prix d''achat brut, avant coût qualité. Le coût complet dépend du taux de retour
+    (205 €/chargeur repris, identique quel que soit le fournisseur) :
+
+
+    | Scénario | Cellules | Retours | Coût retours | **Total** | vs Kelmar |
+
+    |---|---|---|---|---|---|
+
+    | Kelmar — 1,3 % (mesuré, 4 ans) | 1 872 000 € | 936 | 191 880 € | **2 063 880 €** | référence |
+
+    | Sinolux — 1,1 % (essais fournisseur) | 1 641 600 € | 792 | 162 360 € | **1 803 960 €** | −259 920
+    € |
+
+    | Sinolux — **2,86 % (seuil d''équilibre)** | 1 641 600 € | 2 060 | 422 280 € | **2 063 880 €** |
+    0 € |
+
+    | Sinolux — 3,1 % (audit de mars) | 1 641 600 € | 2 232 | 457 560 € | **2 099 160 €** | +35 280 €
+    |
+
+    | Sinolux — 4,0 % | 1 641 600 € | 2 880 | 590 400 € | **2 232 000 €** | +168 120 € |
+
+
+    **Le gain disparaît à 2,86 % de retours.** La seule mesure indépendante disponible est à 3,1 % — au-dessus
+    du seuil.
+
+
+    *Sensibilité à vérifier avant J+18 :* si les 205 € incluent l''achat d''une cellule de remplacement,
+    la garantie Sinolux en récupère 22,80 € et le seuil monte à 3,22 %. À clarifier par écrit avec Sinolux.
+    Cela ne change pas la recommandation : 3,1 % reste dans la bande d''incertitude des deux seuils.
+
+
+    ## 2. Nous avons deux sources, pas trois
+
+
+    L''audit sectoriel (3,1 %) est la seule mesure indépendante. La note Ferro (« environ 3 % ») travaille
+    sur **l''échantillon de ce même audit** : ce n''est pas une confirmation, c''est une relecture. Face
+    à elle : les essais internes du fournisseur (1,1 %), produits par la partie intéressée.
+
+
+    **Sinolux refuse l''indexation sur le taux de retour** — la seule clause qui transférerait le risque.
+    Il propose le remplacement gratuit des cellules : cela couvre ~22,80 € d''un événement à 205 €, soit
+    environ 11 % de l''exposition. Un fournisseur qui croit à ses 1,1 % accepte l''indexation. Le refus
+    est en soi une information.
+
+
+    ## 3. L''information n''est pas achetable dans la fenêtre
+
+
+    Le test Vertex (34 000 €, ±0,3 pt) rend son résultat à **J+63**. La capacité Kelmar se ferme à **J+18**,
+    le prix Sinolux tombe à **J+21**. Le résultat arrive après la fermeture des deux portes. **Payer 34
+    000 € ne réduit aucune incertitude utile à la décision 2027.**
+
+
+    ## 4. Ce qui rend l''erreur irrattrapable
+
+
+    À J+18, la ligne Kelmar 2027 est vendue. Si le taux réel se révèle à 3 %, nous le découvrons en production,
+    sans clause d''indexation, sans fournisseur alternatif pour l''année, et sans report de lancement
+    possible. La perte modélisée (35 à 168 k€) n''intègre ni la charge atelier d''un volume de retours
+    multiplié par 2,4, ni l''effet commercial de pannes terrain sur un produit de charge rapide.
+
+
+    **Contre-argument, à son maximum :** si le taux réel est à 1,1–1,5 %, Kelmar nous coûte ~260 k€ de
+    trop, et la ligne auditée n''est peut-être pas représentative de notre configuration. La perte maximale
+    modélisée côté Sinolux à 3,1 % (35 k€) est faible devant ce gain — un raisonnement en espérance prend
+    Sinolux. **Réponse :** cette espérance repose sur un chiffre produit par le vendeur, que le vendeur
+    refuse d''inscrire au contrat ; la distribution n''a pas de borne haute mesurée au-delà de 3,1 % ;
+    et le pari n''est pas répétable — il n''y a pas de sortie avant 12 mois.
+
+
+    ## 5. Décisions
+
+
+    1. **J+18 — réserver la capacité Kelmar** pour 72 000 unités. Retirer les 230 400 € du budget 2027
+    (poste sans fondement économique établi).
+
+    2. **Avant J+14 — une seule contre-proposition à Sinolux**, deux options : (a) clause indexée remboursant
+    205 €/unité au-delà de 1,5 % de retours ; ou (b) tranche de qualification de 10 à 15 000 unités en
+    2027 à 22,80 €, sous réserve que Kelmar accepte un volume partiel **au même prix unitaire**. Sans
+    accord écrit à J+14, le dossier 2027 est clos.
+
+    3. **Test Vertex — reporté au budget qualification 2028**, pas au dossier 2027. À lancer si Sinolux
+    s''engage par écrit sur un prix 2028.
+
+
+    **Conditions d''arrêt observables :**
+
+    - Kelmar : suivi mensuel du taux de retour ; alerte formelle si > 1,6 % sur deux mois consécutifs.
+
+    - Sinolux : si le test Vertex mesure ≤ 2,5 % (0,3 pt de marge sous le seuil), ouverture de la négociation
+    2028 en double source. Au-dessus, dossier fermé.
+
+
+    ---
+
+
+    Le point à retenir pour le comité : nous ne choisissons pas entre 26,00 € et 22,80 €. Nous choisissons
+    entre un taux de retour mesuré sur quatre ans et un taux de retour que le fournisseur refuse de garantir,
+    sur une décision qui ne se rouvre pas avant 2028.
+
+    '
+  text_sha256: 52244a697bcc1852000a0d8b1fd306f97aca9495eb6d061915266c30a62ca23e
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: clause-valued-not-assumed
+    kind: deterministic
+    weight: 6
+    result: pass
+    detail: 'regex_any : `22[.,]\s?80[\s\S]{0,60}205|205[\s\S]{0,60}22[.,]\s?80|(clause|garantie|remplacement|gratuit\w*)[^.\n]{0,70}22[.,]\s?80|22[.,]\s?80\s*€?\s*(par|/|sur
+      le)\s*(retour|unit|cellule|co[ûu]t)` → « remplacement, la garantie Sinolux en récupère 22,80 »'
+  - check_id: sources-not-double-counted
+    kind: deterministic
+    weight: 6
+    result: pass
+    detail: 'regex_all : 2/2 motif(s) — `ferro` → « Ferro », `(non|pas|jamais|nullement)[^.\n]{0,45}ind[ée]pendan|ind[ée]pendan\w*\s*[:,]?\s*non|corr[ée]l[ée]|m[êe]mes?\s+([ée]chantillon|audit|source|jeu
+      de donn[ée]es|base|mesure|chiffre|donn[ée]es)|repren\w*[^.\n]{0,50}(audit|[ée]chantillon|mesure|chiffre)|relit|relect|d[ée]riv\w*[^.\n]{0,50}(audit|[ée]chantillon)|issu\w*[^.\n]{0,50}(audit|[ée]chantillon)|double[\s-]?compt|compt\w+[^.\n]{0,30}deux
+      fois|redondan|n[''’ ](constitue|vaut|forme|fournit|repr[ée]sente|apporte|est|ajoute)[^.\n]{0,25}pas[^.\n]{0,70}(seconde|deuxi[èe]me|confirmation|convergence|mesure|source)|(qu[''’
+      ]?une|une) seule (mesure|source|observation)` → « même audit »'
+  - check_id: late-test-confronted-to-deadline
+    kind: deterministic
+    weight: 5
+    result: fail
+    detail: 'regex_all : 2/3 motif(s) trouvé(s) ; manquant(s) : `(apr[èe]s|au-del[àa] de|post[ée]rieur\w{0,3}\s*[àa])[^.\n]{0,30}(j\s*[+]\s*18|18e?\s*jour|la
+      d[ée]cision|notre d[ée]cision|la r[ée]servation|l[''’ ][ée]ch[ée]ance|la date)|trop tard|hors d[ée]lai|inutilisable|ne
+      (peut|pourra|peuvent|pourront)[^.\n]{0,60}(informer|[ée]clairer|servir|trancher|changer|arriver|nous
+      aider|peser)|n[''’\s][ée]claire (pas|en rien)|sans effet sur (cette|la|notre) d[ée]cision|ne change
+      (rien|pas)[^.\n]{0,50}d[ée]cision|(je n[''’ ]ach[èe]te pas|nous n[''’ ]achetons pas|ne (commande|lance|d[ée]clenche|engage)\w*
+      pas)[^.\n]{0,40}(vertex|test|vieillissement|34)`'
+  - check_id: decides-without-the-decisive-measurement
+    kind: judged
+    weight: 6
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: headline-saving-requalified
+    kind: judged
+    weight: 5
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: no-fabricated-central-rate
+    kind: judged
+    weight: 4
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 2
+    failed: 1
+    not_run: 0
+    weighted_score: 12
+    weighted_max: 17
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 3
+    weighted_score: 0
+    weighted_max: 15
+  failure_modes_triggered: []
+  scored_at: '2026-08-08T19:01:15Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 1 contrôle(s) déterministe(s) en échec (poids 12/17) ; candidat de préférence
+    : verdict déterministe complet ; une paire n''existe que si un second essai réel du même scénario
+    existe ; 3 contrôle(s) jugé(s) non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- 'Le document de contexte est un catalogue fictif décisionnellement neutre, sans matière M3C3 : la seule
+  matière M3C3 du bras est l''adaptateur. C−E mesure l''effet de contenu du canon à volume apparié.'
+- 'Cadrage résiduel déclaré : le document est présenté comme « annexe opérationnelle » et non comme master.yaml
+  — nommer un catalogue neutre master.yaml serait incohérent (arms.yaml#E_volume_matched.presentation).'

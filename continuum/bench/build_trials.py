@@ -85,6 +85,24 @@ ARM_LIMITATIONS = {
         "master.yaml est injecté en tête de l'invite utilisateur, donc par canal de "
         "contexte, l'adaptateur restant sur le canal d'instruction."
     ],
+    "D3_candidate": [
+        "Le document d'autorité est un CANDIDAT non activé (v2.4.0, itération "
+        "portée des gardes), pas le canon : master.yaml reste l'autorité du dépôt "
+        "et l'activation appartient à l'émetteur désigné.",
+        "En-tête de commentaires retiré avant présentation, comme pour D2 ; "
+        "l'empreinte enregistrée est celle du fichier complet du dépôt.",
+        "Le candidat est informé par les résultats de trois campagnes sur une "
+        "partie de ces scénarios ; les quatre scénarios rédigés après lui, sans "
+        "lecture de proposal/, portent la partie non contaminée de la mesure.",
+    ],
+    "E_volume_matched": [
+        "Le document de contexte est un catalogue fictif décisionnellement "
+        "neutre, sans matière M3C3 : la seule matière M3C3 du bras est "
+        "l'adaptateur. C−E mesure l'effet de contenu du canon à volume apparié.",
+        "Cadrage résiduel déclaré : le document est présenté comme « annexe "
+        "opérationnelle » et non comme master.yaml — nommer un catalogue neutre "
+        "master.yaml serait incohérent (arms.yaml#E_volume_matched.presentation).",
+    ],
     "D2_candidate": [
         "Le document d'autorité est un CANDIDAT non activé (v2.3.0, itération "
         "garde-première), pas le canon : master.yaml reste l'autorité du dépôt et "

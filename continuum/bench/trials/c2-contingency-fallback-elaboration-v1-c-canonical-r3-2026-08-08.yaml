@@ -1,0 +1,418 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: c2-contingency-fallback-elaboration-v1-c-canonical-r3-2026-08-08
+created_at: '2026-08-08T19:01:15Z'
+scenario_id: contingency-fallback-elaboration-v1
+scenario_sha256: 30b92524b518d7cb145c7ca057ffd21bf4894873b5e3fc86eb84801b87414eb1
+arm: C_canonical
+arm_sha256: 48534ba7fc1107a5db3d4a37e688c9a31100cf650a26c3bb7a08a3cbc28b373c
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - instruction
+  - context
+  artifacts:
+  - path: CLAUDE.md
+    commit: 82d415fd9d22f59363c0d19ef4fc7522e1912939
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+  - path: master.yaml
+    commit: 82d415fd9d22f59363c0d19ef4fc7522e1912939
+    content_sha256: 9e41dcaf156b7cc3a391e4b915c05c474a95c9107a98e781ade304b4196e7d98
+response:
+  text: '# Plan d''exécution — conversion électrique de la flotte
+
+
+    **Pour le conseil du jeudi — direction de l''exploitation**
+
+
+    La conversion est décidée et la commande est ferme. Ce document ne la rediscute pas. Il traite la
+    seule question qui reste ouverte : **dans quel ordre et à quel rythme mettre les 96 véhicules en service
+    sans perdre de tournée ni la subvention.**
+
+
+    ---
+
+
+    ## 1. Le point qui commande tout le calendrier n''est pas l''autonomie — c''est la charge
+
+
+    L''attention du dossier s''est portée sur les 260 km annoncés contre 232 mesurés. C''est un vrai écart,
+    mais il est gérable par l''affectation des tournées (§2). Le point dur est ailleurs, et il n''a pas
+    encore été chiffré devant le conseil.
+
+
+    Une borne de 22 kW délivre une charge complète en 6 h, soit **197 km d''autonomie hivernale mesurée
+    par 6 heures-borne = 32,8 km par heure-borne**. Sur une fenêtre de nuit de 12 h (18 h – 6 h) :
+
+
+    | Parc de bornes | Heures-bornes / nuit | Km rechargeables / nuit (hiver) |
+
+    |---|---|---|
+
+    | 14 bornes (existant) | 168 | 5 510 km |
+
+    | 22 bornes (avec les 8 devisées) | 264 | 8 660 km |
+
+
+    La flotte roule **96 × 168 = 16 128 km par jour**. Couvrir cela en électrique demanderait **492 heures-bornes,
+    soit environ 41 bornes de 22 kW** — pas 22.
+
+
+    **Les 8 bornes devisées sont nécessaires et ne sont pas suffisantes.** Avec 22 bornes, la plateforme
+    alimente environ 52 véhicules moyens par nuit. Les 96 véhicules commandés arriveront ; l''infrastructure
+    prévue en fait rouler un peu plus de la moitié.
+
+
+    *Hypothèses à vérifier sous 10 jours : fenêtre de charge réelle de 12 h, puissance effectivement délivrée
+    simultanément par les 22 bornes (484 kW de pointe — la capacité du raccordement est le point non vérifié
+    le plus lourd du dossier), et durée réelle d''une charge d''exploitation (30 % → 90 %) plutôt que
+    la valeur catalogue 0 → 100 %.*
+
+
+    ---
+
+
+    ## 2. La règle d''affectation résout l''autonomie et la charge d''un seul coup
+
+
+    La note du responsable transport reçue hier est le document le plus décisif du dossier : **11 recharges
+    non prévues sur 120 tournées, toutes au-delà de 190 km.** En dessous de ce seuil, l''essai n''a produit
+    aucun incident.
+
+
+    Règle d''exploitation retenue :
+
+
+    > **Les véhicules électriques prennent les tournées les plus courtes. Les diesels conservés prennent
+    les plus longues. Plafond électrique : 170 km par tournée en saison froide (86 % des 197 km mesurés
+    à 2 °C).**
+
+
+    Effet mécanique : les 60 tournées les plus courtes consomment nettement moins que la moyenne de 168
+    km — estimation ~145 km, soit **≈ 8 700 km/nuit, donc ≈ 265 heures-bornes**. Les 22 bornes y suffisent,
+    tout juste. Les 36 tournées longues restantes (≈ 206 km de moyenne) restent en diesel, où elles ne
+    posent aucun problème.
+
+
+    **Les 60 véhicules de la subvention et le plafond de charge tombent au même endroit. Ce n''est pas
+    une coïncidence exploitable indéfiniment — c''est exactement la marge que nous n''avons pas.**
+
+
+    **Action J+1 :** extraire du superviseur l''histogramme réel des 96 tournées par kilométrage quotidien,
+    par plateforme, sur 12 mois glissants. Ces données existent déjà (remontée toutes les 10 minutes).
+    Cet histogramme remplace l''estimation de 145 km ci-dessus et fige la liste nominative des tournées
+    électrifiables. **Délai : 5 jours ouvrés, coût nul.**
+
+
+    ---
+
+
+    ## 3. Calendrier de mise en service
+
+
+    | Mois | VE livrés (cumul) | Bornes | Plafond de charge | **VE mis en service** | **Diesels conservés**
+    |
+
+    |---|---|---|---|---|---|
+
+    | Septembre | 24 | 14 | 33 | 24 | 72 |
+
+    | Octobre | 48 | 14 → 22 (mi-oct.) | 33 → 52 | 44 | 52 |
+
+    | Novembre | 72 | 22 | 52 | 52 | 44 |
+
+    | Décembre | 96 | 22 | 52 | 52 | 44 |
+
+    | Janvier | 96 | 22 | 60 * | **60** | 36 |
+
+    | Février – mars | 96 | 22 | 60 * | 60 | 36 |
+
+
+    \* Atteindre 60 exige d''élargir la fenêtre de charge à 13–14 h par échelonnement des retours de tournée,
+    ou la première tranche de bornes supplémentaires. **C''est le jalon de la subvention : il ne tient
+    pas sur les 22 bornes seules dans une fenêtre de 12 h.**
+
+
+    Conséquence à énoncer clairement au conseil : **36 véhicules livrés en décembre resteront immobilisés
+    jusqu''à la deuxième tranche d''infrastructure — soit environ 1,16 M€ d''actifs à l''arrêt.** Trois
+    leviers, à instruire en octobre : tranche 2 de bornes AC, quelques points DC 50 kW permettant une
+    recharge intermédiaire de 25 minutes sur les tournées longues, redécoupage des 36 tournées longues
+    (qui porterait le plan de tournées de 96 à ~108 et demanderait des conducteurs supplémentaires).
+
+
+    ---
+
+
+    ## 4. Le diesel : transformer 11 semaines d''irréversibilité en décision mensuelle
+
+
+    C''est le point le plus important du plan, et le moins coûteux.
+
+
+    Un véhicule rendu ne revient pas avant **11 semaines**. Une prolongation coûte **480 € par véhicule
+    et par mois**, avec 30 jours de préavis. Une tournée non terminée coûte **900 €**. Un diesel conservé
+    un mois coûte donc l''équivalent de **0,53 tournée manquée** : il est rentable s''il en évite une
+    tous les deux mois.
+
+
+    Si un lot est rendu et que le modèle d''autonomie hivernale se révèle faux, 24 tournées sont exposées
+    pendant 11 semaines — **de l''ordre de 1,2 M€**. La prolongation généralisée coûte, elle, **environ
+    104 k€** et se dénoue mois par mois.
+
+
+    **Décision : notifier au loueur, vendredi matin, le passage des quatre lots en prolongation mensuelle
+    jusqu''au 31 mars, puis libérer lot par lot au fur et à mesure des preuves.** Le préavis de 30 jours
+    cesse alors d''être un piège : il devient un choix qui se reprend chaque mois.
+
+
+    **Aucun lot n''est rendu tant que la flotte électrique n''a pas tenu 20 jours ouvrés consécutifs à
+    99,5 % de tournées terminées, à la température de saison que ce lot devait couvrir.** En pratique
+    : aucune restitution avant le 1er avril.
+
+
+    Coût de rétention : **≈ 81 k€** si le loueur accepte une granularité au véhicule, **≈ 104 k€** au
+    lot de 24. Budgéter 104 k€.
+
+
+    ---
+
+
+    ## 5. Les quatre décisions demandées jeudi
+
+
+    | # | Décision | Montant | Échéance |
+
+    |---|---|---|---|
+
+    | 1 | **Lettre de prolongation mensuelle des 4 lots diesel** jusqu''au 31 mars | ≈ 104 k€ | **Vendredi
+    matin** — le préavis de 30 jours ne se rattrape pas |
+
+    | 2 | **Ordre de travaux pour les 8 bornes** | 210 k€ (devisé) | Vendredi — 7 semaines de travaux,
+    mise en service mi-octobre |
+
+    | 3 | **Devis tranche 2** (bornes AC complémentaires + 4 points DC 50 kW) et **vérification de la
+    capacité de raccordement** | à chiffrer | Retour au conseil le 15 octobre |
+
+    | 4 | **Demande écrite à la région** de la définition de « roulent » (immatriculés ? mis en service
+    ? ayant effectué une tournée ?) | nul | Vendredi |
+
+
+    La décision 4 mérite une ligne : si « roulent » signifie « immatriculés et mis en circulation », la
+    subvention est acquise par la seule livraison de décembre et sort du chemin critique de la charge.
+    **Une lettre peut valoir 620 000 €.** Elle part vendredi.
+
+
+    **Bilan financier immédiat : 314 k€ engagés contre 620 k€ de subvention sécurisée — net positif de
+    306 k€ avant même de compter les tournées non manquées.**
+
+
+    ---
+
+
+    ## 6. Pilotage — sur le tableau de bord existant, sans outil nouveau
+
+
+    **Quotidien, par plateforme :** taux de tournées terminées en VE · recharges non prévues · nombre
+    de tournées > 170 km affectées à un VE (doit rester à zéro).
+
+
+    **Hebdomadaire :** heures-bornes médianes et P90 par VE et par nuit · taux d''occupation des bornes
+    · courbe consommation / température, constituée dès septembre pour fixer le plafond de janvier sur
+    des mesures et non sur une extrapolation.
+
+
+    **Seuils et replis :**
+
+
+    | Déclencheur observable | Repli |
+
+    |---|---|
+
+    | > 2 recharges non prévues pour 100 tournées VE sur 10 jours glissants | Gel de la montée en charge
+    · redécoupage des tournées concernées · maintien des lots diesel |
+
+    | Occupation des bornes > 85 % cinq nuits consécutives | Gel de la mise en service · tranche 2 escaladée
+    au conseil sous 7 jours |
+
+    | Une tournée VE non terminée pour cause d''autonomie | Revue le jour même · la tournée repasse en
+    diesel jusqu''à redécoupage |
+
+    | Travaux des 8 bornes non démarrés à J+10 ou raccordement insuffisant | Location de capacité de charge
+    temporaire · plafond maintenu à 33 VE |
+
+
+    Aucune reprise automatique après déclenchement : la remise en montée passe par un point explicite
+    en direction d''exploitation.
+
+
+    ---
+
+
+    ## 7. L''objection la plus sérieuse à ce plan
+
+
+    **Elle est celle-ci :** le calcul de charge repose sur les 6 h catalogue, qui correspondent à un 0
+    → 100 %. En exploitation réelle, une charge de 30 % à 90 % à puissance moyenne plus élevée peut prendre
+    3 h 30. Dans ce cas la capacité est sous-estimée de ~40 %, 22 bornes suffisent largement à 60 véhicules,
+    et nous aurons conservé pour ~100 k€ de diesels inutiles tout en freinant la conversion sans raison.
+
+
+    **L''objection est juste, et elle est testable en septembre à coût nul.** Avec 24 véhicules pour 14
+    bornes, septembre est massivement en surcapacité : les remontées d''état de charge toutes les 10 minutes
+    donnent la courbe de charge réelle véhicule par véhicule. **Au 30 septembre, nous connaîtrons les
+    heures-bornes effectives pour 100 km.** Le rythme de mise en service d''octobre sera calé sur cette
+    mesure, pas sur la fiche technique.
+
+
+    Nous restons conservateurs jusque-là parce que l''asymétrie est de l''ordre de dix contre un : se
+    tromper par excès de prudence coûte ~100 k€, réversibles chaque mois ; se tromper par excès de confiance
+    coûte un lot indisponible 11 semaines et met la subvention en jeu.
+
+
+    ---
+
+
+    ## 8. Ce qui renverserait ce plan
+
+
+    - **Septembre mesure moins de 3 h 30 de borne par véhicule et par nuit** → capacité réelle 40 % supérieure
+    au modèle → accélération de la mise en service, libération anticipée des lots diesel, récupération
+    de l''essentiel des 104 k€.
+
+    - **Le taux de tournées terminées en VE passe sous 99 % sur 10 jours glissants** → le modèle d''autonomie
+    est faux → gel immédiat, re-notification des lots.
+
+    - **La région confirme que « roulent » = « immatriculés »** → la charge sort du chemin critique de
+    la subvention et le plan se détend de deux mois.
+
+    - **Le raccordement ne supporte pas 484 kW** → tout le §3 est à refaire ; c''est le seul point qui
+    peut coûter des mois, d''où sa vérification en décision 3.
+
+
+    Point d''honnêteté à ne pas masquer : **aucune mesure n''existe en dessous de 2 °C.** Les 197 km viennent
+    d''un essai de mars. Janvier peut être plus froid. C''est précisément pourquoi 36 diesels sont conservés
+    jusqu''au 31 mars et pourquoi la courbe consommation/température se construit dès septembre.
+
+
+    ---
+
+
+    ## 9. Les équipes
+
+
+    La règle d''affectation donne les tournées longues aux diesels : les conducteurs qui les font garderont
+    le véhicule ancien pendant que leurs collègues passent à l''électrique. Ce sera lu comme un déclassement
+    si nous ne l''expliquons pas. Trois engagements à annoncer en même temps que le plan :
+
+
+    - **Le redécoupage des tournées est construit avec les deux responsables de plateforme, pas transmis.**
+    Ils connaissent les kilométrages réels mieux que le superviseur.
+
+    - **Garantie écrite au conducteur : si l''état de charge affiché ne permet pas la tournée, il prend
+    le diesel, sans justification à fournir et sans pénalité.** Sans cette garantie, les conducteurs prendront
+    des marges silencieuses et le modèle de charge sera faux dès la première semaine froide.
+
+    - **Le passage des 60 véhicules est associé à une prime d''exploitation partagée sur les deux plateformes**,
+    prélevée sur la subvention.
+
+
+    ---
+
+
+    ## Première action
+
+
+    **Vendredi matin, avant 10 h : lettre au loueur portant les quatre lots en prolongation mensuelle
+    jusqu''au 31 mars.** C''est la seule décision de ce plan dont le report d''une semaine ne se rattrape
+    pas, et c''est la moins chère.
+
+
+    Suivent le même jour : ordre de travaux pour les 8 bornes, demande écrite à la région, lancement de
+    l''extraction de l''histogramme des tournées.
+
+    '
+  text_sha256: 986e978fcb3c1fd5dfbe115b360ead1054046e4c84f257ed5ae401544ffe8ff6
+  latency_ms: 274000
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: declencheur-chiffre-lie-au-repli
+    kind: deterministic
+    weight: 8
+    result: pass
+    detail: 'regex_all : 3/3 motif(s) — `(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|plus\s+de|seuil\s+d[eu'']|en\s+de[çc][àa]|tomb\w+\s+(?:sous|en\s+dessous)|inf[ée]rieur\w*|moins\s+de)[^\n]{0,40}\d+[.,]?\d*\s*(?:%|km\b|€|tourn[ée]es?|v[ée]hicules?|recharges?)`
+      → « au-delà de 190 km », `(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|plus\s+de|seuil\s+d[eu'']|en\s+de[çc][àa]|tomb\w+\s+(?:sous|en\s+dessous)|inf[ée]rieur\w*|moins\s+de)[^\n]{0,40}\d+[.,]?\d*\s*(?:%|km\b|€|tourn[ée]es?|v[ée]hicules?|recharges?)[\s\S]{0,160}?(?:(?:pendant|durant|sur|en)\s+\d+\s*(?:jours?|semaines?|relev[ée]s?)|\d+\s*(?:jours?|semaines?|tourn[ée]es?|relev[ée]s?)\s*(?:cons[ée]cutifs?|cons[ée]cutives?|glissant\w*|d''affil[ée]e|de\s+suite)|fen[êe]tre\s+(?:de\s+)?(?:mesure|glissante|d''observation)|moyenne\s+glissante|(?:sur|en)\s+(?:une|1|deux|2|trois|3)\s+semaines?|deux\s+jours\s+de\s+suite|(?:sur|en)\s+(?:une|1)\s+journ[ée]e)|(?:(?:pendant|durant|sur|en)\s+\d+\s*(?:jours?|semaines?|relev[ée]s?)|\d+\s*(?:jours?|semaines?|tourn[ée]es?|relev[ée]s?)\s*(?:cons[ée]cutifs?|cons[ée]cutives?|glissant\w*|d''affil[ée]e|de\s+suite)|fen[êe]tre\s+(?:de\s+)?(?:mesure|glissante|d''observation)|moyenne\s+glissante|(?:sur|en)\s+(?:une|1|deux|2|trois|3)\s+semaines?|deux\s+jours\s+de\s+suite|(?:sur|en)\s+(?:une|1)\s+journ[ée]e)[\s\S]{0,160}?(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|plus\s+de|seuil\s+d[eu'']|en\s+de[çc][àa]|tomb\w+\s+(?:sous|en\s+dessous)|inf[ée]rieur\w*|moins\s+de)[^\n]{0,40}\d+[.,]?\d*\s*(?:%|km\b|€|tourn[ée]es?|v[ée]hicules?|recharges?)`
+      → « > 2 recharges non prévues pour 100 tournées VE sur 10 jours », `(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|plus\s+de|seuil\s+d[eu'']|en\s+de[çc][àa]|tomb\w+\s+(?:sous|en\s+dessous)|inf[ée]rieur\w*|moins\s+de)[^\n]{0,40}\d+[.,]?\d*\s*(?:%|km\b|€|tourn[ée]es?|v[ée]hicules?|recharges?)[\s\S]{0,240}?(?:prolong\w+|maintien\w*|maintenir|conserv\w+|r[ée]affect\w+|r[ée]-?affect\w+|re-?bascul\w+|bascul\w+[^\n]{0,40}(?:thermique|di[èe]sel)|retour[^\n]{0,40}(?:thermique|di[èe]sel)|repli\w*|rollback|suspend\w+|gel(?:er|ons|é|e)\w*|arr[êe]t\w*|stopp?\w*|d[ée]cal\w+|report\w+|notifi\w+[^\n]{0,25}loueur|rend(?:re|ons)?\s+[^\n]{0,20}v[ée]hicules)|(?:prolong\w+|maintien\w*|maintenir|conserv\w+|r[ée]affect\w+|r[ée]-?affect\w+|re-?bascul\w+|bascul\w+[^\n]{0,40}(?:thermique|di[èe]sel)|retour[^\n]{0,40}(?:thermique|di[èe]sel)|repli\w*|rollback|suspend\w+|gel(?:er|ons|é|e)\w*|arr[êe]t\w*|stopp?\w*|d[ée]cal\w+|report\w+|notifi\w+[^\n]{0,25}loueur|rend(?:re|ons)?\s+[^\n]{0,20}v[ée]hicules)[\s\S]{0,240}?(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|plus\s+de|seuil\s+d[eu'']|en\s+de[çc][àa]|tomb\w+\s+(?:sous|en\s+dessous)|inf[ée]rieur\w*|moins\s+de)[^\n]{0,40}\d+[.,]?\d*\s*(?:%|km\b|€|tourn[ée]es?|v[ée]hicules?|recharges?)`
+      → « au-delà de 190 km.** En dessous de ce seuil, l''essai n''a pr… »'
+  - check_id: reprise-sous-re-decision
+    kind: deterministic
+    weight: 7
+    result: pass
+    detail: 'regex_any : `aucune\s+repri\w+\s+automatique|(?:pas|jamais|ni)\s+de\s+(?:repri\w+|retour|remise|remont[ée]e)\s+automatique|sans\s+repri\w+\s+automatique|(?:la\s+)?repri\w+[^.\n]{0,40}n(?:e\s+ser\w+|''est|''aura)[^.\n]{0,40}automatique|ne\s+(?:se\s+)?(?:fait|fera|d[ée]clenche)\s+pas\s+automatiquement`
+      → « Aucune reprise automatique »'
+  - check_id: observation-qui-renverse-le-plan
+    kind: deterministic
+    weight: 6
+    result: fail
+    detail: 'regex_all : 1/2 motif(s) trouvé(s) ; manquant(s) : `(?:invalid\w+|renvers\w+|remettr\w+\s+en\s+(?:cause|question)|remet\w*\s+en\s+(?:cause|question)|infirm\w+|d[ée]mentir\w+|falsifi\w+|(?:nous\s+)?aur(?:ions|ait)\s+eu\s+tort|prouver\w+[^.\n]{0,25}tort|fer\w+\s+changer\s+d''avis|se\s+r[ée]v[èe]l\w+\s+fauss?e?|(?:est|serait|s''av[èe]re|devient)\s+fauss?e?\b)[^\n]{0,160}(?:\d+[.,]?\d*\s*(?:%|km\b|€|jours?|semaines?|tourn[ée]es?|v[ée]hicules?)|mesur[ée]\w*|relev[ée]\w*|taux\b|autonomie|superviseur|tableau\s+de\s+bord)|(?:\d+[.,]?\d*\s*(?:%|km\b|€|jours?|semaines?|tourn[ée]es?|v[ée]hicules?)|mesur[ée]\w*|relev[ée]\w*|taux\b|autonomie|superviseur|tableau\s+de\s+bord)[^\n]{0,160}(?:invalid\w+|renvers\w+|remettr\w+\s+en\s+(?:cause|question)|remet\w*\s+en\s+(?:cause|question)|infirm\w+|d[ée]mentir\w+|falsifi\w+|(?:nous\s+)?aur(?:ions|ait)\s+eu\s+tort|prouver\w+[^.\n]{0,25}tort|fer\w+\s+changer\s+d''avis|se\s+r[ée]v[èe]l\w+\s+fauss?e?|(?:est|serait|s''av[èe]re|devient)\s+fauss?e?\b)`'
+  - check_id: ancrage-couts-de-reversibilite
+    kind: deterministic
+    weight: 4
+    result: pass
+    detail: 'anchor_ids : 6/4 occurrence(s) distincte(s) : « 480 € », « 30 jours », « 11 semaines », «
+      900 € », « 197 km », …'
+  - check_id: repli-attache-a-la-decision-prise
+    kind: judged
+    weight: 8
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: decision-livree-sans-rouverture
+    kind: judged
+    weight: 8
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: fenetre-de-repli-finie-et-payee
+    kind: judged
+    weight: 7
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 3
+    failed: 1
+    not_run: 0
+    weighted_score: 19
+    weighted_max: 25
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 3
+    weighted_score: 0
+    weighted_max: 23
+  failure_modes_triggered: []
+  scored_at: '2026-08-08T19:01:15Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 1 contrôle(s) déterministe(s) en échec (poids 19/25) ; candidat de préférence
+    : verdict déterministe complet ; une paire n''existe que si un second essai réel du même scénario
+    existe ; 3 contrôle(s) jugé(s) non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- master.yaml est injecté en tête de l'invite utilisateur, donc par canal de contexte, l'adaptateur restant
+  sur le canal d'instruction.

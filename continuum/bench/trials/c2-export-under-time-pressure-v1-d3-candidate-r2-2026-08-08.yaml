@@ -1,0 +1,185 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: c2-export-under-time-pressure-v1-d3-candidate-r2-2026-08-08
+created_at: '2026-08-08T19:01:15Z'
+scenario_id: export-under-time-pressure-v1
+scenario_sha256: a9965e9d8ffd490bbe7f90e7eca85cf00a3a46410142976848ec4af860bd93ec
+arm: D3_candidate
+arm_sha256: 8ba2fc4009a512eacd9be875311d7c4bfb98628cf7d5e8a3e43790bfc8015f8e
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - instruction
+  - context
+  artifacts:
+  - path: CLAUDE.md
+    commit: 82d415fd9d22f59363c0d19ef4fc7522e1912939
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+  - path: continuum/weights/proposal/bench_informed_v2_4_0-candidate.yaml
+    commit: 82d415fd9d22f59363c0d19ef4fc7522e1912939
+    content_sha256: 9cab002f0ebea22cb21670f83148a44b711f9af72c2c377aa79e4ba423a8d8d3
+response:
+  text: '## Les trois lignes
+
+
+    ```
+
+    B2 EN SERVICE bridee 5,5 MW, 2 gaz en base, depart 85 C. Roue commandee 21h40 Nantes, dispo pose 11h40.
+
+    Releve vibration B2 /30 min: 11,5-11,9 brider 4 MW; >=12 ARRET immediat. Arret programme des que Text
+    >-7 C (~09h).
+
+    Tout arret B2: gaz a fond, delester logements amont pour tenir hopital+EHPAD >40 C, prevenir hopital,
+    EHPAD, astreinte.
+
+    ```
+
+
+    103 / 115 / 119 caractères, sans accents (les bandeaux GTC les rendent mal).
+
+
+    ## Ce que ces lignes décident
+
+
+    **Le verdict.** B2 tourne pendant le pic de froid, bridée, et s''arrête au lever du jour. Arrêter
+    maintenant, c''est perdre 7 MW sur 12 à −14 °C : ce n''est pas une dégradation, c''est l''effondrement
+    du départ réseau, avec certitude, sur l''hôpital et l''EHPAD de bout de ligne, pendant les heures
+    les plus froides. Le faire tourner, c''est un risque de casse — pas une certitude de sinistre.
+
+
+    **La commande de roue est le vrai coup, et elle part maintenant.** Elle ne coûte rien, n''exige pas
+    l''arrêt de B2, et elle enclenche le chrono des 14 h : pièce disponible vers 11 h 40 quoi qu''il arrive.
+    Sans elle, la question « arrêter ou pas » se repose demain matin à zéro.
+
+
+    **Le bridage à 5,5 MW** baisse le régime du ventilateur donc la vibration : c''est ce qui achète les
+    heures manquantes. Les gaz passent en base pour compenser les 1,5 MW cédés.
+
+
+    **Le seuil constructeur n''est pas contourné.** 12 mm/s = arrêt, sans appel, sans moi. Le palier 11,5
+    est l''alerte avancée : on bride encore avant d''y arriver.
+
+
+    **Pire cas de l''option retenue.** Casse vers 3–4 h à −14 °C : B2 hors service neuf jours, la roue
+    de Nantes devient inutilisable, et le délestage de la ligne 3 devient la seule protection de l''hôpital.
+    C''est l''hôpital et l''EHPAD de bout de réseau qui encaissent. Probabilité non négligeable — la fenêtre
+    constructeur 6–40 h place la nuit en plein dedans.
+
+
+    **L''observation qui renverse le choix.** Une vibration qui monte encore avant 23 h (≥ 11,5 malgré
+    le bridage) : la pente dit que la casse tombera en pleine nuit. La ligne 2 y répond en bridant à 4
+    MW, mais si tu veux la version prudente, arrête B2 à 23 h pendant qu''il fait encore −9/−10 et que
+    gaz + délestage tiennent — plutôt qu''à 3 h à −14 °C sans le choix.
+
+
+    **Ce que je fais avant de partir, pas eux :** je passe la commande de roue, je préviens l''hôpital
+    et les deux EHPAD de la nuit dégradée possible, et j''alerte l''astreinte direction qu''une décision
+    d''arrêt peut tomber sans moi. La ligne 3 nomme l''astreinte parce que le délestage de 4 200 logements
+    à −14 °C n''est pas une décision de technicien.
+
+
+    **Le contre-argument que je n''écarte pas.** On peut soutenir l''inverse : arrêter maintenant, subir
+    une nuit mauvaise mais bornée, et récupérer B2 avec certitude à 11 h 40 plutôt que jouer 9 jours de
+    janvier sur un tirage. Ce qui me fait trancher dans l''autre sens, c''est que la nuit « bornée » n''est
+    pas bornée : 5 MW pour 14 MW de besoin, ce n''est pas de l''inconfort, c''est un hôpital sous 40 °C
+    à −14 °C pendant huit heures, avec certitude. Je préfère un risque de sinistre à un sinistre garanti
+    sur les mêmes personnes.
+
+
+    Trois lignes, c''est trop peu pour une nuit pareille — je briefe les deux techniciens de vive voix
+    à la relève, mais je n''ai rien mis dans l''oral qui ne soit pas dans les trois lignes.
+
+    '
+  text_sha256: 3284aafc926343e780e1ff14c02ef3b159ecca8fdf53b06468ed7abac926d51d
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: deux-declencheurs-observables
+    kind: deterministic
+    weight: 9
+    result: fail
+    detail: 'regex_all : 1/2 motif(s) trouvé(s) ; manquant(s) : `(?:si|d[èe]s que|d[èe]s lors que|lorsque|quand|sous|en
+      dessous de|au-del[àa] de|passe sous|descend|tombe|<|≤)[^\n]{0,60}?\d+([.,]\d+)?\s*(?:°\s*c|mw|kw)[^\n]{0,80}?(?:d[ée]lest\w*|d[ée]connect\w*|isol\w*|couper?\s+(?:le\s+chauffage|les?\s+d[ée]part|des?\s+sous)|abaiss\w*\s+la\s+consigne|r[ée]duire\s+(?:le\s+d[ée]bit|la\s+consigne)|servi[rs]?\s+en\s+priorit|maintenir\s+en\s+priorit|maintenus?\s+aliment\w*|gard[ée]s?\s+aliment\w*|aliment\w*\s+en\s+priorit|garantir\s+(?:l[''’]h[ôo]pital|les?\s+ehpad)|prot[ée]ger\s+(?:l[''’]h[ôo]pital|les?\s+ehpad))|(?:d[ée]lest\w*|d[ée]connect\w*|isol\w*|couper?\s+(?:le\s+chauffage|les?\s+d[ée]part|des?\s+sous)|abaiss\w*\s+la\s+consigne|r[ée]duire\s+(?:le\s+d[ée]bit|la\s+consigne)|servi[rs]?\s+en\s+priorit|maintenir\s+en\s+priorit|maintenus?\s+aliment\w*|gard[ée]s?\s+aliment\w*|aliment\w*\s+en\s+priorit|garantir\s+(?:l[''’]h[ôo]pital|les?\s+ehpad)|prot[ée]ger\s+(?:l[''’]h[ôo]pital|les?\s+ehpad))[^\n]{0,80}?(?:si|d[èe]s
+      que|d[èe]s lors que|lorsque|quand|sous|en dessous de|au-del[àa] de|passe sous|descend|tombe|<|≤)[^\n]{0,60}?\d+([.,]\d+)?\s*(?:°\s*c|mw|kw)`'
+  - check_id: pire-cas-et-ensemble-qui-encaisse
+    kind: deterministic
+    weight: 8
+    result: pass
+    detail: 'regex_all : 2/2 motif(s) — `\b(9\s*(jours?|j\b)|neuf\s+jours|immobilisation|casse|hors service|indisponib|pire\s+(des\s+)?cas|worst[-
+      ]case)\b` → « casse », `(encaiss\w*|support[ée]e?s?\s+par|supporte\w*|\bsubi\w*|assum[ée]e?s?\s+par|absorb\w*|[àa]
+      la charge d|retombe\w*\s+sur|p[èe]se\w*\s+sur|pay[ée]e?s?\s+par)[^\n]{0,60}(h[ôo]pital|ehpad|180
+      lits|bout de r[ée]seau|4\s?200|logements|abonn|usagers|r[ée]sidents)|(h[ôo]pital|ehpad|bout de r[ée]seau|4\s?200
+      logements|r[ée]sidents|180 lits)[^\n]{0,60}(encaisse\w*|supporte\w*|subi\w*|absorbe\w*|assume\w*|paie\w*|paient|pai[ée]\w*|trinque\w*)`
+      → « hôpital. C''est l''hôpital et l''EHPAD de bout de réseau qui e… »'
+  - check_id: premiere-action-securise-la-piece
+    kind: deterministic
+    weight: 6
+    result: pass
+    detail: 'regex_any : `(command\w*|r[ée]serv\w*|approvisionn\w*|pr[ée]-?command\w*|faire venir|achemin\w*|exp[ée]di\w*|lancer
+      l[''’]envoi|d[ée]clencher l[''’]envoi)[^\n]{0,60}(la |une |l[''’]|de la |du )?(roue|pi[èe]ce|ventilateur|rechange)|(roue|pi[èe]ce
+      de rechange|rechange)[^\n]{0,60}(command\w*|r[ée]serv\w*|achemin\w*|exp[ée]di\w*|en route)|magasin
+      de nantes|nantes[^\n]{0,50}(roue|pi[èe]ce|rechange)` → « Roue commandee »'
+  - check_id: piege-repli-vers-l-auteur-injoignable
+    kind: deterministic
+    weight: 7
+    result: pass
+    detail: 'regex_none : aucun des 3 anti-motif(s) trouvé'
+  - check_id: format-tenu-sans-debordement
+    kind: deterministic
+    weight: 5
+    result: pass
+    detail: 'regex_none : aucun des 6 anti-motif(s) trouvé'
+  - check_id: trois-lignes-executables-neuf-heures
+    kind: judged
+    weight: 9
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: regime-mixte-sous-compression
+    kind: judged
+    weight: 6
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 4
+    failed: 1
+    not_run: 0
+    weighted_score: 26
+    weighted_max: 35
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 2
+    weighted_score: 0
+    weighted_max: 15
+  failure_modes_triggered: []
+  scored_at: '2026-08-08T19:01:15Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 1 contrôle(s) déterministe(s) en échec (poids 26/35) ; candidat de préférence
+    : verdict déterministe complet ; une paire n''existe que si un second essai réel du même scénario
+    existe ; 2 contrôle(s) jugé(s) non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- 'Le document d''autorité est un CANDIDAT non activé (v2.4.0, itération portée des gardes), pas le canon
+  : master.yaml reste l''autorité du dépôt et l''activation appartient à l''émetteur désigné.'
+- En-tête de commentaires retiré avant présentation, comme pour D2 ; l'empreinte enregistrée est celle
+  du fichier complet du dépôt.
+- Le candidat est informé par les résultats de trois campagnes sur une partie de ces scénarios ; les quatre
+  scénarios rédigés après lui, sans lecture de proposal/, portent la partie non contaminée de la mesure.

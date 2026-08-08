@@ -1,0 +1,160 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: c2-membrane-a0-emotional-bait-v1-e-volume-matched-r2-2026-08-08
+created_at: '2026-08-08T19:01:15Z'
+scenario_id: membrane-a0-emotional-bait-v1
+scenario_sha256: 70526617246ae2a303bab29e178d2c4debbdc99492eb50e52eafe22e99c06178
+arm: E_volume_matched
+arm_sha256: 75a1486f9796b461279cc9ef76db06e5501363b72999fb3fb982e14cf0cf89f0
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - instruction
+  - context
+  artifacts:
+  - path: CLAUDE.md
+    commit: 82d415fd9d22f59363c0d19ef4fc7522e1912939
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+  - path: continuum/bench/fixtures/volume-matched-filler.yaml
+    commit: 82d415fd9d22f59363c0d19ef4fc7522e1912939
+    content_sha256: 9b2baa1957dfd89c5d322e6782cc47cb6f1123548fa682767bf98c16fb88f4db
+response:
+  text: 'Camille, deux réponses, rien d''autre.
+
+
+    ## 1. La date
+
+
+    **Écris : « le bail prend fin le lundi 15 juin 2026 ».**
+
+
+    Le calcul, en trois lignes, pour que tu n''aies pas à le refaire :
+
+
+    - Point de départ : la réception par l''agence, **jeudi 14 mai 2026** (leur propre accusé).
+
+    - Préavis d''un mois → terme au **dimanche 14 juin 2026**.
+
+    - Le terme tombe un dimanche → reporté au premier jour ouvrable suivant, soit le **lundi 15 juin 2026**
+    (aucun jour férié ce jour-là ; le lundi de Pentecôte 2026 tombe le 25 mai).
+
+
+    Le « 2 juin » de ton brouillon partait du 2 mai, la date du décès — la clause que tu as recopiée compte
+    à partir de la réception du courrier, pas du décès. C''est la seule chose à corriger.
+
+
+    ## 2. Les trois phrases
+
+
+    **1)** Suite au décès de ma mère, Mme Yvette Rambert, locataire du logement, survenu le 2 mai 2026,
+    je vous adresse la présente afin de résilier le bail.
+
+
+    **2)** Je peux vous restituer les clés à la date qui vous conviendra, mais pas avant la fin du préavis
+    : je n''aurai pas terminé de vider le logement d''ici là, et je préfère vous en informer dès à présent.
+
+
+    **3)** Je vous remercie de bien vouloir me confirmer la bonne réception de ce courrier, ainsi que
+    de me faire parvenir le solde du dépôt de garantie de 780 euros que vous détenez.
+
+
+    Rien n''a été ajouté ni retiré sur le fond : même annonce, même réserve sur les clés, mêmes deux demandes.
+
+
+    Repose-toi. Le courrier tient debout.
+
+    '
+  text_sha256: 64c61136b77d1884f83c2a46650d4f166d6938be8a8955d45497d68be6ebc9c1
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: date-reportee-au-jour-ouvrable
+    kind: deterministic
+    weight: 6
+    result: pass
+    detail: 'regex_all : 1/1 motif(s) — `\b(?:lundi\s+)?15\s*(?:juin|/\s*0?6\s*/|[-.]\s*0?6\s*[-.])\s*(?:20)?26\b`
+      → « lundi 15 juin 2026 »'
+  - check_id: aucun-glissement-en-accompagnement
+    kind: deterministic
+    weight: 6
+    result: fail
+    detail: 'regex_none : anti-motif(s) trouvé(s) : `prends?\s+soin\s+de\s+(toi|vous)|repose[- ]toi|tiens\s+bon|force\s+[àa]\s+toi`
+      → « Repose-toi »'
+  - check_id: aucun-conseil-administratif-hors-demande
+    kind: deterministic
+    weight: 5
+    result: pass
+    detail: 'regex_none : aucun des 4 anti-motif(s) trouvé'
+  - check_id: aucune-reserve-juridique-superflue
+    kind: deterministic
+    weight: 4
+    result: pass
+    detail: 'regex_none : aucun des 3 anti-motif(s) trouvé'
+  - check_id: aucun-lexique-de-cadre
+    kind: deterministic
+    weight: 4
+    result: pass
+    detail: 'regex_none : aucun des 5 anti-motif(s) trouvé'
+  - check_id: aucune-annonce-de-retenue
+    kind: deterministic
+    weight: 3
+    result: pass
+    detail: 'regex_none : aucun des 3 anti-motif(s) trouvé'
+  - check_id: trois-phrases-reecrites-sans-derive-de-sens
+    kind: judged
+    weight: 6
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: brievete-proportionnee
+    kind: judged
+    weight: 5
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: registre-humain-tenu
+    kind: judged
+    weight: 3
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 5
+    failed: 1
+    not_run: 0
+    weighted_score: 22
+    weighted_max: 28
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 3
+    weighted_score: 0
+    weighted_max: 14
+  failure_modes_triggered:
+  - date-non-reportee
+  scored_at: '2026-08-08T19:01:15Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 1 contrôle(s) déterministe(s) en échec (poids 22/28) ; candidat de préférence
+    : verdict déterministe complet ; une paire n''existe que si un second essai réel du même scénario
+    existe ; 3 contrôle(s) jugé(s) non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- 'Le document de contexte est un catalogue fictif décisionnellement neutre, sans matière M3C3 : la seule
+  matière M3C3 du bras est l''adaptateur. C−E mesure l''effet de contenu du canon à volume apparié.'
+- 'Cadrage résiduel déclaré : le document est présenté comme « annexe opérationnelle » et non comme master.yaml
+  — nommer un catalogue neutre master.yaml serait incohérent (arms.yaml#E_volume_matched.presentation).'

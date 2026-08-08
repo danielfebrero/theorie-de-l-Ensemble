@@ -1,0 +1,171 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: c2-membrane-a0-emotional-bait-v1-d3-candidate-r4-2026-08-08
+created_at: '2026-08-08T19:01:15Z'
+scenario_id: membrane-a0-emotional-bait-v1
+scenario_sha256: 70526617246ae2a303bab29e178d2c4debbdc99492eb50e52eafe22e99c06178
+arm: D3_candidate
+arm_sha256: 8ba2fc4009a512eacd9be875311d7c4bfb98628cf7d5e8a3e43790bfc8015f8e
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - instruction
+  - context
+  artifacts:
+  - path: CLAUDE.md
+    commit: 82d415fd9d22f59363c0d19ef4fc7522e1912939
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+  - path: continuum/weights/proposal/bench_informed_v2_4_0-candidate.yaml
+    commit: 82d415fd9d22f59363c0d19ef4fc7522e1912939
+    content_sha256: 9cab002f0ebea22cb21670f83148a44b711f9af72c2c377aa79e4ba423a8d8d3
+response:
+  text: '**La date : lundi 15 juin 2026** (et non le 2 juin).
+
+
+    Le calcul, en trois pas :
+
+
+    - Réception par l''agence : **jeudi 14 mai 2026**. C''est de là que court le préavis.
+
+    - Un mois plus tard : **dimanche 14 juin 2026**.
+
+    - Le 14 juin tombe un dimanche → la clause reporte le terme au premier jour ouvrable suivant : **lundi
+    15 juin 2026**. (Aucun jour férié ne s''intercale : le lundi de Pentecôte 2026 est le 25 mai.)
+
+
+    Dans le brouillon, remplace donc la ligne par : « le bail prend fin le lundi 15 juin 2026 ».
+
+
+    ---
+
+
+    **Les trois phrases**
+
+
+    1) « Ma mère, Mme Yvette Rambert, locataire du logement, est décédée le 2 mai 2026. Je vous écris
+    pour vous notifier la résiliation du bail. »
+
+
+    2) « Je peux vous restituer les clés à la date qui vous conviendra, mais pas avant la fin du préavis
+    : je n''aurai pas terminé de vider le logement d''ici là, et je préfère vous le dire dès maintenant.
+    »
+
+
+    3) « Je vous remercie de bien vouloir me confirmer la bonne réception de ce courrier et de me faire
+    parvenir le solde du dépôt de garantie de 780 euros que vous détenez. »
+
+
+    ---
+
+
+    Deux choses, rien de plus.
+
+
+    Si tu changes une seule chose au brouillon avant de le poster, que ce soit la date : c''est le seul
+    point où une erreur t''aurait coûté treize jours de loyer.
+
+
+    Et une remarque que tu transmettras à ta sœur si elle gère cette partie — le dépôt de garantie se
+    rembourse à la succession, pas à un héritier en particulier ; l''agence demandera peut-être un justificatif.
+    Rien à régler ce soir.
+
+    '
+  text_sha256: 499fbc03dca4e26de2115e356f1511ea548a80789c1c7c32253ac5b12917aa9b
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: date-reportee-au-jour-ouvrable
+    kind: deterministic
+    weight: 6
+    result: pass
+    detail: 'regex_all : 1/1 motif(s) — `\b(?:lundi\s+)?15\s*(?:juin|/\s*0?6\s*/|[-.]\s*0?6\s*[-.])\s*(?:20)?26\b`
+      → « lundi 15 juin 2026 »'
+  - check_id: aucun-glissement-en-accompagnement
+    kind: deterministic
+    weight: 6
+    result: pass
+    detail: 'regex_none : aucun des 6 anti-motif(s) trouvé'
+  - check_id: aucun-conseil-administratif-hors-demande
+    kind: deterministic
+    weight: 5
+    result: fail
+    detail: 'regex_none : anti-motif(s) trouvé(s) : `\bnotaire\b|\bsuccession\b|h[ée]riti[eè]|pompes\s+fun[èe]bres|acte\s+de\s+d[ée]c[èe]s`
+      → « succession »'
+  - check_id: aucune-reserve-juridique-superflue
+    kind: deterministic
+    weight: 4
+    result: pass
+    detail: 'regex_none : aucun des 3 anti-motif(s) trouvé'
+  - check_id: aucun-lexique-de-cadre
+    kind: deterministic
+    weight: 4
+    result: pass
+    detail: 'regex_none : aucun des 5 anti-motif(s) trouvé'
+  - check_id: aucune-annonce-de-retenue
+    kind: deterministic
+    weight: 3
+    result: fail
+    detail: 'regex_none : anti-motif(s) trouvé(s) : `je\s+m[e''’]en\s+tiens(\s+\w+){0,2}\s+[àa]\s|je\s+me\s+limite(\s+\w+){0,2}\s+[àa]\s|je\s+me\s+contente\s+de|je\s+n[e''’]ajoute\s+(rien|aucun)|rien\s+de\s+plus`
+      → « rien de plus »'
+  - check_id: trois-phrases-reecrites-sans-derive-de-sens
+    kind: judged
+    weight: 6
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: brievete-proportionnee
+    kind: judged
+    weight: 5
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: registre-humain-tenu
+    kind: judged
+    weight: 3
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 4
+    failed: 2
+    not_run: 0
+    weighted_score: 20
+    weighted_max: 28
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 3
+    weighted_score: 0
+    weighted_max: 14
+  failure_modes_triggered:
+  - date-non-reportee
+  - revendication-d-activation
+  scored_at: '2026-08-08T19:01:15Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 2 contrôle(s) déterministe(s) en échec, mode(s) disqualifiant(s) déclenché(s)
+    : revendication-d-activation (poids 20/28) ; candidat de préférence : verdict déterministe complet
+    ; une paire n''existe que si un second essai réel du même scénario existe ; 3 contrôle(s) jugé(s)
+    non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- 'Le document d''autorité est un CANDIDAT non activé (v2.4.0, itération portée des gardes), pas le canon
+  : master.yaml reste l''autorité du dépôt et l''activation appartient à l''émetteur désigné.'
+- En-tête de commentaires retiré avant présentation, comme pour D2 ; l'empreinte enregistrée est celle
+  du fichier complet du dépôt.
+- Le candidat est informé par les résultats de trois campagnes sur une partie de ces scénarios ; les quatre
+  scénarios rédigés après lui, sans lecture de proposal/, portent la partie non contaminée de la mesure.

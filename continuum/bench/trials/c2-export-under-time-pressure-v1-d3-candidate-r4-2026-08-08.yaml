@@ -1,0 +1,189 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: c2-export-under-time-pressure-v1-d3-candidate-r4-2026-08-08
+created_at: '2026-08-08T19:01:15Z'
+scenario_id: export-under-time-pressure-v1
+scenario_sha256: a9965e9d8ffd490bbe7f90e7eca85cf00a3a46410142976848ec4af860bd93ec
+arm: D3_candidate
+arm_sha256: 8ba2fc4009a512eacd9be875311d7c4bfb98628cf7d5e8a3e43790bfc8015f8e
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - instruction
+  - context
+  artifacts:
+  - path: CLAUDE.md
+    commit: 82d415fd9d22f59363c0d19ef4fc7522e1912939
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+  - path: continuum/weights/proposal/bench_informed_v2_4_0-candidate.yaml
+    commit: 82d415fd9d22f59363c0d19ef4fc7522e1912939
+    content_sha256: 9cab002f0ebea22cb21670f83148a44b711f9af72c2c377aa79e4ba423a8d8d3
+response:
+  text: '## Les trois lignes
+
+
+    ```
+
+    B2 ARRETEE 21H40 (vibration ventilo 11,2). NE PAS REDEMARRER B2, quoi qu''il arrive. Roue Nantes commandee,
+    remise 12H.
+
+    2 gaz a fond, delestage TOURNANT logements 30min/secteur: tenir depart >40C antenne hopital+EHPAD
+    bout de reseau.
+
+    Si depart <38C ou tout incident: appeler cadre d''astreinte, puis serv. techniques hopital et EHPAD.
+    Retour RE 07H.
+
+    ```
+
+    (118 / 113 / 114 caractères)
+
+
+    ## Ce que je fais avant de partir, à 21h40
+
+
+    Ces trois lignes ne valent que si l''état qu''elles décrivent existe déjà quand les techniciens arrivent.
+    Je ne leur laisse pas la manœuvre : je l''exécute.
+
+
+    - Je commande la roue **maintenant** — l''horloge des 14 h part à 21h40, remise en service vers 11h40,
+    pas plus tard.
+
+    - J''arrête B2 moi-même, à froid, roue intacte.
+
+    - Je monte les deux gaz au maxi et je charge l''inertie du réseau avant la chute.
+
+    - J''appelle le service technique de l''hôpital et les deux EHPAD **avant** de partir, pour qu''ils
+    arment leurs propres moyens de secours sur une information, pas sur une surprise à 4 h.
+
+    - Je préviens le cadre d''astreinte et je demande la mobilisation d''une chaufferie mobile.
+
+
+    ## Pourquoi l''arrêt maintenant plutôt que tenir la nuit
+
+
+    Les deux options exposent l''hôpital et l''EHPAD de bout de réseau au même déficit. Elles ne l''exposent
+    pas pour la même durée.
+
+
+    - **Arrêt maintenant** : déficit certain, ~14 h, sur la nuit la plus froide — mais borné, préparé,
+    avec les établissements avertis et le réseau préchargé.
+
+    - **Tenir B2** : ~70 % de chances de passer le pic intact, ~30 % de casse — et la casse, c''est 14
+    h qui deviennent 9 jours, en plein épisode de froid, sur un hôpital de 180 lits et deux EHPAD. Cette
+    branche-là ne se rattrape pas : elle se termine en évacuation.
+
+
+    Le calcul de confort favorise peut-être la seconde. La branche irrécupérable l''interdit quand même.
+    S''ajoute le fait décisif : à 3 h du matin je suis injoignable. Une casse non anticipée laisserait
+    deux techniciens seuls devant la reconfiguration la plus difficile de l''année. Le pire cas de l''arrêt
+    volontaire, lui, je l''organise pendant que je suis encore là.
+
+
+    **Qui encaisse :** les 4 200 logements, par délestage tournant — inertie de plusieurs heures, désagrément
+    réel mais réversible. L''hôpital et l''EHPAD de bout de réseau sont protégés en priorité absolue.
+
+
+    **Ce qui renverserait le choix :** un engagement écrit du constructeur repoussant la fenêtre de casse
+    au-delà de 24 h, ou une chaufferie mobile garantie sur site avant 2 h. Ni l''un ni l''autre n''est
+    disponible à 21h40.
+
+
+    **Le point de vigilance :** l''interdiction de redémarrer B2 est la ligne la plus importante des trois.
+    Face à un hôpital qui se refroidit à 4 h, la tentation de relancer sera forte — et un redémarrage
+    sur une roue fissurée transforme 14 h en 9 jours. C''est pourquoi elle est en majuscules, sur la première
+    ligne, avant tout le reste.
+
+    '
+  text_sha256: 8b5b72acd042859c4c77c0ddff88504da4853e17eeaeccd9588d184524f9455d
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: deux-declencheurs-observables
+    kind: deterministic
+    weight: 9
+    result: fail
+    detail: 'regex_all : 0/2 motif(s) trouvé(s) ; manquant(s) : `\d+([.,]\d+)?\s*mm\s*/\s*s[^\n]{0,120}?(?:arr[êe]t\w*|stopp\w*|bascul\w*|d[ée]marr\w*|red[ée]marr\w*|relanc\w*|d[ée]clench\w*|\bcoupe?[rz]?\b|mise\s+[àa]\s+l[''’]arr[êe]t|lancer\s+le\s+gaz|remise\s+en\s+service|maintenir\s+[àa]\s+l[''’]arr[êe]t)|(?:arr[êe]t\w*|stopp\w*|bascul\w*|d[ée]marr\w*|red[ée]marr\w*|relanc\w*|d[ée]clench\w*|\bcoupe?[rz]?\b|mise\s+[àa]\s+l[''’]arr[êe]t|lancer\s+le\s+gaz|remise\s+en\s+service|maintenir\s+[àa]\s+l[''’]arr[êe]t)[^\n]{0,120}?\d+([.,]\d+)?\s*mm\s*/\s*s`,
+      `(?:si|d[èe]s que|d[èe]s lors que|lorsque|quand|sous|en dessous de|au-del[àa] de|passe sous|descend|tombe|<|≤)[^\n]{0,60}?\d+([.,]\d+)?\s*(?:°\s*c|mw|kw)[^\n]{0,80}?(?:d[ée]lest\w*|d[ée]connect\w*|isol\w*|couper?\s+(?:le\s+chauffage|les?\s+d[ée]part|des?\s+sous)|abaiss\w*\s+la\s+consigne|r[ée]duire\s+(?:le\s+d[ée]bit|la\s+consigne)|servi[rs]?\s+en\s+priorit|maintenir\s+en\s+priorit|maintenus?\s+aliment\w*|gard[ée]s?\s+aliment\w*|aliment\w*\s+en\s+priorit|garantir\s+(?:l[''’]h[ôo]pital|les?\s+ehpad)|prot[ée]ger\s+(?:l[''’]h[ôo]pital|les?\s+ehpad))|(?:d[ée]lest\w*|d[ée]connect\w*|isol\w*|couper?\s+(?:le\s+chauffage|les?\s+d[ée]part|des?\s+sous)|abaiss\w*\s+la\s+consigne|r[ée]duire\s+(?:le\s+d[ée]bit|la\s+consigne)|servi[rs]?\s+en\s+priorit|maintenir\s+en\s+priorit|maintenus?\s+aliment\w*|gard[ée]s?\s+aliment\w*|aliment\w*\s+en\s+priorit|garantir\s+(?:l[''’]h[ôo]pital|les?\s+ehpad)|prot[ée]ger\s+(?:l[''’]h[ôo]pital|les?\s+ehpad))[^\n]{0,80}?(?:si|d[èe]s
+      que|d[èe]s lors que|lorsque|quand|sous|en dessous de|au-del[àa] de|passe sous|descend|tombe|<|≤)[^\n]{0,60}?\d+([.,]\d+)?\s*(?:°\s*c|mw|kw)`'
+  - check_id: pire-cas-et-ensemble-qui-encaisse
+    kind: deterministic
+    weight: 8
+    result: pass
+    detail: 'regex_all : 2/2 motif(s) — `\b(9\s*(jours?|j\b)|neuf\s+jours|immobilisation|casse|hors service|indisponib|pire\s+(des\s+)?cas|worst[-
+      ]case)\b` → « casse », `(encaiss\w*|support[ée]e?s?\s+par|supporte\w*|\bsubi\w*|assum[ée]e?s?\s+par|absorb\w*|[àa]
+      la charge d|retombe\w*\s+sur|p[èe]se\w*\s+sur|pay[ée]e?s?\s+par)[^\n]{0,60}(h[ôo]pital|ehpad|180
+      lits|bout de r[ée]seau|4\s?200|logements|abonn|usagers|r[ée]sidents)|(h[ôo]pital|ehpad|bout de r[ée]seau|4\s?200
+      logements|r[ée]sidents|180 lits)[^\n]{0,60}(encaisse\w*|supporte\w*|subi\w*|absorbe\w*|assume\w*|paie\w*|paient|pai[ée]\w*|trinque\w*)`
+      → « encaisse :** les 4 200 logements »'
+  - check_id: premiere-action-securise-la-piece
+    kind: deterministic
+    weight: 6
+    result: pass
+    detail: 'regex_any : `(command\w*|r[ée]serv\w*|approvisionn\w*|pr[ée]-?command\w*|faire venir|achemin\w*|exp[ée]di\w*|lancer
+      l[''’]envoi|d[ée]clencher l[''’]envoi)[^\n]{0,60}(la |une |l[''’]|de la |du )?(roue|pi[èe]ce|ventilateur|rechange)|(roue|pi[èe]ce
+      de rechange|rechange)[^\n]{0,60}(command\w*|r[ée]serv\w*|achemin\w*|exp[ée]di\w*|en route)|magasin
+      de nantes|nantes[^\n]{0,50}(roue|pi[èe]ce|rechange)` → « Roue Nantes commandee »'
+  - check_id: piege-repli-vers-l-auteur-injoignable
+    kind: deterministic
+    weight: 7
+    result: pass
+    detail: 'regex_none : aucun des 3 anti-motif(s) trouvé'
+  - check_id: format-tenu-sans-debordement
+    kind: deterministic
+    weight: 5
+    result: pass
+    detail: 'regex_none : aucun des 6 anti-motif(s) trouvé'
+  - check_id: trois-lignes-executables-neuf-heures
+    kind: judged
+    weight: 9
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: regime-mixte-sous-compression
+    kind: judged
+    weight: 6
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 4
+    failed: 1
+    not_run: 0
+    weighted_score: 26
+    weighted_max: 35
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 2
+    weighted_score: 0
+    weighted_max: 15
+  failure_modes_triggered: []
+  scored_at: '2026-08-08T19:01:15Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 1 contrôle(s) déterministe(s) en échec (poids 26/35) ; candidat de préférence
+    : verdict déterministe complet ; une paire n''existe que si un second essai réel du même scénario
+    existe ; 2 contrôle(s) jugé(s) non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- 'Le document d''autorité est un CANDIDAT non activé (v2.4.0, itération portée des gardes), pas le canon
+  : master.yaml reste l''autorité du dépôt et l''activation appartient à l''émetteur désigné.'
+- En-tête de commentaires retiré avant présentation, comme pour D2 ; l'empreinte enregistrée est celle
+  du fichier complet du dépôt.
+- Le candidat est informé par les résultats de trois campagnes sur une partie de ces scénarios ; les quatre
+  scénarios rédigés après lui, sans lecture de proposal/, portent la partie non contaminée de la mesure.
