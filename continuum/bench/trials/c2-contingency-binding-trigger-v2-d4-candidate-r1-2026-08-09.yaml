@@ -1,0 +1,230 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: c2-contingency-binding-trigger-v2-d4-candidate-r1-2026-08-09
+created_at: '2026-08-09T11:59:39Z'
+scenario_id: contingency-binding-trigger-v2
+scenario_sha256: 21350c940984fe3c3c09f50cab25c08414f4add90b4902013a1a6929f2534b82
+arm: D4_candidate
+arm_sha256: fb419b579a5bd830adbf289fbe15e7fbbe5c80ef3c7c16cbc2bc6491e5232f6f
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - instruction
+  - context
+  artifacts:
+  - path: CLAUDE.md
+    commit: be5b7e4ac6fe7606136d95b6b733073146be444d
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+  - path: continuum/weights/proposal/bench_informed_v2_5_0-candidate.yaml
+    commit: be5b7e4ac6fe7606136d95b6b733073146be444d
+    content_sha256: 1976a8f7619336b3814676190a24b58d41663609c6af58fe3765f3ac99769b1e
+response:
+  text: '**Verdict : Option B**, avec une modification du calendrier — gel du palier pendant le pic. Sur
+    le coût attendu seul, A gagne d''environ 190 k€ ; B se justifie non par l''espérance de gain mais
+    par la branche défavorable de A, qui ne se répare pas. Voici la note.
+
+
+    ---
+
+
+    **NOTE AU COMITÉ DE DIRECTION**
+
+    **Objet : prestataire de paiement — arbitrage Solda / Payflux**
+
+    Direction des opérations — 14 août 2026
+
+
+    **Recommandation : Option B, avec gel du palier pendant le pic de fin d''année.** Elle coûte environ
+    190 k€ de plus que l''Option A la première année. C''est le prix pour que le pic reste réversible.
+
+
+    **Pourquoi pas A.** Sur le seul coût attendu, A gagne : 500 k€ contre 310 k€, et les refus supplémentaires
+    d''une bascule intégrale (3 semaines à 1,3 % contre 0,4 %, soit 3 400 transactions refusées, 143 k€
+    de volume) ne comblent pas l''écart. Nous écartons A pour une raison qui n''est pas comptable : sa
+    branche défavorable ne se répare pas. Une fois les jetons transférés **et le compte Solda clos**,
+    le retour prend 6 semaines et impose de redemander sa carte à 2,1 millions de clients. Si Payflux
+    décroche entre le 27 novembre et le 31 décembre — plus de 26 M€ de volume sur cette fenêtre — nous
+    n''avons aucun moyen de revenir en arrière, et la campagne de recollecte coûte une part définitive
+    de la base.
+
+
+    Ce que nous ne savons pas mesurer, et il faut le dire au comité : la probabilité que Payflux décroche
+    pendant le pic. Le pilote (1,3 % pendant trois semaines) documente une période de rodage, pas un risque
+    d''incident majeur, et il porte sur un seul marchand. Nous tranchons donc sur la nature de la perte,
+    pas sur sa probabilité.
+
+
+    **Le point de non-retour n''est pas la migration, c''est la fermeture du compte.** Transférer les
+    jetons reste réversible tant que Solda est ouvert. Toute la valeur de l''Option B tient là.
+
+
+    | | A | B |
+
+    |---|---|---|
+
+    | Économie contractuelle, 1re année | 500 k€ | 310 k€ |
+
+    | Trafic exposé pendant les 3 semaines de rodage | 100 % → 143 k€ | 10 puis 25 % → 29 k€ |
+
+    | Retour arrière pendant le pic | aucun | < 15 min |
+
+    | Double run | — | 45 k€/mois |
+
+
+    **Calendrier**
+
+    - **Avant le 1er octobre (échéance dure : 15 octobre)** — prévenir Solda par écrit de la prolongation
+    au mois le mois (130 k€/mois, plafond 28 février). C''est la seule date qui ne peut pas glisser :
+    passée le 15 octobre, le compte ferme le 30 novembre et l''Option B n''existe plus.
+
+    - **1er–8 octobre** — signature Payflux, pas avant, pour que les 90 jours de sortie sans pénalité
+    couvrent le Black Friday et décembre. À négocier en priorité : faire courir ces 90 jours depuis la
+    première mise en production, non depuis la signature.
+
+    - **3 nov : 10 % — 10 nov : 25 % — 17 nov au 4 janvier : gel à 25 %.** Aucun palier pendant le pic,
+    aucun palier un vendredi.
+
+    - **5 janvier : 50 % — 19 janvier : 100 %.**
+
+    - **Fermeture du compte Solda** : pas avant quatre semaines de stabilité à 100 %, donc mi-février
+    au plus tôt.
+
+
+    **Repli.** L''astreinte est autorisée d''avance à basculer 100 % du trafic sur Solda, sans validation
+    hiérarchique, dès que le taux d''échec Payflux dépasse 1,5 % sur trois rafraîchissements consécutifs
+    du tableau de bord (15 minutes). Le service client peut déclencher le même repli. Ce n''est pas une
+    consultation, c''est une décision qui leur appartient. Si au 1er décembre le taux d''échec n''est
+    pas redescendu sous 0,6 %, les paliers ne reprennent pas : arbitrage go/no-go le 5 janvier, tant que
+    la sortie sans pénalité est ouverte.
+
+
+    **Ce qui renverserait cette recommandation.** Trois références Payflux à volume comparable affichant
+    un taux d''autorisation ≥ 99,6 %, plus un post-mortem attribuant les 1,3 % du pilote à l''intégration
+    du marchand et non à la plateforme. Nous demandons ces pièces en septembre, avant signature ; si nous
+    les obtenons, la période de gel se raccourcit. À l''inverse, si Solda refuse la prolongation par écrit,
+    l''Option B disparaît — et la réponse n''est alors pas A au 3 novembre, mais A en janvier.
+
+
+    **Lundi**
+
+    1. Achats : lettre de prolongation à Solda prête à signer avant mercredi.
+
+    2. Finance : vérifier si les 310 k€ intègrent l''extension Solda de décembre et janvier. Si non, l''écart
+    avec A est de 320 k€ et non 190 k€ — la recommandation ne change pas.
+
+    3. Payflux, par écrit : 90 jours depuis la mise en production, engagement contractuel sur le **taux
+    d''autorisation** et pas seulement la disponibilité, trois références, post-mortem du pilote.
+
+    4. Astreinte : consigne de repli écrite (seuil 1,5 %) et un exercice de bascule à blanc avant le 3
+    novembre.
+
+
+    Un point permanent à verrouiller au contrat : 0,5 % contre 0,4 % en régime stable, c''est 6 600 transactions
+    refusées par an, 276 k€ de volume — récurrent, là où l''économie est acquise une fois. D''où l''engagement
+    sur le taux d''autorisation demandé au point 3.
+
+
+    ---
+
+
+    Deux hypothèses explicites, à confirmer lundi : les 143 k€ et 29 k€ sont du volume d''affaires brut,
+    avant récupération par relance — l''impact P&L est la marge sur ces montants, ce qui renforce plutôt
+    l''avantage comptable de A ; et le périmètre exact des 310 k€ (point 2). Le verdict tient dans les
+    deux cas de figure. Je peux produire la note en fichier ou en page partageable si elle doit circuler
+    avant vendredi.
+
+    '
+  text_sha256: c252fa96b51e3892bcbcea7290412e1184b8f49f294d58cdb76049918b9007a6
+  latency_ms: 231000
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: repli-seuil-fenetre-action-liee
+    kind: deterministic
+    weight: 8
+    result: fail
+    detail: 'regex_all : 2/3 motif(s) trouvé(s) ; manquant(s) : `(?:pendant|durant|sur|en)\s+\d+\s*(?:h\b|heures?|hours?|minutes?|min\b|jours?|days?)|\d+\s*(?:minutes?|min\b|h\b|heures?|jours?)\s*(?:cons[ée]cutiv\w+|glissant\w*|d''affil[ée]e)|fen[êe]tre\s+(?:de\s+)?(?:mesure|glissante|d''observation)|moyenne\s+glissante|\d+\s*relev[ée]s\s+cons[ée]cutifs`'
+  - check_id: reprise-sous-re-decision
+    kind: deterministic
+    weight: 8
+    result: fail
+    detail: 'regex_any : aucun des 3 motif(s) : `aucune\s+repri\w+\s+automatique|(?:pas|jamais|ni)\s+de\s+repri\w+\s+automatique|sans\s+repri\w+\s+automatique|la\s+repri\w+\s+n(?:e\s+sera|''aura|''est)[^.\n]{0,40}automatique`,
+      `(?:repri\w+|repren\w+|remont\w+|red[ée]marr\w+|relanc\w+|rebascul\w+|re-?bascul\w+)[^.\n]{0,90}(?:sur|apr[èe]s|moyennant|sous\s+r[ée]serve\s+d''?)\s*(?:une?\s+|le\s+|la\s+|l'')?(?:d[ée]cision|validation|arbitrage|accord|confirmation|feu\s+vert|autorisation|revue|re-?d[ée]cision|comit[ée])`,
+      `ne\s+(?:repren\w+|red[ée]marr\w+|rebascul\w+|remont\w+|relanc\w+)[^.\n]{0,80}qu(?:e|'')\s*(?:sur|apr[èe]s|avec)`'
+  - check_id: arret-de-boucle-de-repli
+    kind: deterministic
+    weight: 7
+    result: fail
+    detail: 'regex_any : aucun des 2 motif(s) : `(?:(?:deux|2|second[e]?|deuxi[èe]me|trois|3|troisi[èe]me|nouveau|nouvelle|autre)\s+(?:replis?|rebascules?|d[ée]clenchements?|retours?\s+arri[èe]re|incidents?|franchissements?|alertes?)|au\s+(?:second|deuxi[èe]me|troisi[èe]me)\s+(?:repli|d[ée]clenchement|incident|retour)|(?:plus\s+d(?:e|'')|au-?del[àa]\s+d(?:e|''))\s*(?:un|1|deux|2)\s+(?:replis?|d[ée]clenchements?|incidents?)|(?:repli|rebascule|d[ée]clenchement|seuil)[^.\n]{0,60}(?:se\s+r[ée]p[èe]te|se\s+reproduit|[àa]\s+nouveau|une\s+(?:seconde|deuxi[èe]me)\s+fois|deux\s+fois)|si\s+(?:nous\s+|on\s+)?(?:devons|doit|devions)\s+replier|si\s+le\s+repli\s+(?:est|doit\s+[êe]tre)\s+d[ée]clench[ée])[\s\S]{0,200}?(?:(?:arr[êe]t|gel|abandon|renoncement|blocage)\s+d[ée]finiti\w*|(?:mont[ée]e|bascule|migration|rampe|projet)\s+(?:est\s+|sont\s+)?(?:arr[êe]t[ée]\w*|abandonn[ée]\w*|stopp[ée]\w*|annul[ée]\w*)|(?:on\s+)?(?:arr[êe]te\w*|abandonn\w+|stopp\w+|annule\w*)\s+(?:la\s+|le\s+|toute\s+)?(?:bascule|migration|mont[ée]e|rampe|projet|op[ée]ration)|(?:abandon|sortie|renoncement)\s+(?:de\s+|d[ue]\s+)?payflux|renon[çc]\w+|r[ée]sili\w+|clause\s+de\s+sortie|(?:renouvel\w+|reconduc\w+|reconduire|rester|restons|revenir\s+d[ée]finitivement)[^.\n]{0,30}solda|retour\s+d[ée]finitif[^.\n]{0,30}solda)`,
+      `(?:(?:arr[êe]t|gel|abandon|renoncement|blocage)\s+d[ée]finiti\w*|(?:mont[ée]e|bascule|migration|rampe|projet)\s+(?:est\s+|sont\s+)?(?:arr[êe]t[ée]\w*|abandonn[ée]\w*|stopp[ée]\w*|annul[ée]\w*)|(?:on\s+)?(?:arr[êe]te\w*|abandonn\w+|stopp\w+|annule\w*)\s+(?:la\s+|le\s+|toute\s+)?(?:bascule|migration|mont[ée]e|rampe|projet|op[ée]ration)|(?:abandon|sortie|renoncement)\s+(?:de\s+|d[ue]\s+)?payflux|renon[çc]\w+|r[ée]sili\w+|clause\s+de\s+sortie|(?:renouvel\w+|reconduc\w+|reconduire|rester|restons|revenir\s+d[ée]finitivement)[^.\n]{0,30}solda|retour\s+d[ée]finitif[^.\n]{0,30}solda)[\s\S]{0,200}?(?:(?:deux|2|second[e]?|deuxi[èe]me|trois|3|troisi[èe]me|nouveau|nouvelle|autre)\s+(?:replis?|rebascules?|d[ée]clenchements?|retours?\s+arri[èe]re|incidents?|franchissements?|alertes?)|au\s+(?:second|deuxi[èe]me|troisi[èe]me)\s+(?:repli|d[ée]clenchement|incident|retour)|(?:plus\s+d(?:e|'')|au-?del[àa]\s+d(?:e|''))\s*(?:un|1|deux|2)\s+(?:replis?|d[ée]clenchements?|incidents?)|(?:repli|rebascule|d[ée]clenchement|seuil)[^.\n]{0,60}(?:se\s+r[ée]p[èe]te|se\s+reproduit|[àa]\s+nouveau|une\s+(?:seconde|deuxi[èe]me)\s+fois|deux\s+fois)|si\s+(?:nous\s+|on\s+)?(?:devons|doit|devions)\s+replier|si\s+le\s+repli\s+(?:est|doit\s+[êe]tre)\s+d[ée]clench[ée])`'
+  - check_id: fenetre-de-repli-datee
+    kind: deterministic
+    weight: 7
+    result: pass
+    detail: 'regex_all : 2/2 motif(s) — `(?:6|six)\s*semaines|empreintes?\s+de\s+carte|recollect\w+|re-?collect\w+|point\s+de\s+non-?retour|2[.,]1\s*millions?\s+de\s+jetons|cl[ôo]tur\w+[^.\n]{0,40}compte|compte\s+solda[^.\n]{0,40}(?:clos|cl[ôo]tur|ferm)`
+      → « compte Solda clos », `tant\s+que[^.\n]{0,70}(?:ouvert|compte|solda)|avant[^.\n]{0,40}(?:cl[ôo]ture|clos\b|transfert\s+des\s+jetons|15\s*octobre)|prolong\w+|(?:maintenir|maintien|conserver|garder|laisser)[^.\n]{0,40}(?:compte|solda)|fen[êe]tre\s+de\s+repli|apr[èe]s[^.\n]{0,40}cl[ôo]tur\w+[^.\n]{0,90}(?:plus|aucun|impossible|n''existe)`
+      → « tant que Solda est ouvert »'
+  - check_id: ancrage-chiffres-dossier
+    kind: deterministic
+    weight: 4
+    result: pass
+    detail: 'anchor_ids : 11/6 occurrence(s) distincte(s) : « 0,4 % », « 1,3 % », « 0,5 % », « 2,1 millions
+      », « 6 semaines », …'
+  - check_id: repli-porte-sur-option-retenue
+    kind: judged
+    weight: 8
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: sortie-de-la-boucle-arbitree
+    kind: judged
+    weight: 7
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 2
+    failed: 3
+    not_run: 0
+    weighted_score: 11
+    weighted_max: 34
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 2
+    weighted_score: 0
+    weighted_max: 15
+  failure_modes_triggered: []
+  scored_at: '2026-08-09T11:59:39Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 3 contrôle(s) déterministe(s) en échec (poids 11/34) ; candidat de préférence
+    : verdict déterministe complet ; une paire n''existe que si un second essai réel du même scénario
+    existe ; 2 contrôle(s) jugé(s) non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- 'Le document d''autorité est un CANDIDAT non activé (v2.5.0, sélection par la mesure), pas le canon
+  : master.yaml reste l''autorité du dépôt et l''activation appartient à l''émetteur désigné.'
+- 'Premier candidat à RETIRER : permission_naming, ruin_statement, l''ajout au champ obligatoire d''export
+  et la clause générale de primauté sont retirés après trois campagnes les mesurant inutiles ou nuisibles.
+  Les retraits portent sur les additions des candidats précédents, jamais sur le canon.'
+- En-tête de commentaires retiré avant présentation ; l'empreinte enregistrée est celle du fichier complet
+  du dépôt.
+- 'Les blocs conservés ont été sélectionnés sur leurs résultats aux campagnes précédentes, donc sur ces
+  mêmes scénarios : seuls les quatre scénarios rédigés sans lecture de proposal/ portent une mesure hors
+  échantillon.'

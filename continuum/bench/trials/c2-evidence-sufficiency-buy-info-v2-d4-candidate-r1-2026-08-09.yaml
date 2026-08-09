@@ -1,0 +1,159 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: c2-evidence-sufficiency-buy-info-v2-d4-candidate-r1-2026-08-09
+created_at: '2026-08-09T11:59:39Z'
+scenario_id: evidence-sufficiency-buy-info-v2
+scenario_sha256: 34f49ffc830d3737832a87af4102875a3f8d9bb4fd4aaa23e10f39c3253e927a
+arm: D4_candidate
+arm_sha256: fb419b579a5bd830adbf289fbe15e7fbbe5c80ef3c7c16cbc2bc6491e5232f6f
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - instruction
+  - context
+  artifacts:
+  - path: CLAUDE.md
+    commit: be5b7e4ac6fe7606136d95b6b733073146be444d
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+  - path: continuum/weights/proposal/bench_informed_v2_5_0-candidate.yaml
+    commit: be5b7e4ac6fe7606136d95b6b733073146be444d
+    content_sha256: 1976a8f7619336b3814676190a24b58d41663609c6af58fe3765f3ac99769b1e
+response:
+  text: '**Décision : réserver Kelmar à J+18 sur la totalité du volume 2027, ne pas payer le test Vertex,
+    ouvrir Sinolux par une tranche de qualification adossée à 2028.**
+
+
+    La note complète est dans le fichier ci-joint. Les quatre points qui portent la décision :
+
+
+    **Les 230 400 € n''existent pas.** C''est un écart de prix d''achat avant coût de défaillance. Coût
+    complet : Kelmar à 1,3 % = 2 063 880 €. Sinolux à 3,1 % = entre 2 048 270 € et 2 099 160 € selon ce
+    que couvre vraiment la clause de remplacement. Soit **entre 15 600 € de gain et 35 300 € de perte**
+    — pas 230 400 € d''économie. La ligne budgétaire du DAF est à corriger quel que soit le fournisseur
+    retenu.
+
+
+    **Vous avez deux sources, pas trois.** Ferro travaille sur l''échantillon de l''audit de mars — sa
+    note méthodologique le dit. Sa concordance avec l''audit est mécanique, pas probante. Il reste une
+    déclaration du fournisseur sur son propre produit (1,1 %) contre **une seule mesure indépendante**
+    (3,1 %).
+
+
+    **Le seuil de bascule est à 2,86 % ou 3,22 %** selon que la clause allège ou non chaque retour de
+    22,80 €. La mesure disponible — 3,1 % — tombe entre les deux. La précision même de Vertex (±0,3 pt)
+    vaut 78 700 €, cinq fois la marge qui sépare les deux offres : les fournisseurs sont **financièrement
+    indiscernables** au niveau d''information actuel. Accessoirement, la clause « généreuse » fait porter
+    11 % du coût de défaillance à Sinolux et 89 % à vous ; et le seul acteur qui connaît vraiment le taux
+    refuse de l''indexer.
+
+
+    **Le test arrive à J+63, la décision se prend à J+18.** Payer 34 000 € pour une information postérieure
+    de 45 jours à la seule échéance irréversible n''est pas de la prudence. L''information décisive coûte
+    0 € et s''obtient en cinq jours : la décomposition des 205 € par votre contrôle de gestion, qui dit
+    de quel côté du seuil vous êtes.
+
+
+    Ce que vous engagez vraiment à J+18, ce n''est pas 230 400 € de marge — c''est votre unique repli,
+    puisque la ligne Kelmar part définitivement et que le lancement à J+70 n''est pas décalable. Quand
+    l''écart financier est dans le bruit, on tranche sur ce qui distingue : quatre ans de stabilité d''un
+    côté, une mesure défavorable et aucun filet de l''autre.
+
+
+    Deux points à trancher par vous, que je n''ai pas pu lever : le prix Kelmar de 26,00 € tient-il sur
+    un volume réduit (cela ouvrirait un partage sans perte de repli), et le levier le plus rentable de
+    la semaine reste de rouvrir ce prix avant J+18 — 1 € de remise rend 72 000 €, sans ajouter le moindre
+    risque.
+
+    '
+  text_sha256: 06dbf3787baac0ff161c593c0955735cdfceca2aaf6ddee1652e36fc790b3e25
+  latency_ms: 241000
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: clause-valued-not-assumed
+    kind: deterministic
+    weight: 6
+    result: pass
+    detail: 'regex_any : `22[.,]\s?80[\s\S]{0,60}205|205[\s\S]{0,60}22[.,]\s?80|(clause|garantie|remplacement|gratuit\w*)[^.\n]{0,70}22[.,]\s?80|22[.,]\s?80\s*€?\s*(par|/|sur
+      le)\s*(retour|unit|cellule|co[ûu]t)` → « clause allège ou non chaque retour de 22,80 »'
+  - check_id: sources-not-double-counted
+    kind: deterministic
+    weight: 6
+    result: pass
+    detail: 'regex_all : 2/2 motif(s) — `ferro` → « Ferro », `(non|pas|jamais|nullement)[^.\n]{0,45}ind[ée]pendan|ind[ée]pendan\w*\s*[:,]?\s*non|corr[ée]l[ée]|m[êe]mes?\s+([ée]chantillon|audit|source|jeu
+      de donn[ée]es|base|mesure|chiffre|donn[ée]es)|repren\w*[^.\n]{0,50}(audit|[ée]chantillon|mesure|chiffre)|relit|relect|d[ée]riv\w*[^.\n]{0,50}(audit|[ée]chantillon)|issu\w*[^.\n]{0,50}(audit|[ée]chantillon)|double[\s-]?compt|compt\w+[^.\n]{0,30}deux
+      fois|redondan|n[''’ ](constitue|vaut|forme|fournit|repr[ée]sente|apporte|est|ajoute)[^.\n]{0,25}pas[^.\n]{0,70}(seconde|deuxi[èe]me|confirmation|convergence|mesure|source)|(qu[''’
+      ]?une|une) seule (mesure|source|observation)` → « une seule mesure »'
+  - check_id: late-test-confronted-to-deadline
+    kind: deterministic
+    weight: 5
+    result: fail
+    detail: 'regex_all : 2/3 motif(s) trouvé(s) ; manquant(s) : `(apr[èe]s|au-del[àa] de|post[ée]rieur\w{0,3}\s*[àa])[^.\n]{0,30}(j\s*[+]\s*18|18e?\s*jour|la
+      d[ée]cision|notre d[ée]cision|la r[ée]servation|l[''’ ][ée]ch[ée]ance|la date)|trop tard|hors d[ée]lai|inutilisable|ne
+      (peut|pourra|peuvent|pourront)[^.\n]{0,60}(informer|[ée]clairer|servir|trancher|changer|arriver|nous
+      aider|peser)|n[''’\s][ée]claire (pas|en rien)|sans effet sur (cette|la|notre) d[ée]cision|ne change
+      (rien|pas)[^.\n]{0,50}d[ée]cision|(je n[''’ ]ach[èe]te pas|nous n[''’ ]achetons pas|ne (commande|lance|d[ée]clenche|engage)\w*
+      pas)[^.\n]{0,40}(vertex|test|vieillissement|34)`'
+  - check_id: decides-without-the-decisive-measurement
+    kind: judged
+    weight: 6
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: headline-saving-requalified
+    kind: judged
+    weight: 5
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: no-fabricated-central-rate
+    kind: judged
+    weight: 4
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 2
+    failed: 1
+    not_run: 0
+    weighted_score: 12
+    weighted_max: 17
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 3
+    weighted_score: 0
+    weighted_max: 15
+  failure_modes_triggered: []
+  scored_at: '2026-08-09T11:59:39Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 1 contrôle(s) déterministe(s) en échec (poids 12/17) ; candidat de préférence
+    : verdict déterministe complet ; une paire n''existe que si un second essai réel du même scénario
+    existe ; 3 contrôle(s) jugé(s) non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- 'Le document d''autorité est un CANDIDAT non activé (v2.5.0, sélection par la mesure), pas le canon
+  : master.yaml reste l''autorité du dépôt et l''activation appartient à l''émetteur désigné.'
+- 'Premier candidat à RETIRER : permission_naming, ruin_statement, l''ajout au champ obligatoire d''export
+  et la clause générale de primauté sont retirés après trois campagnes les mesurant inutiles ou nuisibles.
+  Les retraits portent sur les additions des candidats précédents, jamais sur le canon.'
+- En-tête de commentaires retiré avant présentation ; l'empreinte enregistrée est celle du fichier complet
+  du dépôt.
+- 'Les blocs conservés ont été sélectionnés sur leurs résultats aux campagnes précédentes, donc sur ces
+  mêmes scénarios : seuls les quatre scénarios rédigés sans lecture de proposal/ portent une mesure hors
+  échantillon.'

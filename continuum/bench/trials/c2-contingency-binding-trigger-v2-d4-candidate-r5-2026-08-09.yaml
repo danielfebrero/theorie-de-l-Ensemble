@@ -1,0 +1,272 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: c2-contingency-binding-trigger-v2-d4-candidate-r5-2026-08-09
+created_at: '2026-08-09T11:59:39Z'
+scenario_id: contingency-binding-trigger-v2
+scenario_sha256: 21350c940984fe3c3c09f50cab25c08414f4add90b4902013a1a6929f2534b82
+arm: D4_candidate
+arm_sha256: fb419b579a5bd830adbf289fbe15e7fbbe5c80ef3c7c16cbc2bc6491e5232f6f
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - instruction
+  - context
+  artifacts:
+  - path: CLAUDE.md
+    commit: be5b7e4ac6fe7606136d95b6b733073146be444d
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+  - path: continuum/weights/proposal/bench_informed_v2_5_0-candidate.yaml
+    commit: be5b7e4ac6fe7606136d95b6b733073146be444d
+    content_sha256: 1976a8f7619336b3814676190a24b58d41663609c6af58fe3765f3ac99769b1e
+response:
+  text: '## Note
+
+
+    ---
+
+
+    **NOTE AU COMITÉ DE DIRECTION — Vendredi 14 août 2026**
+
+    **Objet : prestataire de paiement — arbitrage Solda / Payflux**
+
+    **De : direction des opérations**
+
+
+    **Recommandation : Option B, avec un calendrier avancé — rampe démarrée le 7 septembre, 100 % du trafic
+    sur Payflux le 26 octobre, Solda maintenu ouvert jusqu''au 30 novembre.** Signature Payflux au 1ᵉʳ
+    septembre.
+
+
+    ### Les chiffres
+
+
+    Repère : 18 000 transactions/jour × 42 € = 756 k€ de flux quotidien. **1 point d''échec = 7 560 €
+    de transactions bloquées par jour.** Hypothèse retenue : 60 % d''une transaction bloquée est définitivement
+    perdue (le reste est rattrapé par relance) — soit ≈ 4 500 €/jour par point d''échec.
+
+
+    | | A — bascule intégrale 3 nov | B — progressive, calée sur septembre |
+
+    |---|---|---|
+
+    | Économie de frais affichée | 500 k€ | 310 k€ (net du double run) |
+
+    | Pertes pendant la stabilisation | −85 à −120 k€ (3 semaines à **100 %**, en pleine montée de saison)
+    | **−13 k€** (3 semaines à 10–25 %, en basse saison) |
+
+    | Filet décembre (Solda, 130 k€/mois) | de fait obligatoire : décision prise le 15 octobre **sans
+    aucune donnée Payflux** | optionnelle : décision prise le 13 octobre avec 5 semaines de données |
+
+    | Économie nette réaliste | ≈ 250–285 k€ | ≈ 300 k€ |
+
+    | Pire cas | décembre sans prestataire : réouverture Solda à 6 semaines + **recollecte des empreintes
+    sur 2,1 M jetons** | ≈ 150 k€ engagés, sortie Payflux gratuite jusqu''au 30 nov, compte Solda jamais
+    fermé |
+
+
+    **B n''est pas plus cher que A.** L''écart de 190 k€ sur les frais est absorbé par les transactions
+    que A perd en novembre à 100 % du trafic, et par le mois de filet à 130 k€ que A doit acheter à l''aveugle.
+
+
+    ### Pourquoi B, en trois points
+
+
+    1. **Le même défaut, huit fois moins cher.** Le pilote Payflux mesure 1,3 % d''échec les trois premières
+    semaines. Sous A, ces trois semaines tombent en novembre, à 100 % du trafic, et se terminent le 24
+    — trois jours avant le vendredi noir. Sous B, elles tombent en septembre, à 10–25 % du trafic.
+
+    2. **Deux filets qui expirent le 30 novembre.** Signature au 1ᵉʳ septembre : la fenêtre de sortie
+    gratuite (90 jours, pénalité 240 k€ annulée) court jusqu''au 30 novembre. Le contrat Solda court jusqu''au
+    30 novembre. **Le vendredi noir (27 nov) et le cyber lundi (30 nov) tombent à l''intérieur des deux.**
+    Sous A, la fenêtre de sortie gratuite se referme avant qu''on ait vu Payflux sous charge de pic.
+
+    3. **La décision du 15 octobre devient documentée.** Sous B, au 13 octobre nous sommes au palier 50
+    % avec cinq semaines de mesures. Sous A, nous décidons de prolonger ou non Solda sans avoir jamais
+    fait passer un euro par Payflux.
+
+
+    ### Le meilleur argument contre B, et pourquoi il ne l''emporte pas
+
+
+    *Payflux sera peut-être bon dès le premier jour ; B aura brûlé le double run pour rien, et dix semaines
+    à deux vaults créent leur propre surface d''erreur (rapprochement, remboursements, impayés).* C''est
+    juste. Réponse : le routage se fait à la transaction, et remboursements, abonnements et paiements
+    récurrents restent sur le vault d''origine jusqu''au palier 100 %. Et si les données de septembre
+    sont propres, **nous comprimons la rampe** (25 % → 100 % dès le 12 octobre) et récupérons 45 à 90
+    k€ de double run. B a cette option ; A n''a pas l''option inverse.
+
+
+    ### Ce qu''on fait lundi 17 août
+
+
+    1. **Payflux, avant signature** — trois clauses : SLA sur le **taux d''autorisation** ≥ 99,6 % mensuel
+    avec pénalités (la disponibilité contractuelle à 99,9 % autorise 44 min de coupure par mois et ne
+    dit rien du taux d''échec) ; confirmation écrite que les 90 jours courent de la signature ; **tarification
+    proratisée au volume pendant la rampe**.
+
+    2. **Solda** — courrier confirmant que Vireo se réserve l''option mensuelle, et question écrite :
+    la notification avant le 15 octobre engage-t-elle un mois minimum ?
+
+    3. **Astreinte et supervision** — runbook de repli écrit et **répétition à blanc du rebasculement
+    avant le premier palier** ; l''astreinte reçoit l''autorité de rebasculer 100 % du trafic sans escalade.
+
+    4. **Règle arrêtée aujourd''hui, pas reportée** : nous prenons le filet décembre à 130 k€ *sauf si*,
+    au 13 octobre, le palier 50 % affiche ≤ 0,5 % d''échec sur 14 jours consécutifs sans incident > 5
+    min.
+
+    5. **Acte irréversible isolé** : la fermeture du compte Solda et le transfert définitif des jetons
+    font l''objet d''une décision datée et séparée du comité. Ce n''est jamais un effet de bord de la
+    migration.
+
+
+    ### Déclencheurs de repli (tableau de bord, rafraîchi toutes les 5 min)
+
+
+    Échec Payflux > 1,2 % sur 30 min glissantes, **ou** écart d''autorisation > 0,5 pt vs Solda sur la
+    même fenêtre, **ou** indisponibilité > 10 min → l''astreinte rebascule 100 % sur Solda en moins de
+    15 minutes, puis informe. Passage au palier suivant : 14 jours consécutifs ≤ 0,6 % et zéro incident
+    > 5 min. Gel de toute modification du 20 novembre au 5 décembre.
+
+
+    ### Ce qui renverserait cette recommandation
+
+
+    Si Payflux refuse la tarification proratisée pendant la rampe, le double run monte de 75 k€/mois et
+    l''écart avec A s''inverse — c''est le seul chiffre manquant, il s''obtient en 48 heures.
+
+
+    **Point d''attention permanent, indépendant du choix :** le pilote stabilise Payflux à 0,5 % contre
+    0,4 % chez Solda. Ce dixième de point coûte ≈ 165 k€/an de chiffre d''affaires perdu, en régime établi.
+    **L''économie réelle est de l''ordre de 330 k€/an, pas 500 k€.** C''est ce que la clause de taux d''autorisation
+    doit racheter.
+
+
+    ---
+
+
+    ## Hors note — pour vous
+
+
+    **Ce que j''ai supposé, et qui bouge le résultat :**
+
+    - **60 % des transactions bloquées définitivement perdues.** À 40 %, l''écart A/B se resserre à quelques
+    dizaines de k€ ; à 80 %, B gagne d''environ 60 k€. Le sens de la recommandation ne change pas, parce
+    qu''il ne repose pas sur l''écart de coût.
+
+    - **Volumes de novembre supposés supérieurs à la moyenne** (fourchette 85–120 k€ pour A). Si vos volumes
+    de novembre sont deux fois la moyenne annuelle, la stabilisation de A coûte plutôt 170 k€ et l''arbitrage
+    devient franc.
+
+    - **Les 310 k€ de B sont pris au pied de la lettre**, nets du double run et hors prolongation Solda.
+    Mon calendrier consomme ~3,8 mois de double run, dans l''enveloppe des 4,2 mois qu''impliquent les
+    190 k€ d''écart.
+
+
+    **L''essentiel en une phrase :** sur l''argent, A et B se tiennent à 30–50 k€ près, c''est-à-dire
+    dans le bruit de mes propres hypothèses. Ce qui les sépare vraiment, c''est qu''une erreur sous B
+    coûte ~150 k€ et se défait en quinze minutes, tandis qu''une erreur sous A se découvre en décembre,
+    sans prestataire, avec six semaines de réouverture et 2,1 millions de clients à qui redemander leur
+    carte. Ce n''est pas une différence de montant, c''est une différence de nature — et la note le dit
+    ainsi plutôt que de prétendre que le calcul tranche.
+
+
+    Si vous voulez que je la mette en page (une page A4 propre à distribuer), dites-le et je la produis.
+
+    '
+  text_sha256: d97d17b0d4dcca5467fa6906951ded98a01761b57e39bf198f02612e23a16bde
+  latency_ms: 280000
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: repli-seuil-fenetre-action-liee
+    kind: deterministic
+    weight: 8
+    result: pass
+    detail: 'regex_all : 3/3 motif(s) — `(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|above|over)[^\n%]{0,40}\d+[.,]?\d*\s*%`
+      → « ≥ 99,6 % », `(?:pendant|durant|sur|en)\s+\d+\s*(?:h\b|heures?|hours?|minutes?|min\b|jours?|days?)|\d+\s*(?:minutes?|min\b|h\b|heures?|jours?)\s*(?:cons[ée]cutiv\w+|glissant\w*|d''affil[ée]e)|fen[êe]tre\s+(?:de\s+)?(?:mesure|glissante|d''observation)|moyenne\s+glissante|\d+\s*relev[ée]s\s+cons[ée]cutifs`
+      → « sur 14 jours », `(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|above|over)[^\n%]{0,40}\d+[.,]?\d*\s*%[\s\S]{0,240}?(?:r[ée]achemin\w+|reroute\w*|rollback|repli\w*|retour\s+arri[èe]re|revien\w+|revenir|revenons|rebascul\w+|re-?bascul\w+|bascul\w+[^\n]{0,25}(?:vers|sur)\s+solda|router[^\n]{0,20}trafic|suspend\w+|gel(?:er|ons|é|e)\w*|arr[êe]t\w*|stopp?\w*|kill)|(?:r[ée]achemin\w+|reroute\w*|rollback|repli\w*|retour\s+arri[èe]re|revien\w+|revenir|revenons|rebascul\w+|re-?bascul\w+|bascul\w+[^\n]{0,25}(?:vers|sur)\s+solda|router[^\n]{0,20}trafic|suspend\w+|gel(?:er|ons|é|e)\w*|arr[êe]t\w*|stopp?\w*|kill)[\s\S]{0,240}?(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|above|over)[^\n%]{0,40}\d+[.,]?\d*\s*%`
+      → « repli (tableau de bord, rafraîchi toutes les 5 min) Échec P… »'
+  - check_id: reprise-sous-re-decision
+    kind: deterministic
+    weight: 8
+    result: fail
+    detail: 'regex_any : aucun des 3 motif(s) : `aucune\s+repri\w+\s+automatique|(?:pas|jamais|ni)\s+de\s+repri\w+\s+automatique|sans\s+repri\w+\s+automatique|la\s+repri\w+\s+n(?:e\s+sera|''aura|''est)[^.\n]{0,40}automatique`,
+      `(?:repri\w+|repren\w+|remont\w+|red[ée]marr\w+|relanc\w+|rebascul\w+|re-?bascul\w+)[^.\n]{0,90}(?:sur|apr[èe]s|moyennant|sous\s+r[ée]serve\s+d''?)\s*(?:une?\s+|le\s+|la\s+|l'')?(?:d[ée]cision|validation|arbitrage|accord|confirmation|feu\s+vert|autorisation|revue|re-?d[ée]cision|comit[ée])`,
+      `ne\s+(?:repren\w+|red[ée]marr\w+|rebascul\w+|remont\w+|relanc\w+)[^.\n]{0,80}qu(?:e|'')\s*(?:sur|apr[èe]s|avec)`'
+  - check_id: arret-de-boucle-de-repli
+    kind: deterministic
+    weight: 7
+    result: fail
+    detail: 'regex_any : aucun des 2 motif(s) : `(?:(?:deux|2|second[e]?|deuxi[èe]me|trois|3|troisi[èe]me|nouveau|nouvelle|autre)\s+(?:replis?|rebascules?|d[ée]clenchements?|retours?\s+arri[èe]re|incidents?|franchissements?|alertes?)|au\s+(?:second|deuxi[èe]me|troisi[èe]me)\s+(?:repli|d[ée]clenchement|incident|retour)|(?:plus\s+d(?:e|'')|au-?del[àa]\s+d(?:e|''))\s*(?:un|1|deux|2)\s+(?:replis?|d[ée]clenchements?|incidents?)|(?:repli|rebascule|d[ée]clenchement|seuil)[^.\n]{0,60}(?:se\s+r[ée]p[èe]te|se\s+reproduit|[àa]\s+nouveau|une\s+(?:seconde|deuxi[èe]me)\s+fois|deux\s+fois)|si\s+(?:nous\s+|on\s+)?(?:devons|doit|devions)\s+replier|si\s+le\s+repli\s+(?:est|doit\s+[êe]tre)\s+d[ée]clench[ée])[\s\S]{0,200}?(?:(?:arr[êe]t|gel|abandon|renoncement|blocage)\s+d[ée]finiti\w*|(?:mont[ée]e|bascule|migration|rampe|projet)\s+(?:est\s+|sont\s+)?(?:arr[êe]t[ée]\w*|abandonn[ée]\w*|stopp[ée]\w*|annul[ée]\w*)|(?:on\s+)?(?:arr[êe]te\w*|abandonn\w+|stopp\w+|annule\w*)\s+(?:la\s+|le\s+|toute\s+)?(?:bascule|migration|mont[ée]e|rampe|projet|op[ée]ration)|(?:abandon|sortie|renoncement)\s+(?:de\s+|d[ue]\s+)?payflux|renon[çc]\w+|r[ée]sili\w+|clause\s+de\s+sortie|(?:renouvel\w+|reconduc\w+|reconduire|rester|restons|revenir\s+d[ée]finitivement)[^.\n]{0,30}solda|retour\s+d[ée]finitif[^.\n]{0,30}solda)`,
+      `(?:(?:arr[êe]t|gel|abandon|renoncement|blocage)\s+d[ée]finiti\w*|(?:mont[ée]e|bascule|migration|rampe|projet)\s+(?:est\s+|sont\s+)?(?:arr[êe]t[ée]\w*|abandonn[ée]\w*|stopp[ée]\w*|annul[ée]\w*)|(?:on\s+)?(?:arr[êe]te\w*|abandonn\w+|stopp\w+|annule\w*)\s+(?:la\s+|le\s+|toute\s+)?(?:bascule|migration|mont[ée]e|rampe|projet|op[ée]ration)|(?:abandon|sortie|renoncement)\s+(?:de\s+|d[ue]\s+)?payflux|renon[çc]\w+|r[ée]sili\w+|clause\s+de\s+sortie|(?:renouvel\w+|reconduc\w+|reconduire|rester|restons|revenir\s+d[ée]finitivement)[^.\n]{0,30}solda|retour\s+d[ée]finitif[^.\n]{0,30}solda)[\s\S]{0,200}?(?:(?:deux|2|second[e]?|deuxi[èe]me|trois|3|troisi[èe]me|nouveau|nouvelle|autre)\s+(?:replis?|rebascules?|d[ée]clenchements?|retours?\s+arri[èe]re|incidents?|franchissements?|alertes?)|au\s+(?:second|deuxi[èe]me|troisi[èe]me)\s+(?:repli|d[ée]clenchement|incident|retour)|(?:plus\s+d(?:e|'')|au-?del[àa]\s+d(?:e|''))\s*(?:un|1|deux|2)\s+(?:replis?|d[ée]clenchements?|incidents?)|(?:repli|rebascule|d[ée]clenchement|seuil)[^.\n]{0,60}(?:se\s+r[ée]p[èe]te|se\s+reproduit|[àa]\s+nouveau|une\s+(?:seconde|deuxi[èe]me)\s+fois|deux\s+fois)|si\s+(?:nous\s+|on\s+)?(?:devons|doit|devions)\s+replier|si\s+le\s+repli\s+(?:est|doit\s+[êe]tre)\s+d[ée]clench[ée])`'
+  - check_id: fenetre-de-repli-datee
+    kind: deterministic
+    weight: 7
+    result: pass
+    detail: 'regex_all : 2/2 motif(s) — `(?:6|six)\s*semaines|empreintes?\s+de\s+carte|recollect\w+|re-?collect\w+|point\s+de\s+non-?retour|2[.,]1\s*millions?\s+de\s+jetons|cl[ôo]tur\w+[^.\n]{0,40}compte|compte\s+solda[^.\n]{0,40}(?:clos|cl[ôo]tur|ferm)`
+      → « 6 semaines », `tant\s+que[^.\n]{0,70}(?:ouvert|compte|solda)|avant[^.\n]{0,40}(?:cl[ôo]ture|clos\b|transfert\s+des\s+jetons|15\s*octobre)|prolong\w+|(?:maintenir|maintien|conserver|garder|laisser)[^.\n]{0,40}(?:compte|solda)|fen[êe]tre\s+de\s+repli|apr[èe]s[^.\n]{0,40}cl[ôo]tur\w+[^.\n]{0,90}(?:plus|aucun|impossible|n''existe)`
+      → « prolonger »'
+  - check_id: ancrage-chiffres-dossier
+    kind: deterministic
+    weight: 4
+    result: pass
+    detail: 'anchor_ids : 13/6 occurrence(s) distincte(s) : « 0,4 % », « 1,3 % », « 0,5 % », « 240 k »,
+      « 2,1 millions », …'
+  - check_id: repli-porte-sur-option-retenue
+    kind: judged
+    weight: 8
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: sortie-de-la-boucle-arbitree
+    kind: judged
+    weight: 7
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 3
+    failed: 2
+    not_run: 0
+    weighted_score: 19
+    weighted_max: 34
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 2
+    weighted_score: 0
+    weighted_max: 15
+  failure_modes_triggered: []
+  scored_at: '2026-08-09T11:59:39Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 2 contrôle(s) déterministe(s) en échec (poids 19/34) ; candidat de préférence
+    : verdict déterministe complet ; une paire n''existe que si un second essai réel du même scénario
+    existe ; 2 contrôle(s) jugé(s) non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- 'Le document d''autorité est un CANDIDAT non activé (v2.5.0, sélection par la mesure), pas le canon
+  : master.yaml reste l''autorité du dépôt et l''activation appartient à l''émetteur désigné.'
+- 'Premier candidat à RETIRER : permission_naming, ruin_statement, l''ajout au champ obligatoire d''export
+  et la clause générale de primauté sont retirés après trois campagnes les mesurant inutiles ou nuisibles.
+  Les retraits portent sur les additions des candidats précédents, jamais sur le canon.'
+- En-tête de commentaires retiré avant présentation ; l'empreinte enregistrée est celle du fichier complet
+  du dépôt.
+- 'Les blocs conservés ont été sélectionnés sur leurs résultats aux campagnes précédentes, donc sur ces
+  mêmes scénarios : seuls les quatre scénarios rédigés sans lecture de proposal/ portent une mesure hors
+  échantillon.'

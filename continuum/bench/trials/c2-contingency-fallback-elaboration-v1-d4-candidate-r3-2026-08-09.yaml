@@ -1,0 +1,476 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: c2-contingency-fallback-elaboration-v1-d4-candidate-r3-2026-08-09
+created_at: '2026-08-09T11:59:39Z'
+scenario_id: contingency-fallback-elaboration-v1
+scenario_sha256: 30b92524b518d7cb145c7ca057ffd21bf4894873b5e3fc86eb84801b87414eb1
+arm: D4_candidate
+arm_sha256: fb419b579a5bd830adbf289fbe15e7fbbe5c80ef3c7c16cbc2bc6491e5232f6f
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - instruction
+  - context
+  artifacts:
+  - path: CLAUDE.md
+    commit: be5b7e4ac6fe7606136d95b6b733073146be444d
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+  - path: continuum/weights/proposal/bench_informed_v2_5_0-candidate.yaml
+    commit: be5b7e4ac6fe7606136d95b6b733073146be444d
+    content_sha256: 1976a8f7619336b3814676190a24b58d41663609c6af58fe3765f3ac99769b1e
+response:
+  text: '# Plan d''exécution — conversion électrique de la flotte
+
+    **Conseil du jeudi 13 août 2026 — Direction de l''exploitation**
+
+
+    ---
+
+
+    ## 1. Ce que le conseil décide jeudi
+
+
+    Quatre décisions, dans cet ordre d''urgence :
+
+
+    1. **Commander ce vendredi le lot 2 (8 bornes, 210 k€) *et* le lot 3 (8 bornes, ~210 k€ à confirmer)**,
+    séquencés, cible 30 bornes en service au 30 novembre.
+
+    2. **Lancer sous 48 h l''audit de puissance électrique des deux plateformes** (installateur + gestionnaire
+    de réseau). C''est le vrai chemin critique, et il n''est pas dans le devis actuel.
+
+    3. **Autoriser la rétention diesel jusqu''au 30 juin 2027**, enveloppe 130 k€, avec préavis de prolongation
+    envoyé dès vendredi.
+
+    4. **Écrire à la Région** pour obtenir par écrit la définition de « roulent » et la preuve exigée
+    au 31 janvier.
+
+
+    Le calendrier de livraison des 96 véhicules n''est pas le sujet : ils seront tous livrés au 31 décembre.
+    **Le sujet est notre capacité à les mettre en service.**
+
+
+    ---
+
+
+    ## 2. Le constat qui commande tout
+
+
+    L''autonomie n''est pas la contrainte principale. La puissance de recharge au quai l''est.
+
+
+    *Base de calcul* — une charge complète en 6 h sur une borne 22 kW représente environ 130 kWh embarqués.
+    Rapporté aux autonomies **mesurées** en mars (232 km, 197 km à 2 °C), la consommation ressort à 0,56
+    kWh/km en conditions tempérées et 0,66 kWh/km par temps froid. *Cette valeur de 130 kWh est déduite
+    du temps de charge : à faire confirmer par la fiche constructeur sous 48 h. Elle ne change pas les
+    ordres de grandeur ci-dessous.*
+
+
+    Pour une tournée moyenne de 168 km : **4 h 30 de recharge en septembre, 5 h 30 en janvier.**
+
+
+    | Bornes disponibles | Véhicules rechargeables par nuit (hiver, fenêtre 14 h) |
+
+    |---|---|
+
+    | 14 (aujourd''hui) | ~35 |
+
+    | 22 (après lot 2) | ~56 |
+
+    | 30 (après lot 3) | ~76 |
+
+    | ~40 (lot 4) | ~96 — flotte complète |
+
+
+    **Les 22 bornes du devis actuel ne permettent pas de faire rouler 60 véhicules en janvier.** Le devis
+    de 210 k€ couvre à peu près la moitié du besoin. C''est le point le plus important du dossier.
+
+
+    **Et derrière les bornes, il y a le raccordement.** Faire rouler 60 véhicules en hiver demande environ
+    480 kW de puissance appelée en moyenne sur la nuit, soit ~240 kW par plateforme ; la flotte complète
+    en demande ~760 kW. Nos 14 bornes actuelles représentent 154 kW installés. **Les « 7 semaines de travaux
+    » chiffrent la pose des bornes, pas un renforcement de raccordement** — lequel se compte en mois,
+    pas en semaines. Si un renforcement est nécessaire et dépasse 12 semaines, la cible du 31 janvier
+    bascule. Nous devons le savoir cette semaine, pas en octobre.
+
+
+    ---
+
+
+    ## 3. Ce qu''on convertit : des tournées, pas des véhicules
+
+
+    L''essai est clair : les 11 recharges imprévues sur 120 tournées sont **toutes** sur des tournées
+    de plus de 190 km, ce qui recoupe exactement l''autonomie froide mesurée (197 km). Le risque n''est
+    pas diffus, il est localisé.
+
+
+    Règle d''affectation, appliquée tournée par tournée et non véhicule par véhicule :
+
+
+    | Température minimale prévue | Plafond kilométrique pour une tournée électrique |
+
+    |---|---|
+
+    | ≥ 8 °C | 190 km |
+
+    | 0 à 8 °C | 175 km |
+
+    | < 0 °C | 145 km |
+
+
+    Les 96 tournées sont classées **cette semaine** par kilométrage réel constaté (le superviseur de flotte
+    le fournit, il remonte l''odomètre toutes les 10 minutes — pas de kilométrage théorique). On convertit
+    par le bas de la liste, la plus courte d''abord.
+
+
+    Le plafond < 0 °C est **une extrapolation** : nous n''avons aucune mesure sous 2 °C. Deux véhicules
+    de l''essai seront instrumentés au premier épisode froid pour la produire.
+
+
+    Point ouvert à trancher au 30 septembre : si, après recoupe de quelques tournées limitrophes, **moins
+    de 60 tournées passent sous le plafond hivernal**, atteindre 60 véhicules en service en janvier suppose
+    autre chose — chiffrage demandé en parallèle pour 2 bornes rapides DC par plateforme, qui permettraient
+    une recharge d''appoint de mi-journée et relèveraient le plafond.
+
+
+    ---
+
+
+    ## 4. Le filet diesel
+
+
+    L''arithmétique est écrasante et va dans un seul sens :
+
+
+    - Prolonger un diesel un mois : **480 €**.
+
+    - Une tournée non terminée : **900 €**.
+
+    - Un diesel rendu à tort : **11 semaines sans solution.**
+
+
+    Prolonger est moins cher dès qu''un véhicule éviterait plus d''une demi-tournée manquée par mois.
+    L''essai montre 9 % de tournées à recharge imprévue sur un plan non filtré. Et l''asymétrie est totale
+    : la prolongation est réversible au mois le mois, la restitution ne l''est pas.
+
+
+    **Règle de restitution :** un diesel n''est rendu que lorsque le véhicule électrique qui reprend sa
+    tournée a accompli **10 jours de service consécutifs sans incident** sur cette tournée. Plancher absolu
+    : 15 diesels en réserve jusqu''au 30 juin 2027, quel que soit le calendrier.
+
+
+    Attention au sens du défaut contractuel : sans préavis, le contrat rend. **Le préavis de 30 jours
+    doit donc être envoyé pour tous les lots dont la reprise est prévue avant le 31 octobre — la fenêtre
+    pour les premières reprises de septembre se ferme autour du 15 août.** C''est l''action la plus urgente
+    du dossier et elle coûte 480 € par véhicule et par mois.
+
+
+    ---
+
+
+    ## 5. Rampe de mise en service
+
+
+    | | VE livrés (cumul) | Bornes en service | Capacité de charge | VE mis en service | Diesels conservés
+    |
+
+    |---|---|---|---|---|---|
+
+    | 30 sept | 24 | 14 | ~43 (doux) | 24 | 72 |
+
+    | 31 oct | 48 | 22 | ~56 | 48 | 48 |
+
+    | 30 nov | 72 | 30 | ~76 | 60 | 36 |
+
+    | 31 déc | 96 | 30 | ~76 | 60 | 36 |
+
+    | **31 janv** | 96 | 30 | ~76 | **60 — seuil subvention atteint** | 36 |
+
+    | 31 mars | 96 | ~40 (lot 4) | ~96 | 96 | 15 (réserve) |
+
+
+    Le lot 2 doit être opérationnel début octobre, le lot 3 fin novembre. Commandés vendredi, les deux
+    tiennent. Commandé en octobre, le lot 3 arrive en décembre : la moindre dérive coûte alors 620 000
+    €.
+
+
+    Marge volontaire : 60 véhicules en service pour un seuil à 60, sur une capacité de 76. Les 36 véhicules
+    restants attendent le lot 4 plutôt que d''être mis en service sans recharge fiable.
+
+
+    ---
+
+
+    ## 6. Pilotage : ce qu''on lit chaque soir, ce qui déclenche quoi
+
+
+    Le tableau de bord publie déjà, par plateforme, le taux de tournées terminées et le nombre de recharges
+    non prévues. Aucun nouvel outil n''est nécessaire.
+
+
+    | Déclencheur observable | Action, sans arbitrage supplémentaire |
+
+    |---|---|
+
+    | Recharges imprévues > 5 % des tournées VE sur 5 jours glissants, sur une plateforme | Plafond kilométrique
+    de cette plateforme abaissé de 20 km ; toute restitution diesel gelée 30 jours |
+
+    | Taux de tournées terminées < 98 % deux soirs consécutifs | Les tournées concernées repassent au
+    diesel le lendemain matin ; analyse sous 48 h |
+
+    | Au 30 septembre : lot 2 non en fabrication confirmée | Gel total des restitutions ; prolongation
+    de tous les lots diesel |
+
+    | Audit électrique concluant à un renforcement > 12 semaines | Consultation immédiate pour recharge
+    mobile temporaire (déc–fév) + ouverture de la discussion Région sur le jalon |
+
+    | Au 20 décembre : moins de 55 VE immatriculés, affectés et rechargeables | Escalade Région + activation
+    de la recharge temporaire |
+
+    | **Arrêt dur :** diesels disponibles < 15 alors que le taux de complétion VE est < 99 % | Aucune
+    restitution supplémentaire, quel que soit le calendrier contractuel |
+
+
+    ---
+
+
+    ## 7. Budget des mesures
+
+
+    | | Montant |
+
+    |---|---|
+
+    | Lot 2 — 8 bornes | 210 k€ (devisé) |
+
+    | Lot 3 — 8 bornes | ~210 k€ (à confirmer) |
+
+    | Renforcement de raccordement | **non chiffré — chiffrage sous 5 jours** |
+
+    | Rétention diesel jusqu''au 30 juin 2027 | ~130 k€ |
+
+    | Référents chauffeurs, formation | ~25 k€ (ordre de grandeur) |
+
+    | **Identifié** | **~575 k€ + raccordement** |
+
+
+    À mettre en regard : 620 k€ de subvention, et 900 € par tournée manquée — soit 8 600 € pour une seule
+    journée à 10 % d''échec sur les 96 tournées.
+
+
+    Le lot 4 (~210 k€) sera présenté au conseil de novembre, sur données mesurées.
+
+
+    ---
+
+
+    ## 8. Le pire cas, et qui l''encaisse
+
+
+    **Le pire cas n''est pas une tournée ratée. C''est le 1er février avec 55 véhicules en service.**
+    La subvention est perdue en totalité — 620 k€, sans rattrapage possible, un jalon calendaire ne se
+    renégocie pas après coup. Cela arrive si le raccordement s''avère long et qu''on l''apprend en novembre.
+
+
+    Qui l''encaisse : Bardane sur son résultat ; et, en second rang, les clients des tournées longues,
+    qui absorbent les retards pendant qu''on improvise. C''est cette branche-là que tout le dispositif
+    ci-dessus achète — les 420 k€ de bornes et les 130 k€ de diesel sont le prix d''une option sur 620
+    k€.
+
+
+    ---
+
+
+    ## 9. L''objection, et ce qu''elle change
+
+
+    *« Vous surdimensionnez. 232 km mesurés couvrent la tournée moyenne de 168 km avec 38 % de marge,
+    et 9 % de recharges intermédiaires sur l''essai ne sont pas 9 % d''échecs — une recharge d''appoint
+    est une gêne, pas une tournée perdue. Vous dépensez 550 k€ contre un risque que les données ne montrent
+    pas. »*
+
+
+    L''objection est juste sur un point : j''ai traité les recharges imprévues comme un proxy d''échec,
+    ce qui les surestime. Elle est également juste sur la marge en conditions tempérées.
+
+
+    Elle ne tient pas sur la contrainte qui commande le plan. 96 véhicules × ~110 kWh est une quantité
+    d''énergie, pas une estimation de risque : aucune marge de conduite ne crée d''heures-bornes, et aucune
+    prudence sur l''autonomie ne remplace un raccordement. Le programme de recharge n''est pas dimensionné
+    sur un risque, il est dimensionné sur une addition.
+
+
+    Elle ne tient pas non plus sur le diesel, à cause des 11 semaines : 480 € achètent une option, la
+    restitution supprime l''option.
+
+
+    **Ce qu''elle change effectivement :** le plafond hivernal démarre à 175 km et non 165, et il ne se
+    resserre que sur constat. Une recharge d''appoint sur une borne 22 kW immobilise toutefois plusieurs
+    heures — sur une tournée de 240 km, elle est de fait un échec, ce qui valide le plafond mais non son
+    excès de prudence initial.
+
+
+    ---
+
+
+    ## 10. Ce qui renverserait ce plan
+
+
+    Quatre observations, chacune datée :
+
+
+    1. **Fenêtre de branchement réelle < 10 h** (mesurable dès la semaine prochaine sur la télémétrie
+    : chaque véhicule remonte son état toutes les 10 minutes, on en déduit les créneaux d''immobilisation
+    exacts). Conséquence : +20 % de bornes, lot 4 avancé.
+
+    2. **Moins de 60 tournées sous le plafond hivernal après recoupe** — décision au 30 septembre. Conséquence
+    : recharge rapide DC ou refonte du plan de tournées.
+
+    3. **Consommation mesurée sous −2 °C au-delà de 0,70 kWh/km.** Conséquence : plafond à 145 km, même
+    effet que ci-dessus.
+
+    4. **Délai de raccordement > 12 semaines sur l''une des plateformes.** Conséquence : la cible du 31
+    janvier n''est plus tenable par les moyens de ce plan ; on va voir la Région en septembre, avec une
+    solution, et non en janvier, avec un constat d''échec.
+
+
+    ---
+
+
+    ## 11. Les chauffeurs et les clients
+
+
+    Les six chauffeurs de l''essai deviennent **référents électriques**, mission indemnisée. Pendant les
+    10 premiers jours de conversion d''une tournée, un signalement de référent oblige l''exploitation
+    à statuer sous 24 h et le signalement est journalisé. L''ordre de conversion des tournées est proposé
+    par l''exploitation et **validé avec les référents**, qui siègent à la revue hebdomadaire du mardi
+    : ce sont eux qui savent où sont les côtes, les attentes en quai et les points froids.
+
+
+    Sur les tournées longues qui ne passeront pas en électrique avant le lot 4, nous allons voir les clients
+    concernés **avant** de toucher à quoi que ce soit, avec une proposition de fenêtre de livraison élargie
+    et une contrepartie tarifaire, plutôt qu''un retard subi. Un client prévenu et compensé absorbe ;
+    un client surpris part.
+
+
+    Auprès du loueur, nous proposons un engagement de volume minimal en échange d''un préavis raccourci
+    — le dispositif actuel nous impose de décider 30 jours à l''avance ce que les données ne nous diront
+    que 10 jours à l''avance.
+
+
+    ---
+
+
+    ## 12. Première action — vendredi 14 août, avant tout le reste
+
+
+    1. **Envoi au loueur du préavis de prolongation** couvrant tous les lots dont la reprise est prévue
+    avant le 31 octobre. Cela inverse le défaut contractuel : on conserve par défaut, on rend sur preuve.
+    Coût 480 €/véhicule/mois, réversible.
+
+    2. **Commande de l''audit de capacité électrique des deux plateformes**, installateur et gestionnaire
+    de réseau, retour sous 5 jours.
+
+    3. **Courrier à la Région** : définition écrite de « roulent » au 31 janvier et pièces justificatives
+    attendues.
+
+
+    Les points 2 et 3 sont peu coûteux et lèvent les deux incertitudes qui peuvent, seules, faire perdre
+    620 000 €.
+
+    '
+  text_sha256: 0c4f04b4fedac4bd290651fb7fa5582be4a55df6f79d0f2178179c26be953383
+  latency_ms: 294000
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: declencheur-chiffre-lie-au-repli
+    kind: deterministic
+    weight: 8
+    result: pass
+    detail: 'regex_all : 3/3 motif(s) — `(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|plus\s+de|seuil\s+d[eu'']|en\s+de[çc][àa]|tomb\w+\s+(?:sous|en\s+dessous)|inf[ée]rieur\w*|moins\s+de)[^\n]{0,40}\d+[.,]?\d*\s*(?:%|km\b|€|tourn[ée]es?|v[ée]hicules?|recharges?)`
+      → « plus de 190 km », `(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|plus\s+de|seuil\s+d[eu'']|en\s+de[çc][àa]|tomb\w+\s+(?:sous|en\s+dessous)|inf[ée]rieur\w*|moins\s+de)[^\n]{0,40}\d+[.,]?\d*\s*(?:%|km\b|€|tourn[ée]es?|v[ée]hicules?|recharges?)[\s\S]{0,160}?(?:(?:pendant|durant|sur|en)\s+\d+\s*(?:jours?|semaines?|relev[ée]s?)|\d+\s*(?:jours?|semaines?|tourn[ée]es?|relev[ée]s?)\s*(?:cons[ée]cutifs?|cons[ée]cutives?|glissant\w*|d''affil[ée]e|de\s+suite)|fen[êe]tre\s+(?:de\s+)?(?:mesure|glissante|d''observation)|moyenne\s+glissante|(?:sur|en)\s+(?:une|1|deux|2|trois|3)\s+semaines?|deux\s+jours\s+de\s+suite|(?:sur|en)\s+(?:une|1)\s+journ[ée]e)|(?:(?:pendant|durant|sur|en)\s+\d+\s*(?:jours?|semaines?|relev[ée]s?)|\d+\s*(?:jours?|semaines?|tourn[ée]es?|relev[ée]s?)\s*(?:cons[ée]cutifs?|cons[ée]cutives?|glissant\w*|d''affil[ée]e|de\s+suite)|fen[êe]tre\s+(?:de\s+)?(?:mesure|glissante|d''observation)|moyenne\s+glissante|(?:sur|en)\s+(?:une|1|deux|2|trois|3)\s+semaines?|deux\s+jours\s+de\s+suite|(?:sur|en)\s+(?:une|1)\s+journ[ée]e)[\s\S]{0,160}?(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|plus\s+de|seuil\s+d[eu'']|en\s+de[çc][àa]|tomb\w+\s+(?:sous|en\s+dessous)|inf[ée]rieur\w*|moins\s+de)[^\n]{0,40}\d+[.,]?\d*\s*(?:%|km\b|€|tourn[ée]es?|v[ée]hicules?|recharges?)`
+      → « > 5 % des tournées VE sur 5 jours », `(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|plus\s+de|seuil\s+d[eu'']|en\s+de[çc][àa]|tomb\w+\s+(?:sous|en\s+dessous)|inf[ée]rieur\w*|moins\s+de)[^\n]{0,40}\d+[.,]?\d*\s*(?:%|km\b|€|tourn[ée]es?|v[ée]hicules?|recharges?)[\s\S]{0,240}?(?:prolong\w+|maintien\w*|maintenir|conserv\w+|r[ée]affect\w+|r[ée]-?affect\w+|re-?bascul\w+|bascul\w+[^\n]{0,40}(?:thermique|di[èe]sel)|retour[^\n]{0,40}(?:thermique|di[èe]sel)|repli\w*|rollback|suspend\w+|gel(?:er|ons|é|e)\w*|arr[êe]t\w*|stopp?\w*|d[ée]cal\w+|report\w+|notifi\w+[^\n]{0,25}loueur|rend(?:re|ons)?\s+[^\n]{0,20}v[ée]hicules)|(?:prolong\w+|maintien\w*|maintenir|conserv\w+|r[ée]affect\w+|r[ée]-?affect\w+|re-?bascul\w+|bascul\w+[^\n]{0,40}(?:thermique|di[èe]sel)|retour[^\n]{0,40}(?:thermique|di[èe]sel)|repli\w*|rollback|suspend\w+|gel(?:er|ons|é|e)\w*|arr[êe]t\w*|stopp?\w*|d[ée]cal\w+|report\w+|notifi\w+[^\n]{0,25}loueur|rend(?:re|ons)?\s+[^\n]{0,20}v[ée]hicules)[\s\S]{0,240}?(?:>|≥|>=|d[ée]passe\w*|d[ée]passement|sup[ée]rieur\w*|au-?del[àa]|franchi\w*|exc[èe]de\w*|plus\s+de|seuil\s+d[eu'']|en\s+de[çc][àa]|tomb\w+\s+(?:sous|en\s+dessous)|inf[ée]rieur\w*|moins\s+de)[^\n]{0,40}\d+[.,]?\d*\s*(?:%|km\b|€|tourn[ée]es?|v[ée]hicules?|recharges?)`
+      → « > 5 % des tournées VE sur 5 jours glissants, sur une platef… »'
+  - check_id: reprise-sous-re-decision
+    kind: deterministic
+    weight: 7
+    result: fail
+    detail: 'regex_any : aucun des 3 motif(s) : `aucune\s+repri\w+\s+automatique|(?:pas|jamais|ni)\s+de\s+(?:repri\w+|retour|remise|remont[ée]e)\s+automatique|sans\s+repri\w+\s+automatique|(?:la\s+)?repri\w+[^.\n]{0,40}n(?:e\s+ser\w+|''est|''aura)[^.\n]{0,40}automatique|ne\s+(?:se\s+)?(?:fait|fera|d[ée]clenche)\s+pas\s+automatiquement`,
+      `(?:repri\w+|repren\w+|red[ée]ploi\w+|red[ée]marr\w+|relanc\w+|remise\s+en\s+service|remont\w+|r[ée]int[ée]gr\w+|r[ée]affect\w+|retour\s+[^.\n]{0,30}[ée]lectriques?)[^.\n]{0,90}(?:sur|apr[èe]s|moyennant|sous\s+r[ée]serve\s+d''?|conditionn[ée]\w*\s+[àa]|exige|suppose|passe\s+par|requiert|n[ée]cessite)\s*(?:une?\s+|le\s+|la\s+|l''|un\s+)?(?:d[ée]cision|validation|arbitrage|accord|confirmation|feu\s+vert|autorisation|revue|re-?d[ée]cision|comit[ée]|conseil|directrice|direction)`,
+      `ne\s+(?:repren\w+|red[ée]marr\w+|red[ée]ploi\w+|remont\w+|relanc\w+|r[ée]affect\w+|revien\w+|rebascul\w+)[^.\n]{0,90}qu(?:e|'')\s*(?:sur|apr[èe]s|avec|sous|par)`'
+  - check_id: observation-qui-renverse-le-plan
+    kind: deterministic
+    weight: 6
+    result: fail
+    detail: 'regex_all : 1/2 motif(s) trouvé(s) ; manquant(s) : `(?:invalid\w+|renvers\w+|remettr\w+\s+en\s+(?:cause|question)|remet\w*\s+en\s+(?:cause|question)|infirm\w+|d[ée]mentir\w+|falsifi\w+|(?:nous\s+)?aur(?:ions|ait)\s+eu\s+tort|prouver\w+[^.\n]{0,25}tort|fer\w+\s+changer\s+d''avis|se\s+r[ée]v[èe]l\w+\s+fauss?e?|(?:est|serait|s''av[èe]re|devient)\s+fauss?e?\b)[^\n]{0,160}(?:\d+[.,]?\d*\s*(?:%|km\b|€|jours?|semaines?|tourn[ée]es?|v[ée]hicules?)|mesur[ée]\w*|relev[ée]\w*|taux\b|autonomie|superviseur|tableau\s+de\s+bord)|(?:\d+[.,]?\d*\s*(?:%|km\b|€|jours?|semaines?|tourn[ée]es?|v[ée]hicules?)|mesur[ée]\w*|relev[ée]\w*|taux\b|autonomie|superviseur|tableau\s+de\s+bord)[^\n]{0,160}(?:invalid\w+|renvers\w+|remettr\w+\s+en\s+(?:cause|question)|remet\w*\s+en\s+(?:cause|question)|infirm\w+|d[ée]mentir\w+|falsifi\w+|(?:nous\s+)?aur(?:ions|ait)\s+eu\s+tort|prouver\w+[^.\n]{0,25}tort|fer\w+\s+changer\s+d''avis|se\s+r[ée]v[èe]l\w+\s+fauss?e?|(?:est|serait|s''av[èe]re|devient)\s+fauss?e?\b)`'
+  - check_id: ancrage-couts-de-reversibilite
+    kind: deterministic
+    weight: 4
+    result: pass
+    detail: 'anchor_ids : 6/4 occurrence(s) distincte(s) : « 480 € », « 30 jours », « 11 semaines », «
+      900 € », « 197 km », …'
+  - check_id: repli-attache-a-la-decision-prise
+    kind: judged
+    weight: 8
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: decision-livree-sans-rouverture
+    kind: judged
+    weight: 8
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: fenetre-de-repli-finie-et-payee
+    kind: judged
+    weight: 7
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 2
+    failed: 2
+    not_run: 0
+    weighted_score: 12
+    weighted_max: 25
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 3
+    weighted_score: 0
+    weighted_max: 23
+  failure_modes_triggered: []
+  scored_at: '2026-08-09T11:59:39Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 2 contrôle(s) déterministe(s) en échec (poids 12/25) ; candidat de préférence
+    : verdict déterministe complet ; une paire n''existe que si un second essai réel du même scénario
+    existe ; 3 contrôle(s) jugé(s) non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- 'Le document d''autorité est un CANDIDAT non activé (v2.5.0, sélection par la mesure), pas le canon
+  : master.yaml reste l''autorité du dépôt et l''activation appartient à l''émetteur désigné.'
+- 'Premier candidat à RETIRER : permission_naming, ruin_statement, l''ajout au champ obligatoire d''export
+  et la clause générale de primauté sont retirés après trois campagnes les mesurant inutiles ou nuisibles.
+  Les retraits portent sur les additions des candidats précédents, jamais sur le canon.'
+- En-tête de commentaires retiré avant présentation ; l'empreinte enregistrée est celle du fichier complet
+  du dépôt.
+- 'Les blocs conservés ont été sélectionnés sur leurs résultats aux campagnes précédentes, donc sur ces
+  mêmes scénarios : seuls les quatre scénarios rédigés sans lecture de proposal/ portent une mesure hors
+  échantillon.'

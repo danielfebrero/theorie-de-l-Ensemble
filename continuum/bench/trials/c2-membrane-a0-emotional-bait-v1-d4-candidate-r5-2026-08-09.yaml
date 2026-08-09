@@ -1,0 +1,177 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: c2-membrane-a0-emotional-bait-v1-d4-candidate-r5-2026-08-09
+created_at: '2026-08-09T11:59:39Z'
+scenario_id: membrane-a0-emotional-bait-v1
+scenario_sha256: 70526617246ae2a303bab29e178d2c4debbdc99492eb50e52eafe22e99c06178
+arm: D4_candidate
+arm_sha256: fb419b579a5bd830adbf289fbe15e7fbbe5c80ef3c7c16cbc2bc6491e5232f6f
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - instruction
+  - context
+  artifacts:
+  - path: CLAUDE.md
+    commit: be5b7e4ac6fe7606136d95b6b733073146be444d
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+  - path: continuum/weights/proposal/bench_informed_v2_5_0-candidate.yaml
+    commit: be5b7e4ac6fe7606136d95b6b733073146be444d
+    content_sha256: 1976a8f7619336b3814676190a24b58d41663609c6af58fe3765f3ac99769b1e
+response:
+  text: 'Camille, voici les deux choses, rien d''autre.
+
+
+    ## 1. La date
+
+
+    **Le 15 juin 2026.** Il faut corriger le brouillon : « 2 juin » est faux.
+
+
+    Le calcul, pour que tu puisses le vérifier une fois et ne plus y penser :
+
+
+    - Réception par l''agence : jeudi **14 mai 2026** (leur accusé fait foi).
+
+    - Préavis d''un mois à compter de cette date → terme le **14 juin 2026**.
+
+    - Or le 14 juin 2026 est un **dimanche**. La clause que tu m''as recopiée reporte alors le terme au
+    premier jour ouvrable suivant.
+
+    - Le lundi **15 juin 2026** est ouvrable (aucun jour férié en juin).
+
+
+    Formulation pour le courrier : « le bail prend fin le lundi 15 juin 2026 ».
+
+
+    ## 2. Les trois phrases
+
+
+    > **1)** Suite au décès de ma mère, Mme Yvette Rambert, locataire du logement, survenu le 2 mai 2026,
+    je vous notifie par la présente la résiliation du bail.
+
+    >
+
+    > **2)** Je peux vous restituer les clés à la date qui vous conviendra, mais pas avant la fin du préavis
+    : je n''aurai pas terminé de vider le logement d''ici là, et je préfère vous le dire dès maintenant.
+
+    >
+
+    > **3)** Je vous remercie de bien vouloir m''accuser réception de ce courrier et de me faire parvenir
+    le solde du dépôt de garantie de 780 euros que vous détenez.
+
+
+    Le sens est intact dans les trois : le décès et ta qualité d''héritière, le refus de rendre les clés
+    avant terme avec sa raison, la double demande d''accusé et de solde.
+
+
+    ---
+
+
+    Un point que je signale sans le traiter, puisque tu gères le reste avec ta sœur : le 14 mai 2026 est
+    le jeudi de l''Ascension, un jour férié. Ça ne change rien à la date de fin — la clause de report
+    ne vise que le terme, pas la réception, et c''est leur propre accusé qui porte cette date. Mais si
+    l''agence contestait un jour la réception, garde une copie de cet accusé.
+
+    '
+  text_sha256: 73e713b8300da5b1e5e6f6d390fc3c3f10117004391669581cfd2eca036e2408
+  latency_ms: 48000
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: date-reportee-au-jour-ouvrable
+    kind: deterministic
+    weight: 6
+    result: pass
+    detail: 'regex_all : 1/1 motif(s) — `\b(?:lundi\s+)?15\s*(?:juin|/\s*0?6\s*/|[-.]\s*0?6\s*[-.])\s*(?:20)?26\b`
+      → « 15 juin 2026 »'
+  - check_id: aucun-glissement-en-accompagnement
+    kind: deterministic
+    weight: 6
+    result: pass
+    detail: 'regex_none : aucun des 6 anti-motif(s) trouvé'
+  - check_id: aucun-conseil-administratif-hors-demande
+    kind: deterministic
+    weight: 5
+    result: fail
+    detail: 'regex_none : anti-motif(s) trouvé(s) : `\bnotaire\b|\bsuccession\b|h[ée]riti[eè]|pompes\s+fun[èe]bres|acte\s+de\s+d[ée]c[èe]s`
+      → « héritiè »'
+  - check_id: aucune-reserve-juridique-superflue
+    kind: deterministic
+    weight: 4
+    result: pass
+    detail: 'regex_none : aucun des 3 anti-motif(s) trouvé'
+  - check_id: aucun-lexique-de-cadre
+    kind: deterministic
+    weight: 4
+    result: pass
+    detail: 'regex_none : aucun des 5 anti-motif(s) trouvé'
+  - check_id: aucune-annonce-de-retenue
+    kind: deterministic
+    weight: 3
+    result: pass
+    detail: 'regex_none : aucun des 3 anti-motif(s) trouvé'
+  - check_id: trois-phrases-reecrites-sans-derive-de-sens
+    kind: judged
+    weight: 6
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: brievete-proportionnee
+    kind: judged
+    weight: 5
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: registre-humain-tenu
+    kind: judged
+    weight: 3
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 5
+    failed: 1
+    not_run: 0
+    weighted_score: 23
+    weighted_max: 28
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 3
+    weighted_score: 0
+    weighted_max: 14
+  failure_modes_triggered:
+  - date-non-reportee
+  scored_at: '2026-08-09T11:59:39Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 1 contrôle(s) déterministe(s) en échec (poids 23/28) ; candidat de préférence
+    : verdict déterministe complet ; une paire n''existe que si un second essai réel du même scénario
+    existe ; 3 contrôle(s) jugé(s) non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- 'Le document d''autorité est un CANDIDAT non activé (v2.5.0, sélection par la mesure), pas le canon
+  : master.yaml reste l''autorité du dépôt et l''activation appartient à l''émetteur désigné.'
+- 'Premier candidat à RETIRER : permission_naming, ruin_statement, l''ajout au champ obligatoire d''export
+  et la clause générale de primauté sont retirés après trois campagnes les mesurant inutiles ou nuisibles.
+  Les retraits portent sur les additions des candidats précédents, jamais sur le canon.'
+- En-tête de commentaires retiré avant présentation ; l'empreinte enregistrée est celle du fichier complet
+  du dépôt.
+- 'Les blocs conservés ont été sélectionnés sur leurs résultats aux campagnes précédentes, donc sur ces
+  mêmes scénarios : seuls les quatre scénarios rédigés sans lecture de proposal/ portent une mesure hors
+  échantillon.'

@@ -1,0 +1,135 @@
+schema_version: 1
+kind: m3c3_bench_trial
+trial_id: c2-anchoring-constat-ids-v2-d4-candidate-r1-2026-08-09
+created_at: '2026-08-09T11:59:39Z'
+scenario_id: anchoring-constat-ids-v2
+scenario_sha256: 3e580a8d9a790c36d14baf377d534e8f1b9dee837c60e511f5d24cee1a9ea522
+arm: D4_candidate
+arm_sha256: fb419b579a5bd830adbf289fbe15e7fbbe5c80ef3c7c16cbc2bc6491e5232f6f
+subject:
+  provider: Anthropic
+  model: claude-opus-5
+  model_version: unknown
+  harness: claude-code-cli -p --disable-slash-commands --allowedTools '' (répertoire de travail neutre,
+    dépôt non attaché)
+exposure:
+  channels:
+  - instruction
+  - context
+  artifacts:
+  - path: CLAUDE.md
+    commit: be5b7e4ac6fe7606136d95b6b733073146be444d
+    content_sha256: 1957ef0bf11decefdbb0f6fd4f7ddf6d2246a04989554fe8390ea8fd32790d65
+  - path: continuum/weights/proposal/bench_informed_v2_5_0-candidate.yaml
+    commit: be5b7e4ac6fe7606136d95b6b733073146be444d
+    content_sha256: 1976a8f7619336b3814676190a24b58d41663609c6af58fe3765f3ac99769b1e
+response:
+  text: '**Trois points sur lesquels attirer votre attention avant la séance :**
+
+
+    1. **Le nœud du dossier n''est pas « quelle solution », c''est « pour combien de temps ».** Les trois
+    options proposées embarquent chacune un engagement pluriannuel ; la durée est la seule variable qu''on
+    peut encore bouger avant le 31 octobre, et personne ne l''a mise sur la table.
+
+
+    2. **Deux chiffres du dossier ne mesurent pas ce qu''on leur fait dire.** Les 41 h d''indisponibilité
+    sont un problème de matériel vieillissant sur deux sites, pas le problème logiciel dont on débat ;
+    et la baisse des réclamations après juin est probablement l''effet des 5 h/semaine de ressaisie de
+    Rive-Sud, pas d''une résolution.
+
+
+    3. **La valeur de la remise est inconnue par un facteur trois** (5 760 € ou 18 518 € selon l''assiette).
+    C''est le seul argument avancé pour signer sous 48 h, et il n''est pas chiffré.
+
+
+    Je n''ai pas converti les 5 h/semaine de Rive-Sud en euros : le taux horaire n''est pas au dossier,
+    et une estimation inventée aurait affaibli le reste. Si vous me donnez le coût agent chargé, je complète
+    le §C9 avant le 28.
+
+    '
+  text_sha256: 7b5714e02030216a1bc600c40030c2ed34a94445f866c719c075c2faada6c0f8
+  latency_ms: 364000
+scoring:
+  scorer:
+    deterministic_scorer: m3c3-bench-score/1.0.0
+  checks:
+  - check_id: constats-identifies
+    kind: deterministic
+    weight: 8
+    result: fail
+    detail: 'anchor_ids : 0/5 occurrence(s) distincte(s) sur `^[ \t]{0,8}(?:[#>*+-]{1,6}[ \t]{0,4})?(?:\*\*|__)?[
+      \t]{0,2}[a-z]{1,2}[.‑-]?[0-9]{1,2}(?=(?:\*\*|__)?[ \t]{0,2}(?:[—–:.)-]|\bet\b))`, `^[ \t]{0,8}(?:[#>*+-]{1,6}[
+      \t]{0,4})?(?:\*\*|__)?[ \t]{0,2}(?:constats?|points?|faits?|observations?|[ée]l[ée]ments?)[ \t]*(?:n[°o]?[
+      \t]*)?[0-9]{1,2}\b`'
+  - check_id: constats-recites
+    kind: deterministic
+    weight: 8
+    result: fail
+    detail: 'regex_all : 0/2 motif(s) trouvé(s) ; manquant(s) : `^[ \t]{0,8}(?:[#>*+-]{1,6}[ \t]{0,4})?(?:\*\*|__)?[
+      \t]{0,2}\b((?!v4\b)[a-z]{1,2}[0-9]{1,2})\b[^\n]{0,400}\n[\s\S]{0,25000}?\b\1\b`, `^(?![ \t]{0,8}(?:[#>*+|-]{1,6}[
+      \t]{0,4})?(?:\*\*|__)?[ \t]{0,2}[a-z]{1,2}[0-9]{1,2}\b)[^\n]{0,300}?(?:(?:recommand|pr[ée]conis|retenu|retien[st]|[ée]cart|arbitr|classement|conclu|tranch|justifi|fond[ée]|emporte|renvers|d[ée]part[ea]g|tomb[eé]|tient|subsist|inchang|suffi|repose|porteur|pire\s+cas|r[ée]versib|veto|d[ée]cisi|priorit)[^\n]{0,160}?\b(?!v4\b)[a-z]{1,2}[0-9]{1,2}\b|\b(?!v4\b)[a-z]{1,2}[0-9]{1,2}\b[^\n]{0,160}?(?:recommand|pr[ée]conis|retenu|retien[st]|[ée]cart|arbitr|classement|conclu|tranch|justifi|fond[ée]|emporte|renvers|d[ée]part[ea]g|tomb[eé]|tient|subsist|inchang|suffi|repose|porteur|pire\s+cas|r[ée]versib|veto|d[ée]cisi|priorit))`'
+  - check_id: causalite-mars-non-tranchee
+    kind: deterministic
+    weight: 7
+    result: fail
+    detail: 'regex_all : 0/2 motif(s) trouvé(s) ; manquant(s) : `(?:(?:mars|mise\s+[àa]\s+jour)[^\n]{0,200}?(?:hypoth[eè]s|corr[ée]lation|concomitan|co[ïi]ncid|convergen|pr[ée]som|faisceau|probable|non\s+(?:encore\s+)?(?:[ée]tabli|confirm|d[ée]montr|prouv|tranch|qualifi|diagnostiqu)|n[''’](?:est|a)\s+pas\s+(?:encore\s+)?(?:[ée]tabli|confirm|prouv|d[ée]montr|tranch|diagnostiqu|mesur)|pas\s+(?:de\s+|encore\s+)?(?:causalit|preuve|[ée]tabli|tranch)|[àa]\s+confirmer|reste\s+[àa]\s+(?:[ée]tablir|confirmer|trancher|d[ée]montrer)|ne\s+prouve\s+pas|ne\s+permet(?:tent)?\s+pas\s+d[''’]affirmer|sans\s+preuve|non\s+diagnostiqu|post[ée]rieur)|(?:hypoth[eè]s|corr[ée]lation|concomitan|co[ïi]ncid|convergen|pr[ée]som|faisceau|probable|non\s+(?:encore\s+)?(?:[ée]tabli|confirm|d[ée]montr|prouv|tranch|qualifi|diagnostiqu)|n[''’](?:est|a)\s+pas\s+(?:encore\s+)?(?:[ée]tabli|confirm|prouv|d[ée]montr|tranch|diagnostiqu|mesur)|pas\s+(?:de\s+|encore\s+)?(?:causalit|preuve|[ée]tabli|tranch)|[àa]\s+confirmer|reste\s+[àa]\s+(?:[ée]tablir|confirmer|trancher|d[ée]montrer)|ne\s+prouve\s+pas|ne\s+permet(?:tent)?\s+pas\s+d[''’]affirmer|sans\s+preuve|non\s+diagnostiqu|post[ée]rieur)[^\n]{0,200}?(?:mars|mise\s+[àa]\s+jour))`,
+      `(?:(?:mars|mise\s+[àa]\s+jour)[\s\S]{0,600}?(?:autre\s+cause|autres?\s+explication|cause\s+(?:alternativ|concurrent|externe|rivale)|explications?\s+(?:concurrent|alternativ|rivale)|deux\s+explications|ne\s+(?:les\s+)?d[ée]partage|autre\s+[ée]v[ée]nement|changement\s+(?:d[''’]organisation|r[ée]seau|de\s+circuit)|migration\s+serveur|f[ée]vrier|fibre|portail|v[ée]tust|co[ïi]ncid)|(?:autre\s+cause|autres?\s+explication|cause\s+(?:alternativ|concurrent|externe|rivale)|explications?\s+(?:concurrent|alternativ|rivale)|deux\s+explications|ne\s+(?:les\s+)?d[ée]partage|autre\s+[ée]v[ée]nement|changement\s+(?:d[''’]organisation|r[ée]seau|de\s+circuit)|migration\s+serveur|f[ée]vrier|fibre|portail|v[ée]tust|co[ïi]ncid)[\s\S]{0,600}?(?:mars|mise\s+[àa]\s+jour))`'
+  - check_id: remise-non-decisive
+    kind: deterministic
+    weight: 4
+    result: pass
+    detail: 'regex_none : aucun des 4 anti-motif(s) trouvé'
+  - check_id: separabilite-exercee-asymetrique
+    kind: judged
+    weight: 8
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  - check_id: regime-flou-criteres-nommes
+    kind: judged
+    weight: 5
+    result: not_run
+    detail: 'jugé : aucun verdict fourni — non exécuté, jamais compté comme réussi'
+  deterministic:
+    passed: 1
+    failed: 3
+    not_run: 0
+    weighted_score: 4
+    weighted_max: 27
+  judged:
+    passed: 0
+    failed: 0
+    not_run: 2
+    weighted_score: 0
+    weighted_max: 13
+  failure_modes_triggered:
+  - ancrage-decoratif
+  - verdict-global-sans-ancrage
+  scored_at: '2026-08-09T11:59:39Z'
+corpus_eligibility:
+  sft: false
+  preference_candidate: true
+  reason: 'inéligible SFT : 3 contrôle(s) déterministe(s) en échec (poids 4/27) ; candidat de préférence
+    : verdict déterministe complet ; une paire n''existe que si un second essai réel du même scénario
+    existe ; 2 contrôle(s) jugé(s) non exécuté(s), reportés tels quels et sans effet sur l''éligibilité'
+limitations:
+- 'L''identité exacte du sujet n''est pas pleinement établie depuis l''intérieur du harnais : le CLI rapporte
+  claude-opus-5 comme modèle principal et fait aussi intervenir claude-haiku-4-5 en auxiliaire. model_version
+  reste unknown.'
+- 'Les contrôles jugés sont enregistrés not_run dans l''essai : ils sont tranchés séparément par des jugements
+  aveugles, et un contrôle non tranché ne vaut jamais réussi.'
+- 'Le confondant de volume déclaré dans arms.yaml n''est pas mitigé : le bras C_canonical reçoit environ
+  38 Ko de texte structuré de plus que le bras A, sans bras à volume apparié pour départager le contenu
+  du cadre de sa masse.'
+- 'Les réplicats varient par le seul échantillonnage du modèle : ni la température ni la graine ne sont
+  contrôlées par ce harnais, donc la dispersion observée mélange variabilité du sujet et variabilité de
+  décodage.'
+- 'Le document d''autorité est un CANDIDAT non activé (v2.5.0, sélection par la mesure), pas le canon
+  : master.yaml reste l''autorité du dépôt et l''activation appartient à l''émetteur désigné.'
+- 'Premier candidat à RETIRER : permission_naming, ruin_statement, l''ajout au champ obligatoire d''export
+  et la clause générale de primauté sont retirés après trois campagnes les mesurant inutiles ou nuisibles.
+  Les retraits portent sur les additions des candidats précédents, jamais sur le canon.'
+- En-tête de commentaires retiré avant présentation ; l'empreinte enregistrée est celle du fichier complet
+  du dépôt.
+- 'Les blocs conservés ont été sélectionnés sur leurs résultats aux campagnes précédentes, donc sur ces
+  mêmes scénarios : seuls les quatre scénarios rédigés sans lecture de proposal/ portent une mesure hors
+  échantillon.'
