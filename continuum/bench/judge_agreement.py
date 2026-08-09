@@ -18,6 +18,7 @@ introduit pas.
 from __future__ import annotations
 
 import argparse
+import json
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
@@ -32,6 +33,9 @@ import judge  # noqa: E402
 import validate as v  # noqa: E402
 
 REPORT_PATH = BENCH_ROOT / "results" / "judge-agreement.yaml"
+# Progression hors dépôt : la mesure se rejoue par passes idempotentes, et un
+# couple déjà tranché par le second juge n'est jamais rappelé.
+PROGRESS_PATH = Path("/tmp/agreement-rows.jsonl")
 SAMPLE_MARKERS = ("-r1-", "-r3-")
 DEFAULT_SECOND_JUDGE = "claude-haiku-4-5"
 
@@ -71,7 +75,16 @@ def main(argv: list[str] | None = None) -> int:
     by_id = {scenario["scenario_id"]: scenario for scenario in scenarios}
     primary = v.judgement_index(judgements)
 
+    done: dict[tuple[str, str], dict] = {}
+    if PROGRESS_PATH.exists():
+        for line in PROGRESS_PATH.read_text(encoding="utf-8").splitlines():
+            if not line.strip():
+                continue
+            row = json.loads(line)
+            done[(row["trial_id"], row["check_id"])] = row
+
     work = []
+    total = 0
     for trial in sorted(trials, key=lambda item: item["trial_id"]):
         if not any(marker in trial["trial_id"] for marker in SAMPLE_MARKERS):
             continue
@@ -82,9 +95,15 @@ def main(argv: list[str] | None = None) -> int:
             first = primary.get((trial["trial_id"], check["check_id"]))
             if first is None or first["verdict"] not in ("pass", "fail"):
                 continue
+            total += 1
+            if (trial["trial_id"], check["check_id"]) in done:
+                continue
             work.append((trial, scenario, check, first["verdict"]))
 
-    print(f"{len(work)} contrôle(s) échantillonné(s) · second juge {args.second_judge_model} · aveugle")
+    print(
+        f"échantillon : {total} · déjà tranchés : {len(done)} · restants : {len(work)} · "
+        f"second juge {args.second_judge_model} · aveugle"
+    )
 
     workdir = Path("/tmp/judge-agreement-work")
     workdir.mkdir(parents=True, exist_ok=True)
@@ -95,24 +114,25 @@ def main(argv: list[str] | None = None) -> int:
         verdict, _ = judge.call_judge(prompt, args.second_judge_model, workdir)
         return trial, check, first_verdict, verdict
 
-    results = list(ThreadPoolExecutor(max_workers=args.workers).map(rejudge, work))
+    if work:
+        with PROGRESS_PATH.open("a", encoding="utf-8") as progress:
+            with ThreadPoolExecutor(max_workers=args.workers) as pool:
+                for trial, check, first_verdict, second_verdict in pool.map(rejudge, work):
+                    row = {
+                        "trial_id": trial["trial_id"],
+                        "check_id": check["check_id"],
+                        "primary": first_verdict,
+                        "second": second_verdict,
+                    }
+                    progress.write(json.dumps(row, ensure_ascii=False) + "\n")
+                    progress.flush()
+                    done[(row["trial_id"], row["check_id"])] = row
 
-    rows = []
-    pairs = []
-    unruled = 0
-    for trial, check, first_verdict, second_verdict in results:
-        rows.append(
-            {
-                "trial_id": trial["trial_id"],
-                "check_id": check["check_id"],
-                "primary": first_verdict,
-                "second": second_verdict,
-            }
-        )
-        if second_verdict in ("pass", "fail"):
-            pairs.append((first_verdict, second_verdict))
-        else:
-            unruled += 1
+    rows = sorted(done.values(), key=lambda r: (r["trial_id"], r["check_id"]))
+    pairs = [(r["primary"], r["second"]) for r in rows if r["second"] in ("pass", "fail")]
+    unruled = sum(1 for r in rows if r["second"] not in ("pass", "fail"))
+    if len(rows) < total:
+        print(f"passe incomplète : {len(rows)}/{total} — relancer pour poursuivre")
 
     agreement = round(sum(1 for a, b in pairs if a == b) / len(pairs), 4) if pairs else None
     report = {
@@ -125,7 +145,7 @@ def main(argv: list[str] | None = None) -> int:
             "déterministe : tous les contrôles jugés des essais de réplicat r1 et r3 "
             "dont le juge principal a rendu un verdict pass/fail"
         ),
-        "sampled": len(rows),
+        "sampled": total,
         "ruled_by_both": len(pairs),
         "second_judge_unruled": unruled,
         "percent_agreement": agreement,
