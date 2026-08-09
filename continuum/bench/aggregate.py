@@ -42,6 +42,7 @@ ARMS_ORDER = (
     "D_candidate",
     "D2_candidate",
     "D3_candidate",
+    "D4_candidate",
     "E_volume_matched",
 )
 COMPARISONS = (
@@ -54,6 +55,9 @@ COMPARISONS = (
     # D3 corrige la PORTÉE des gardes (v2.4) ; E apparie le volume de C sans
     # matière M3C3 au-delà de l'adaptateur : C_vs_E est l'effet de contenu du
     # canon à volume apparié, E_vs_B l'effet de la seule masse de contexte.
+    # D4 est le candidat sélectionné par la mesure, premier à retirer des blocs.
+    ("D4_vs_C", "D4_candidate", "C_canonical"),
+    ("D4_vs_D3", "D4_candidate", "D3_candidate"),
     ("D3_vs_C", "D3_candidate", "C_canonical"),
     ("D3_vs_D2", "D3_candidate", "D2_candidate"),
     ("C_vs_E", "C_canonical", "E_volume_matched"),

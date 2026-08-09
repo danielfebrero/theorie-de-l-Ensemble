@@ -45,6 +45,10 @@ EXPOSURE = {
         "channels": ["instruction", "context"],
         "paths": ["CLAUDE.md", "continuum/weights/proposal/bench_informed_v2_3_0-candidate.yaml"],
     },
+    "D4_candidate": {
+        "channels": ["instruction", "context"],
+        "paths": ["CLAUDE.md", "continuum/weights/proposal/bench_informed_v2_5_0-candidate.yaml"],
+    },
     "D3_candidate": {
         "channels": ["instruction", "context"],
         "paths": ["CLAUDE.md", "continuum/weights/proposal/bench_informed_v2_4_0-candidate.yaml"],
@@ -55,7 +59,7 @@ EXPOSURE = {
     },
 }
 
-CELL_RE = re.compile(r"^(?P<scenario>.+)\.(?P<arm>A_placebo|B_adapter|C_canonical|D_candidate|D2_candidate|D3_candidate|E_volume_matched)\.r(?P<rep>\d+)$")
+CELL_RE = re.compile(r"^(?P<scenario>.+)\.(?P<arm>A_placebo|B_adapter|C_canonical|D_candidate|D2_candidate|D3_candidate|D4_candidate|E_volume_matched)\.r(?P<rep>\d+)$")
 
 COMMON_LIMITATIONS = [
     "L'identité exacte du sujet n'est pas pleinement établie depuis l'intérieur du "
@@ -84,6 +88,20 @@ ARM_LIMITATIONS = {
     "C_canonical": [
         "master.yaml est injecté en tête de l'invite utilisateur, donc par canal de "
         "contexte, l'adaptateur restant sur le canal d'instruction."
+    ],
+    "D4_candidate": [
+        "Le document d'autorité est un CANDIDAT non activé (v2.5.0, sélection par "
+        "la mesure), pas le canon : master.yaml reste l'autorité du dépôt et "
+        "l'activation appartient à l'émetteur désigné.",
+        "Premier candidat à RETIRER : permission_naming, ruin_statement, l'ajout au "
+        "champ obligatoire d'export et la clause générale de primauté sont retirés "
+        "après trois campagnes les mesurant inutiles ou nuisibles. Les retraits "
+        "portent sur les additions des candidats précédents, jamais sur le canon.",
+        "En-tête de commentaires retiré avant présentation ; l'empreinte enregistrée "
+        "est celle du fichier complet du dépôt.",
+        "Les blocs conservés ont été sélectionnés sur leurs résultats aux campagnes "
+        "précédentes, donc sur ces mêmes scénarios : seuls les quatre scénarios "
+        "rédigés sans lecture de proposal/ portent une mesure hors échantillon.",
     ],
     "D3_candidate": [
         "Le document d'autorité est un CANDIDAT non activé (v2.4.0, itération "
