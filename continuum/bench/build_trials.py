@@ -45,6 +45,10 @@ EXPOSURE = {
         "channels": ["instruction", "context"],
         "paths": ["CLAUDE.md", "continuum/weights/proposal/bench_informed_v2_3_0-candidate.yaml"],
     },
+    "D5_candidate": {
+        "channels": ["instruction", "context"],
+        "paths": ["CLAUDE.md", "continuum/weights/proposal/bench_informed_v2_6_0-candidate.yaml"],
+    },
     "D4_candidate": {
         "channels": ["instruction", "context"],
         "paths": ["CLAUDE.md", "continuum/weights/proposal/bench_informed_v2_5_0-candidate.yaml"],
@@ -59,7 +63,7 @@ EXPOSURE = {
     },
 }
 
-CELL_RE = re.compile(r"^(?P<scenario>.+)\.(?P<arm>A_placebo|B_adapter|C_canonical|D_candidate|D2_candidate|D3_candidate|D4_candidate|E_volume_matched)\.r(?P<rep>\d+)$")
+CELL_RE = re.compile(r"^(?P<scenario>.+)\.(?P<arm>A_placebo|B_adapter|C_canonical|D_candidate|D2_candidate|D3_candidate|D4_candidate|D5_candidate|E_volume_matched)\.r(?P<rep>\d+)$")
 
 COMMON_LIMITATIONS = [
     "L'identité exacte du sujet n'est pas pleinement établie depuis l'intérieur du "
@@ -88,6 +92,18 @@ ARM_LIMITATIONS = {
     "C_canonical": [
         "master.yaml est injecté en tête de l'invite utilisateur, donc par canal de "
         "contexte, l'adaptateur restant sur le canal d'instruction."
+    ],
+    "D5_candidate": [
+        "Le document d'autorité est un CANDIDAT non activé (v2.6.0, bloc unique), "
+        "pas le canon : master.yaml reste l'autorité et l'activation appartient à "
+        "l'émetteur désigné.",
+        "Premier candidat produit par insertion TEXTUELLE : le canon est repris "
+        "octet pour octet, commentaires compris. Les candidats v2.2 à v2.5 "
+        "passaient par un round-trip YAML qui détruisait 3 406 o de commentaires "
+        "du canon (8,9 %) — ils mesuraient « canon amputé + additions ». Les écarts "
+        "D à D4 portent donc ce confondant, pas celui-ci.",
+        "En-tête de commentaires retiré avant présentation ; l'empreinte "
+        "enregistrée est celle du fichier complet du dépôt.",
     ],
     "D4_candidate": [
         "Le document d'autorité est un CANDIDAT non activé (v2.5.0, sélection par "

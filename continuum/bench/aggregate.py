@@ -43,6 +43,7 @@ ARMS_ORDER = (
     "D2_candidate",
     "D3_candidate",
     "D4_candidate",
+    "D5_candidate",
     "E_volume_matched",
 )
 COMPARISONS = (
@@ -56,6 +57,10 @@ COMPARISONS = (
     # matière M3C3 au-delà de l'adaptateur : C_vs_E est l'effet de contenu du
     # canon à volume apparié, E_vs_B l'effet de la seule masse de contexte.
     # D4 est le candidat sélectionné par la mesure, premier à retirer des blocs.
+    # D5 : bloc unique, et premier candidat sans le confondant de perte des
+    # commentaires du canon (insertion textuelle au lieu du round-trip YAML).
+    ("D5_vs_C", "D5_candidate", "C_canonical"),
+    ("D5_vs_A", "D5_candidate", "A_placebo"),
     ("D4_vs_C", "D4_candidate", "C_canonical"),
     ("D4_vs_D3", "D4_candidate", "D3_candidate"),
     ("D3_vs_C", "D3_candidate", "C_canonical"),

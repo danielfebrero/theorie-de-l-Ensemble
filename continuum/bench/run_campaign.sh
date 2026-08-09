@@ -49,6 +49,17 @@ run_cell() {
           --model "$MODEL" --disable-slash-commands --allowedTools "" \
           --append-system-prompt "$(cat "$REPO/CLAUDE.md")" ) > "$target" 2>&1
       ;;
+    D5_candidate)
+      ( cd "$neutral" && claude -p "Document de référence master.yaml (autorité opérationnelle) :
+
+$(sed '/^# /d' "$REPO/continuum/weights/proposal/bench_informed_v2_6_0-candidate.yaml")
+
+---
+
+$(cat "$prompt_file")" \
+          --model "$MODEL" --disable-slash-commands --allowedTools "" \
+          --append-system-prompt "$(cat "$REPO/CLAUDE.md")" ) > "$target" 2>&1
+      ;;
     D4_candidate)
       ( cd "$neutral" && claude -p "Document de référence master.yaml (autorité opérationnelle) :
 
@@ -156,7 +167,7 @@ print(f"{len(scenarios)} énoncé(s) extraits")
 PY
 
 mapfile -t SCENARIOS < <(ls "$OUT/prompts" | sed 's/\.txt$//' | sort)
-ARMS=(A_placebo B_adapter C_canonical D_candidate D2_candidate D3_candidate D4_candidate E_volume_matched)
+ARMS=(A_placebo B_adapter C_canonical D_candidate D2_candidate D3_candidate D4_candidate D5_candidate E_volume_matched)
 
 total=$(( ${#SCENARIOS[@]} * ${#ARMS[@]} * REPLICATES ))
 echo "cellules : $total  ·  workers : $WORKERS  ·  modèle : $MODEL"
