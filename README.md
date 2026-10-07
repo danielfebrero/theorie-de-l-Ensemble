@@ -6,6 +6,25 @@
 **Rôles :** auteur de la théorie · créateur du Life game · créateur du bit originel  
 → détail : [`docs/authorship.md`](docs/authorship.md)
 
+## En 2 minutes (si vous arrivez de X)
+
+**C'est quoi ?** Un protocole de décision pour humains et agents IA, écrit par Dani Bengal. Il sert à une seule chose : empêcher une décision de passer si elle n'a pas survécu à ses propres tests.
+
+**Trois idées à retenir :**
+
+1. **Pas de ruine.** Avant d'additionner les gains, on vérifie qu'aucune branche ne mène à une perte irréversible (`ruin_gate`). Un bon gain moyen ne rachète pas une ruine.
+2. **La sonde adverse.** Une décision n'est valable que si elle survit à une attaque honnête contre elle-même (`adversarial_probe`).
+3. **Le pouvoir se mérite.** Un agent a un budget de pouvoir (membrane A0 à A3). Les effets critiques (argent réel, `git push`, écriture irréversible) exigent un contrôle frais juste avant d'agir.
+
+**Par où commencer ?**
+
+- Lire la façon de penser : [`docs/mode-de-pensee.md`](docs/mode-de-pensee.md)
+- Voir la règle officielle (seule autorité) : [`master.yaml`](master.yaml)
+- L'essayer dans un projet, sans rien écraser : `python3 distribution/install.py install --profile openai --target /chemin/du/projet --dry-run`
+
+**Pour qui ?** Les équipes qui font tourner des agents avec de vrais accès (outils, navigateur, argent) et qui veulent qu'ils sachent dire non.
+
+
 ## v2.1.0 — Force Publique (**production**)
 
 Noyau formel v1 gelé + continuum v2 + **force publique** :
